@@ -1,0 +1,87 @@
+{
+  "id": "finiture",
+  "nome": "Imbianchini, serramentisti, falegnami, pavimentisti",
+  "imprese": 247954,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Imbianchino",
+    "Serramenti",
+    "Infissi",
+    "Falegnameria",
+    "Pavimentista",
+    "Cartongesso",
+    "Fabbro",
+    "Piastrellista"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "imbianchino bravo a {citta}, tinteggiatura di tre stanze, prezzo onesto",
+      "chi mette i serramenti a {citta}?",
+      "posatore di parquet in provincia di {provincia} con esperienza"
+    ],
+    "bisogno": [
+      "imbianchino a {citta} disponibile questa settimana",
+      "fabbro a {citta} per porta blindata, urgente, sono chiuso fuori casa",
+      "falegname a {citta} per un armadio a muro, preventivo"
+    ],
+    "specialita": [
+      "{categoria} a {citta} per {specialita}",
+      "chi fa {specialita} a {citta}?"
+    ],
+    "requisito": [
+      "serramentista a {citta} che gestisce la pratica {requisito}",
+      "{categoria} a {citta} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per infissi a {citta}?"
+    ],
+    "nome": [
+      "{nome} {citta} affidabile? recensioni"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "Sito ufficiale",
+    "Instapro",
+    "Habitissimo",
+    "ProntoPro",
+    "PagineGialle",
+    "Houzz"
+  ],
+  "metriche": [
+    "presenza per lavorazione",
+    "bonus e pratiche citati",
+    "tempi citati"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Instapro",
+      "quando": "Instapro è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

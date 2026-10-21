@@ -1,10 +1,11 @@
 import type { RigaDomanda } from "@/lib/types";
+import { spontanee } from "@/lib/stats";
 import { COLORE_POSIZIONE } from "./Heatmap";
 
-/** Conta le risposte per posizione (1º…5º) dalle celle del report. */
+/** Conta le risposte per posizione (1º…5º) dalle celle delle domande spontanee. */
 export function distribuzionePosizioni(righe: RigaDomanda[]): Record<1 | 2 | 3 | 4 | 5, number> {
   const d: Record<1 | 2 | 3 | 4 | 5, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-  for (const riga of righe) {
+  for (const riga of spontanee(righe)) {
     for (const c of riga.celle) {
       if (c.posizione === null) continue;
       d[c.posizione] += c.volte ?? Number(c.frequenza.split(" ")[0]);
@@ -50,7 +51,7 @@ export function Posizioni({ righe }: { righe: RigaDomanda[] }) {
           .filter((p) => d[p] > 0)
           .map((p) => `${p}º ${d[p]}`)
           .join(" · ")}{" "}
-        su {totale} risposte in cui compari.
+        su {totale} risposte in cui compari alle domande spontanee.
       </figcaption>
     </figure>
   );

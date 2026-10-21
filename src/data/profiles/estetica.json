@@ -1,0 +1,85 @@
+{
+  "id": "estetica",
+  "nome": "Centri estetici, nail e spa",
+  "imprese": 47466,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Centro estetico",
+    "Estetista",
+    "Nail salon",
+    "Spa",
+    "Centro benessere",
+    "Centro massaggi",
+    "Laser"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "estetista brava in {zona} a {citta}, prezzi onesti",
+      "centro estetico consigliato a {citta}",
+      "spa o centro benessere vicino a {citta} per una giornata in coppia"
+    ],
+    "bisogno": [
+      "dove fare le unghie a {citta}, semipermanente, oggi",
+      "estetista a {citta} aperta la sera dopo le 19",
+      "massaggio decontratturante serio a {citta}"
+    ],
+    "specialita": [
+      "centro estetico a {citta} per {specialita}",
+      "dove fare {specialita} a {citta}"
+    ],
+    "requisito": [
+      "centro estetico a {citta} che faccia {requisito}",
+      "centro estetico a {citta} con buoni regalo"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per {specialita} a {citta}?"
+    ],
+    "nome": [
+      "{nome} estetica {citta} com'è? recensioni"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "Treatwell",
+    "Instagram",
+    "Facebook",
+    "Sito ufficiale",
+    "PagineGialle"
+  ],
+  "metriche": [
+    "presenza per trattamento",
+    "prenotazione online citata",
+    "orari coerenti"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Treatwell",
+      "quando": "Treatwell è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

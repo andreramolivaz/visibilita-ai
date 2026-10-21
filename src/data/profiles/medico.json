@@ -1,0 +1,91 @@
+{
+  "id": "medico",
+  "nome": "Studi medici e specialisti",
+  "imprese": 147455,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Medico",
+    "Studio medico",
+    "Poliambulatorio",
+    "Dermatologo",
+    "Ortopedico",
+    "Ginecologo",
+    "Cardiologo",
+    "Pediatra",
+    "Oculista",
+    "Centro medico"
+  ],
+  "famiglia": "sanita",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "miglior {specialita} a {citta}",
+      "{specialita} a {citta} con buone recensioni dei pazienti",
+      "poliambulatorio in {zona} a {citta}"
+    ],
+    "bisogno": [
+      "{specialita} a {citta} che riceva presto, anche a pagamento, ho una visita urgente",
+      "dove faccio {specialita} a {citta} senza aspettare mesi?",
+      "quanto costa una visita da {specialita} privata a {citta} e da chi andare?",
+      "pediatra privato a {citta} che prenda nuovi pazienti"
+    ],
+    "specialita": [
+      "{specialita} a {citta} consigliato",
+      "centro medico a {citta} con {specialita}"
+    ],
+    "requisito": [
+      "{specialita} a {citta} che accetti {requisito}",
+      "medico a {citta} che parli inglese per {specialita}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per {specialita} a {citta}?"
+    ],
+    "nome": [
+      "{nome} {citta} com'è? recensioni dei pazienti"
+    ]
+  },
+  "fonti": [
+    "MioDottore",
+    "Dottori.it",
+    "Google Maps",
+    "Sito ufficiale",
+    "iDoctors",
+    "TopDoctors",
+    "Ordine professionale",
+    "PagineGialle"
+  ],
+  "metriche": [
+    "presenza per prestazione",
+    "convenzioni e tempi citati",
+    "dati di contatto corretti"
+  ],
+  "azioni": [
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su MioDottore con prestazioni, convenzioni e orari",
+      "quando": "MioDottore è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa la scheda Google: categoria precisa, prestazioni, orari, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "sito-prestazioni",
+      "titolo": "Una pagina in testo per ogni prestazione, con convenzioni e tempi di attesa",
+      "quando": "domande per specialità o requisito senza citazioni"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino la prestazione",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

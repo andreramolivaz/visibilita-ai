@@ -1,0 +1,91 @@
+{
+  "id": "ingrosso",
+  "nome": "Fornitori all'ingrosso e distributori",
+  "imprese": 360471,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Grossista",
+    "Ingrosso",
+    "Distributore",
+    "Cash and carry",
+    "Fornitore"
+  ],
+  "famiglia": "b2b",
+  "b2b": true,
+  "inglese": true,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "migliori grossisti di {categoria} nel nord Italia",
+      "fornitore all'ingrosso di {categoria} in {regione}",
+      "cash and carry di {specialita} vicino a {citta}"
+    ],
+    "bisogno": [
+      "cerco un distributore di {specialita} per un ristorante a {citta}, con minimo d'ordine basso",
+      "fornitore di {specialita} in {regione} che consegni entro 48 ore"
+    ],
+    "specialita": [
+      "grossista di {specialita} in provincia di {provincia} che serva anche piccoli negozi",
+      "distributore di {specialita} per {regione}"
+    ],
+    "requisito": [
+      "fornitore all'ingrosso di {categoria} in {regione} con {requisito}",
+      "ingrosso di {categoria} a {citta} aperto anche ai privati?"
+    ],
+    "confronto": [
+      "confronta {nome} e {concorrente} come fornitori di {specialita} in provincia di {provincia}, per prezzo e tempi"
+    ],
+    "nome": [
+      "{nome} ingrosso {citta} come fornitore, è affidabile?"
+    ],
+    "inglese": [
+      "Italian wholesale supplier of {specialita} in {regione}, small orders accepted"
+    ]
+  },
+  "fonti": [
+    "Sito ufficiale",
+    "Europages",
+    "Kompass",
+    "PagineGialle",
+    "LinkedIn",
+    "Google Maps",
+    "Registro Imprese"
+  ],
+  "metriche": [
+    "presenza per prodotto",
+    "consegna e minimo d'ordine citati",
+    "presenza nelle directory"
+  ],
+  "azioni": [
+    {
+      "codice": "directory",
+      "titolo": "Inserisci l'azienda su Europages, Kompass e PagineGialle Pro con lavorazioni, materiali e certificazioni",
+      "quando": "le directory sono citate dagli assistenti e tu non ci sei"
+    },
+    {
+      "codice": "catalogo",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni lavorazione: materiali, spessori, lotti minimi, tempi",
+      "quando": "catalogo solo in PDF o lavorazioni non descritte"
+    },
+    {
+      "codice": "certificazioni",
+      "titolo": "Metti le certificazioni sul sito e sulle schede, con numero ed ente",
+      "quando": "domande per requisito senza citazioni"
+    },
+    {
+      "codice": "linkedin",
+      "titolo": "Aggiorna la pagina LinkedIn aziendale con settori serviti e referenze",
+      "quando": "LinkedIn tra le fonti citate e pagina ferma"
+    },
+    {
+      "codice": "inglese",
+      "titolo": "Versione inglese delle pagine chiave del sito",
+      "quando": "domande in inglese senza citazioni"
+    },
+    {
+      "codice": "elenchi",
+      "titolo": "Fatti elencare dall'associazione di categoria e negli elenchi espositori delle fiere",
+      "quando": "concorrenti citati da elenchi di settore"
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "id": "pulizie",
+  "nome": "Imprese di pulizie, giardinaggio e facility",
+  "imprese": 59303,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Impresa di pulizie",
+    "Pulizie",
+    "Giardiniere",
+    "Manutenzione del verde",
+    "Disinfestazione",
+    "Sanificazione",
+    "Facility management"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "impresa di pulizie a {citta} per uffici, preventivo per 200 mq",
+      "giardiniere consigliato a {citta}",
+      "impresa di facility management in {regione} per più sedi"
+    ],
+    "bisogno": [
+      "impresa di pulizie post ristrutturazione a {citta}, urgente",
+      "giardiniere a {citta} per potatura siepi e manutenzione mensile",
+      "pulizie domestiche a {citta} con contratto regolare"
+    ],
+    "specialita": [
+      "ditta di {specialita} a {citta}",
+      "giardiniere in provincia di {provincia} per {specialita}"
+    ],
+    "requisito": [
+      "ditta di pulizie a {citta} per un condominio con {requisito}",
+      "impresa di pulizie a {citta} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per le pulizie degli uffici a {citta}?"
+    ],
+    "nome": [
+      "{nome} pulizie {citta} recensioni"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "Sito ufficiale",
+    "ProntoPro",
+    "PagineGialle",
+    "Facebook",
+    "Registro Imprese"
+  ],
+  "metriche": [
+    "presenza per servizio",
+    "requisiti citati (DURC, assicurazione)",
+    "preventivo e tempi citati"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su ProntoPro",
+      "quando": "ProntoPro è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

@@ -72,8 +72,8 @@ export function AnteprimaReport() {
             Apri il report completo
           </Link>
           <span className="text-muted">
-            : per tipo di domanda, testa a testa con i concorrenti, le 15 domande una per una, le parole e le
-            fonti, cosa dice ogni assistente di te.
+            : quota di voce, dove ti trovano domanda per domanda, per assistente e per tipo, le fonti e le parole, cosa dice ogni
+            assistente di te, note tecniche con campione e intervalli.
           </span>
         </p>
       </div>

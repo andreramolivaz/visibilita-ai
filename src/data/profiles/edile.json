@@ -1,0 +1,84 @@
+{
+  "id": "edile",
+  "nome": "Imprese edili e ristrutturazioni",
+  "imprese": 116734,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Impresa edile",
+    "Impresa di costruzioni",
+    "Ristrutturazioni",
+    "Appaltatore"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "impresa edile seria a {citta} per ristrutturare un appartamento di 80 mq",
+      "chi mi consigli per ristrutturare casa a {citta}?",
+      "impresa edile in provincia di {provincia} con buone recensioni"
+    ],
+    "bisogno": [
+      "ditta edile a {citta} che faccia un preventivo gratuito e inizi entro un mese",
+      "quanto costa ristrutturare un bagno a {citta} e a chi mi rivolgo?",
+      "ditta per un piccolo lavoro in {zona} a {citta}, che risponda al telefono"
+    ],
+    "specialita": [
+      "chi mi consigli per {specialita} a {citta}?",
+      "impresa edile in provincia di {provincia} specializzata in {specialita}"
+    ],
+    "requisito": [
+      "impresa a {provincia} che fa ristrutturazione chiavi in mano con {requisito}",
+      "impresa edile con {requisito} in {regione}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per ristrutturare casa a {citta}?"
+    ],
+    "nome": [
+      "{nome} impresa edile {citta} recensioni, sono affidabili?",
+      "{nome} di {citta}: che lavori fanno?"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "Sito ufficiale",
+    "Instapro",
+    "Habitissimo",
+    "ProntoPro",
+    "PagineGialle",
+    "Edilportale"
+  ],
+  "metriche": [
+    "presenza per lavorazione",
+    "pratiche e bonus citati",
+    "preventivo e tempi citati"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Instapro",
+      "quando": "Instapro è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

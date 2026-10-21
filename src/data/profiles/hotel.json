@@ -1,69 +1,89 @@
 {
   "id": "hotel",
-  "nome": "Hotel, B&B, casa vacanze",
+  "nome": "Hotel e alberghi",
+  "imprese": 21203,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
   "categorieGoogle": [
     "Hotel",
-    "Bed & Breakfast",
-    "Casa vacanze",
     "Albergo",
-    "Affittacamere",
-    "Agriturismo"
+    "Boutique hotel",
+    "Resort",
+    "Hotel 4 stelle",
+    "Hotel 3 stelle"
   ],
+  "famiglia": "ricettivo",
+  "b2b": false,
+  "inglese": true,
+  "generatoDaAI": false,
   "domande": {
     "generica": [
-      "Miglior {categoria} a {citta}",
-      "Dove dormire a {citta}",
-      "Hotel migliori a {citta} secondo le recensioni",
-      "{categoria} in {zona} a {citta}"
+      "miglior hotel 4 stelle a {citta} per una coppia",
+      "hotel consigliato in {zona} a {citta}",
+      "albergo tranquillo in {zona} per un weekend di relax"
     ],
     "bisogno": [
-      "{categoria} in centro a {citta} con parcheggio",
-      "{categoria} economico a {citta}",
-      "{categoria} a {citta} che accetta animali",
-      "{categoria} vicino alla stazione di {citta}",
-      "{categoria} a {citta} per famiglie",
-      "{categoria} a {citta} con colazione inclusa",
-      "{categoria} a {citta} per un weekend",
-      "{categoria} a {citta} con piscina",
-      "{categoria} a {citta} per viaggi di lavoro"
+      "hotel a {citta} vicino a {zona} con parcheggio, due notti, fino a 120 euro",
+      "hotel per famiglie a {citta} con camere quadruple",
+      "hotel a {citta} per un viaggio di lavoro, vicino alla stazione, con sala riunioni"
     ],
     "specialita": [
-      "{categoria} con {specialita} a {citta}"
+      "hotel a {citta} con {specialita}",
+      "hotel {specialita} a {citta}"
     ],
-    "nome": "Com'è {nome} a {citta}?"
+    "requisito": [
+      "hotel a {citta} che accetta cani e ha {requisito}",
+      "hotel a {citta} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} a {citta}?"
+    ],
+    "nome": [
+      "{nome} hotel {citta} recensioni, ne vale la pena?"
+    ],
+    "inglese": [
+      "best boutique hotel in {citta}, Italy, under 200 euro"
+    ]
   },
   "fonti": [
     "Booking",
     "Google Hotels",
     "TripAdvisor",
-    "Airbnb",
+    "Expedia",
+    "Google Maps",
     "Sito ufficiale",
-    "Google Maps"
+    "Trivago",
+    "Portale turistico del Comune"
   ],
   "metriche": [
-    "zona e servizi citati",
-    "fascia di prezzo riportata dall'AI contro quella reale"
+    "presenza per servizio richiesto",
+    "prezzo e zona citati",
+    "parità dati tra OTA e sito"
   ],
   "azioni": [
     {
-      "codice": "booking",
-      "titolo": "Completa la scheda Booking",
-      "quando": "scheda Booking assente o incompleta"
+      "codice": "ota",
+      "titolo": "Completa la scheda su Booking: servizi, foto con didascalia, politiche",
+      "quando": "Booking è la fonte più citata e la tua scheda è incompleta"
     },
     {
-      "codice": "google-hotels",
-      "titolo": "Completa la scheda Google Hotels",
-      "quando": "scheda assente"
+      "codice": "scheda-google",
+      "titolo": "Completa la scheda Google: servizi, orari di check-in, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
     },
     {
-      "codice": "come-arrivare",
-      "titolo": "Aggiungi servizi e 'come arrivare' sul sito",
-      "quando": "zona o servizi non citati"
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio: parcheggio, animali, famiglie, colazione",
+      "quando": "domande per requisito senza citazioni"
     },
     {
-      "codice": "prezzo",
-      "titolo": "Correggi la fascia di prezzo sui portali",
-      "quando": "l'AI riporta un prezzo diverso"
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio richiesto",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "inglese",
+      "titolo": "Versione inglese delle pagine chiave del sito",
+      "quando": "domande in inglese senza citazioni"
     }
   ]
 }

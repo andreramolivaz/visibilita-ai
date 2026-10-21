@@ -1,0 +1,85 @@
+{
+  "id": "viaggi",
+  "nome": "Agenzie di viaggio e tour operator",
+  "imprese": 19906,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Agenzia di viaggi",
+    "Tour operator",
+    "Agenzia viaggi",
+    "Organizzazione viaggi",
+    "Agenzia incoming"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": true,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "agenzia di viaggi affidabile a {citta} zona {zona}",
+      "tour operator in {regione} consigliato",
+      "agenzia di viaggi a {citta} con buone recensioni"
+    ],
+    "bisogno": [
+      "agenzia a {citta} per un viaggio last minute questo weekend",
+      "dove prenotare un viaggio organizzato per single a {citta}"
+    ],
+    "specialita": [
+      "agenzia di viaggi a {citta} per organizzare {specialita}",
+      "tour operator in {regione} specializzato in {specialita}"
+    ],
+    "requisito": [
+      "agenzia di viaggi a {citta} che faccia {requisito}",
+      "agenzia di incoming in {regione} per gruppi stranieri"
+    ],
+    "confronto": [
+      "meglio prenotare da solo o con {nome} a {citta} per {specialita}?"
+    ],
+    "nome": [
+      "{nome} viaggi {citta} recensioni"
+    ],
+    "inglese": [
+      "local tour operator in {regione}, Italy, for private wine tours"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "Sito ufficiale",
+    "TripAdvisor",
+    "Trustpilot",
+    "Facebook",
+    "FIAVET"
+  ],
+  "metriche": [
+    "presenza per destinazione",
+    "servizi citati (rate, assicurazione)",
+    "recensioni citate"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Google Maps",
+      "quando": "Google Maps è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

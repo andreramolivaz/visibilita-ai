@@ -1,57 +1,76 @@
 {
   "id": "altro",
-  "nome": "Altro: qualsiasi mestiere",
+  "nome": "Altre attività",
+  "imprese": 0,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
   "categorieGoogle": [],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
   "generatoDaAI": true,
   "domande": {
     "generica": [
-      "{categoria} a {citta}",
-      "{categoria} in provincia di {citta}",
-      "{categoria} affidabile a {citta}",
-      "{categoria} migliore a {citta} secondo le recensioni"
+      "miglior {categoria} a {citta}",
+      "{categoria} consigliata in {zona} a {citta}",
+      "{categoria} a {citta} con buone recensioni"
     ],
     "bisogno": [
-      "{categoria} con {requisito} a {citta}",
-      "{categoria} economico a {citta}",
-      "{categoria} con preventivo gratuito a {citta}",
-      "{categoria} con consegna rapida a {citta}",
-      "{categoria} certificato a {citta}"
+      "{categoria} a {citta} aperta oggi",
+      "{categoria} economica a {citta}",
+      "{categoria} a {citta} che risponda al telefono e faccia un preventivo"
     ],
     "specialita": [
-      "{specialita} a {citta}",
-      "{specialita} in {regione}"
+      "{categoria} a {citta} per {specialita}",
+      "chi fa {specialita} a {citta}?"
     ],
-    "nome": "Com'è {nome} a {citta}?"
+    "requisito": [
+      "{categoria} a {citta} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} come {categoria} a {citta}?"
+    ],
+    "nome": [
+      "com'è {nome} a {citta}? recensioni"
+    ]
   },
   "fonti": [
     "Google Maps",
     "Sito ufficiale",
     "PagineGialle",
-    "Europages",
-    "Kompass",
-    "LinkedIn"
+    "Facebook",
+    "Instagram"
   ],
   "metriche": [
-    "presenza per lavorazione o servizio",
-    "presenza per area servita",
-    "sede e certificazioni corrette"
+    "presenza per servizio",
+    "orari coerenti",
+    "dati di contatto corretti"
   ],
   "azioni": [
     {
-      "codice": "pagina-lavorazione",
-      "titolo": "Una pagina per ogni lavorazione",
-      "quando": "invisibile sulle domande per lavorazione"
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
     },
     {
-      "codice": "europages",
-      "titolo": "Schede Europages e Kompass",
-      "quando": "fonti B2B assenti"
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Google Maps",
+      "quando": "Google Maps è tra le fonti citate e tu non ci sei"
     },
     {
-      "codice": "casi-cliente",
-      "titolo": "Casi cliente sul sito",
-      "quando": "nessuna fonte propria citata"
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
     }
   ],
-  "nota": "Claude genera il profilo dal sito e dalla categoria Google, lo salva e, dopo 10 attività simili, lo promuove a categoria standard."
+  "nota": "Per i mestieri senza un profilo dedicato le domande vengono adattate dal sito e dalla scheda Google dell'attività."
 }

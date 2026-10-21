@@ -1,0 +1,84 @@
+{
+  "id": "elettricista",
+  "nome": "Elettricisti e impiantisti",
+  "imprese": 66035,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Elettricista",
+    "Impianti elettrici",
+    "Installatore fotovoltaico",
+    "Domotica",
+    "Impianti di allarme"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "elettricista a {citta} per rifare l'impianto elettrico di un appartamento",
+      "elettricista economico in {zona} a {citta} per montare tre lampadari",
+      "buon elettricista in provincia di {provincia}"
+    ],
+    "bisogno": [
+      "elettricista urgente a {citta}, è saltata la corrente in casa e non torna",
+      "elettricista disponibile sabato a {citta}",
+      "installatore di impianti di allarme a {citta} con prezzi onesti"
+    ],
+    "specialita": [
+      "chi installa {specialita} a {citta}?",
+      "elettricista in provincia di {provincia} specializzato in {specialita}"
+    ],
+    "requisito": [
+      "elettricista a {citta} che rilascia la dichiarazione di conformità",
+      "elettricista a {citta} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per un impianto fotovoltaico in provincia di {provincia}?"
+    ],
+    "nome": [
+      "{nome} elettricista {citta} recensioni"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "Sito ufficiale",
+    "ProntoPro",
+    "Instapro",
+    "Habitissimo",
+    "PagineGialle",
+    "Facebook"
+  ],
+  "metriche": [
+    "presenza su urgenza",
+    "presenza per impianto",
+    "conformità e certificazioni citate"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su ProntoPro",
+      "quando": "ProntoPro è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

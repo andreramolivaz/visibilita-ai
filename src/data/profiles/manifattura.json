@@ -1,0 +1,95 @@
+{
+  "id": "manifattura",
+  "nome": "Manifattura: alimentare, moda, legno-arredo, plastica, packaging",
+  "imprese": 140000,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Produttore",
+    "Azienda alimentare",
+    "Laboratorio artigianale",
+    "Azienda tessile",
+    "Mobilificio",
+    "Falegnameria industriale",
+    "Stampaggio plastica",
+    "Packaging",
+    "Produzione"
+  ],
+  "famiglia": "b2b",
+  "b2b": true,
+  "inglese": true,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "produttori di {specialita} in {regione}",
+      "aziende di {categoria} in provincia di {provincia}"
+    ],
+    "bisogno": [
+      "fornitore di {specialita} conto terzi per piccole quantità in {regione}",
+      "laboratorio di {specialita} conto terzi vicino a {citta}"
+    ],
+    "specialita": [
+      "produttore di {specialita} in {regione} che faccia private label",
+      "azienda in provincia di {provincia} che produce {specialita} su misura"
+    ],
+    "requisito": [
+      "aziende con certificazione {requisito} in {regione}",
+      "produttore di {specialita} in Italia con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} come fornitore di {specialita}?"
+    ],
+    "nome": [
+      "{nome} è un buon fornitore di {specialita}?"
+    ],
+    "inglese": [
+      "Italian manufacturer of {specialita} for private label, minimum order 500 units"
+    ]
+  },
+  "fonti": [
+    "Sito ufficiale",
+    "Europages",
+    "Kompass",
+    "LinkedIn",
+    "PagineGialle",
+    "Registro Imprese",
+    "Elenchi espositori",
+    "Associazione di categoria"
+  ],
+  "metriche": [
+    "presenza per prodotto",
+    "certificazioni citate",
+    "private label e lotti minimi citati"
+  ],
+  "azioni": [
+    {
+      "codice": "directory",
+      "titolo": "Inserisci l'azienda su Europages e Kompass con lavorazioni, materiali e certificazioni",
+      "quando": "le directory sono citate dagli assistenti e tu non ci sei"
+    },
+    {
+      "codice": "catalogo",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni lavorazione: materiali, spessori, lotti minimi, tempi",
+      "quando": "catalogo solo in PDF o lavorazioni non descritte"
+    },
+    {
+      "codice": "certificazioni",
+      "titolo": "Metti le certificazioni sul sito e sulle schede, con numero ed ente",
+      "quando": "domande per requisito senza citazioni"
+    },
+    {
+      "codice": "linkedin",
+      "titolo": "Aggiorna la pagina LinkedIn aziendale con settori serviti e referenze",
+      "quando": "LinkedIn tra le fonti citate e pagina ferma"
+    },
+    {
+      "codice": "inglese",
+      "titolo": "Versione inglese delle pagine chiave del sito",
+      "quando": "domande in inglese senza citazioni"
+    },
+    {
+      "codice": "elenchi",
+      "titolo": "Fatti elencare dall'associazione di categoria e negli elenchi espositori delle fiere",
+      "quando": "concorrenti citati da elenchi di settore"
+    }
+  ]
+}

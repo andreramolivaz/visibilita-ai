@@ -1,0 +1,94 @@
+{
+  "id": "logistica",
+  "nome": "Trasporti, logistica, spedizioni e traslochi",
+  "imprese": 83111,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Autotrasporti",
+    "Logistica",
+    "Spedizioniere",
+    "Corriere",
+    "Traslochi",
+    "Magazzino",
+    "Trasporti eccezionali"
+  ],
+  "famiglia": "b2b",
+  "b2b": true,
+  "inglese": true,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "trasportatore in provincia di {provincia} per spedizioni su pallet in tutta Italia",
+      "azienda di logistica in {regione} con magazzino conto terzi",
+      "ditta di traslochi seria a {citta}, preventivo gratuito"
+    ],
+    "bisogno": [
+      "spedizioniere a {citta} per export con pratiche doganali",
+      "logistica per e-commerce in {regione} per un piccolo negozio online",
+      "trasporto di {specialita} da {citta} in tutta Italia, preventivo"
+    ],
+    "specialita": [
+      "trasportatore per {specialita} in {regione}",
+      "azienda di logistica in provincia di {provincia} specializzata in {specialita}"
+    ],
+    "requisito": [
+      "autotrasportatore con {requisito} in provincia di {provincia}",
+      "azienda di logistica in {regione} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per spedizioni groupage da {regione}?"
+    ],
+    "nome": [
+      "{nome} trasporti {citta}: affidabile come fornitore?"
+    ],
+    "inglese": [
+      "3PL logistics provider in {regione}, Italy, with bonded warehouse"
+    ]
+  },
+  "fonti": [
+    "Sito ufficiale",
+    "Europages",
+    "Kompass",
+    "Albo autotrasportatori",
+    "PagineGialle",
+    "LinkedIn",
+    "Google Maps"
+  ],
+  "metriche": [
+    "presenza per servizio e tratta",
+    "requisiti citati (ADR, temperatura)",
+    "presenza nelle directory"
+  ],
+  "azioni": [
+    {
+      "codice": "directory",
+      "titolo": "Inserisci l'azienda su Europages, Kompass e Albo autotrasportatori con lavorazioni, materiali e certificazioni",
+      "quando": "le directory sono citate dagli assistenti e tu non ci sei"
+    },
+    {
+      "codice": "catalogo",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni lavorazione: materiali, spessori, lotti minimi, tempi",
+      "quando": "catalogo solo in PDF o lavorazioni non descritte"
+    },
+    {
+      "codice": "certificazioni",
+      "titolo": "Metti le certificazioni sul sito e sulle schede, con numero ed ente",
+      "quando": "domande per requisito senza citazioni"
+    },
+    {
+      "codice": "linkedin",
+      "titolo": "Aggiorna la pagina LinkedIn aziendale con settori serviti e referenze",
+      "quando": "LinkedIn tra le fonti citate e pagina ferma"
+    },
+    {
+      "codice": "inglese",
+      "titolo": "Versione inglese delle pagine chiave del sito",
+      "quando": "domande in inglese senza citazioni"
+    },
+    {
+      "codice": "elenchi",
+      "titolo": "Fatti elencare dall'associazione di categoria e negli elenchi espositori delle fiere",
+      "quando": "concorrenti citati da elenchi di settore"
+    }
+  ]
+}

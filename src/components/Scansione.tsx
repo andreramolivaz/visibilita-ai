@@ -10,6 +10,8 @@ const TIPO: Record<TipoDomanda, string> = {
   generica: "domanda generica",
   bisogno: "domanda per bisogno",
   specialita: "domanda per specialità",
+  requisito: "domanda per requisito",
+  confronto: "domanda di confronto",
   nome: "domanda sul tuo nome",
 };
 

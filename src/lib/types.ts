@@ -58,7 +58,16 @@ export type Portale =
   | "Ordine professionale"
   | "Portale turistico del Comune";
 
-export type TipoDomanda = "generica" | "bisogno" | "specialita" | "nome";
+/**
+ * Sei tipi di domanda, dallo studio dei prompt reali (Semrush 2025-26,
+ * Otterly, Citations.press, BrightLocal): generica (categoria + luogo),
+ * per bisogno (urgenza, orario, prezzo), per specialità (la prestazione),
+ * per requisito (certificazione, convenzione, servizio accessorio),
+ * di confronto («meglio X o Y?»), sul nome (verifica dell'attività).
+ */
+export type TipoDomanda = "generica" | "bisogno" | "specialita" | "requisito" | "confronto" | "nome";
+
+export const TIPI_DOMANDA: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "confronto", "nome"];
 
 export interface Domanda {
   id: string;
@@ -66,6 +75,8 @@ export interface Domanda {
   tipo: TipoDomanda;
   /** Il titolare può cambiare una sola domanda. */
   modificabile?: boolean;
+  /** Per le domande di confronto: il concorrente nominato. */
+  concorrente?: string;
 }
 
 export interface ProfiloAttivita {
@@ -122,6 +133,8 @@ export interface Concorrente {
   /** Risposte in cui viene citato. */
   citazioni: number;
   totale: number;
+  /** Citazioni in cui è tra i primi tre nomi dell'elenco. */
+  primiTre?: number;
   seiTu?: boolean;
 }
 
@@ -138,6 +151,8 @@ export interface CellaDomanda {
 export interface RigaDomanda {
   domanda: Domanda;
   celle: CellaDomanda[];
+  /** Concorrenti distinti citati per questa domanda, su tutti gli assistenti. 0 = nessuno. */
+  concorrentiCitati?: number;
 }
 
 export interface Fonte {
@@ -212,18 +227,26 @@ export interface Contesto {
   percentile: number;
 }
 
+/** Tono della descrizione: conta solo quando è critico (Insites 2026: positivo nel 79,8% dei casi). */
+export type Tono = "positivo" | "neutro" | "critico";
+
 export interface DescrizioneMotore {
   motore: EngineId;
   testo: string;
+  tono?: Tono;
+  /** Dati dell'attività riportati correttamente (categoria, orari, indirizzo, telefono, servizi). */
+  datiCorretti?: boolean;
 }
 
 export interface Metodo {
-  /** Inizio e fine della scansione, ISO. */
+  /** Inizio e fine della scansione, ISO. Nell'abbonamento le ripetizioni sono su giorni diversi. */
   inizio: string;
   fine: string;
   /** Posizione impostata nelle API. */
   posizione: string;
   lingua: string;
+  /** Canale di raccolta dichiarato: interfacce ufficiali (API) o app. */
+  canale?: string;
   note: string[];
 }
 
@@ -235,6 +258,8 @@ export interface Report {
   data: string;
   motori: EngineId[];
   domande: number;
+  /** Domande in cui il cliente non fa il tuo nome: su queste si calcolano punteggio e numeri chiave. */
+  domandeSpontanee: number;
   ripetizioni: number;
   punteggio: number;
   verdetto: Verdetto;
@@ -243,6 +268,8 @@ export interface Report {
   perMotore: RisultatoMotore[];
   perTipo: RisultatoTipo[];
   concorrenti: Concorrente[];
+  /** Citazioni di tutte le attività nelle risposte (anche fuori dai primi cinque): base della quota di voce. */
+  citazioniTotali?: number;
   testaATesta: TestaATesta[];
   citaChi: CitaChi[];
   contesto?: Contesto;

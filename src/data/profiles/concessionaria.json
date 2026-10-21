@@ -1,0 +1,86 @@
+{
+  "id": "concessionaria",
+  "nome": "Concessionarie auto e moto, autonoleggio",
+  "imprese": 35120,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Concessionaria",
+    "Concessionario auto",
+    "Auto usate",
+    "Concessionario moto",
+    "Autonoleggio",
+    "Noleggio furgoni",
+    "Noleggio a lungo termine"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "concessionaria affidabile a {citta}",
+      "dove comprare un'auto usata a {citta} senza brutte sorprese",
+      "noleggio auto a {citta} economico"
+    ],
+    "bisogno": [
+      "noleggio furgone a {citta} per un trasloco, un giorno",
+      "dove vendere la mia auto a {citta} al prezzo migliore",
+      "concessionario moto a {citta} che faccia la permuta"
+    ],
+    "specialita": [
+      "concessionario a {citta} con {specialita}",
+      "concessionaria {specialita} a {citta}"
+    ],
+    "requisito": [
+      "noleggio auto a {citta} {requisito}",
+      "noleggio a lungo termine a {citta} per partita IVA"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per comprare un usato a {citta}?"
+    ],
+    "nome": [
+      "{nome} concessionaria {citta} recensioni"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "AutoScout24",
+    "Subito",
+    "Sito ufficiale",
+    "Trustpilot",
+    "Facebook",
+    "PagineGialle"
+  ],
+  "metriche": [
+    "presenza per tipo di veicolo",
+    "permuta e finanziamenti citati",
+    "recensioni citate"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su AutoScout24",
+      "quando": "AutoScout24 è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

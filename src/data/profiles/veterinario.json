@@ -1,0 +1,82 @@
+{
+  "id": "veterinario",
+  "nome": "Veterinari e toelettature",
+  "imprese": 17815,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Veterinario",
+    "Clinica veterinaria",
+    "Ambulatorio veterinario",
+    "Toelettatura",
+    "Pensione per cani"
+  ],
+  "famiglia": "sanita",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "miglior veterinario a {citta} zona {zona} per gatti",
+      "clinica veterinaria consigliata a {citta}",
+      "veterinario a {citta} con buone recensioni"
+    ],
+    "bisogno": [
+      "veterinario a {citta} aperto adesso, urgenza per il mio cane",
+      "veterinario a {citta} con prezzi onesti per la sterilizzazione",
+      "pensione per cani vicino a {citta} per dieci giorni ad agosto"
+    ],
+    "specialita": [
+      "clinica veterinaria a {citta} con {specialita}",
+      "toelettatura per cani a {citta} per {specialita}"
+    ],
+    "requisito": [
+      "veterinario a {citta} che faccia {requisito}",
+      "veterinario a domicilio a {citta}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per il mio cane a {citta}?"
+    ],
+    "nome": [
+      "{nome} veterinario {citta} recensioni"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "Sito ufficiale",
+    "Facebook",
+    "Ordine professionale",
+    "PagineGialle"
+  ],
+  "metriche": [
+    "presenza su urgenza",
+    "presenza per specialità",
+    "orari e prezzi citati"
+  ],
+  "azioni": [
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Google Maps con prestazioni, convenzioni e orari",
+      "quando": "Google Maps è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa la scheda Google: categoria precisa, prestazioni, orari, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "sito-prestazioni",
+      "titolo": "Una pagina in testo per ogni prestazione, con convenzioni e tempi di attesa",
+      "quando": "domande per specialità o requisito senza citazioni"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino la prestazione",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

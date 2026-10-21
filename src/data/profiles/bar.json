@@ -1,0 +1,87 @@
+{
+  "id": "bar",
+  "nome": "Bar, pasticcerie e gelaterie",
+  "imprese": 104501,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Bar",
+    "Caffetteria",
+    "Pasticceria",
+    "Gelateria",
+    "Panificio",
+    "Cocktail bar",
+    "Enoteca"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "miglior bar per la colazione a {citta} zona {zona}",
+      "gelateria artigianale consigliata a {citta}",
+      "pasticceria più buona di {citta}"
+    ],
+    "bisogno": [
+      "bar a {citta} aperto presto la mattina",
+      "dove fare l'aperitivo a {citta} con buffet, prezzo onesto",
+      "caffetteria tranquilla a {citta} dove lavorare al computer, con wifi",
+      "pasticceria a {citta} per una torta di compleanno su ordinazione"
+    ],
+    "specialita": [
+      "{categoria} a {citta} con {specialita}",
+      "bar con cornetti fatti in casa a {citta}"
+    ],
+    "requisito": [
+      "{categoria} a {citta} con {requisito}",
+      "pasticceria a {citta} che faccia dolci senza lattosio"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per il gelato a {citta}?"
+    ],
+    "nome": [
+      "{nome} {citta} recensioni, com'è?"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "TripAdvisor",
+    "Instagram",
+    "Facebook",
+    "Gambero Rosso",
+    "Giornale locale",
+    "Sito ufficiale"
+  ],
+  "metriche": [
+    "presenza per prodotto",
+    "orari di apertura coerenti",
+    "servizi citati"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su TripAdvisor",
+      "quando": "TripAdvisor è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

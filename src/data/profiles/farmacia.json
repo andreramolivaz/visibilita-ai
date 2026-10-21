@@ -1,0 +1,83 @@
+{
+  "id": "farmacia",
+  "nome": "Farmacie, parafarmacie, ottici e sanitarie",
+  "imprese": 22669,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Farmacia",
+    "Parafarmacia",
+    "Ottico",
+    "Ortopedia sanitaria",
+    "Negozio di articoli sanitari"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "ottico a {citta} per occhiali progressivi, bravo e non carissimo",
+      "farmacia consigliata in {zona} a {citta}",
+      "parafarmacia a {citta} con buona scelta"
+    ],
+    "bisogno": [
+      "farmacia aperta adesso a {citta} zona {zona}",
+      "farmacia a {citta} aperta la domenica",
+      "ortopedia sanitaria a {citta} per noleggiare una carrozzina"
+    ],
+    "specialita": [
+      "farmacia a {citta} che faccia {specialita}",
+      "ottico a {citta} specializzato in {specialita}"
+    ],
+    "requisito": [
+      "ottico a {citta} con {requisito}",
+      "farmacia a {citta} con consegna a domicilio"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per gli occhiali a {citta}?"
+    ],
+    "nome": [
+      "{nome} {citta} recensioni, orari"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "Sito ufficiale",
+    "Federfarma",
+    "PagineGialle",
+    "Facebook",
+    "Trustpilot"
+  ],
+  "metriche": [
+    "presenza su orari e turni",
+    "servizi citati",
+    "dati di contatto corretti"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Google Maps",
+      "quando": "Google Maps è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

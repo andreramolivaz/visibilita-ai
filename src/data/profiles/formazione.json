@@ -1,0 +1,86 @@
+{
+  "id": "formazione",
+  "nome": "Scuole di lingue, formazione e autoscuole",
+  "imprese": 27032,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Scuola di lingue",
+    "Scuola di inglese",
+    "Centro di formazione",
+    "Autoscuola",
+    "Corsi professionali",
+    "Ripetizioni"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "scuola di inglese a {citta} per adulti, corsi serali",
+      "autoscuola consigliata a {citta}",
+      "centro di formazione a {citta} con buone recensioni"
+    ],
+    "bisogno": [
+      "corso di {specialita} a {citta}, prezzo",
+      "autoscuola a {citta} economica con buone percentuali di promossi",
+      "scuola di italiano per stranieri a {citta} con lezioni al mattino",
+      "corso online o in presenza a {citta} per {specialita}"
+    ],
+    "specialita": [
+      "scuola di lingue a {citta} per {specialita}",
+      "autoscuola a {citta} per la patente {specialita}"
+    ],
+    "requisito": [
+      "corso di {specialita} a {citta} con {requisito}",
+      "scuola a {citta} per la preparazione {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per imparare l'inglese a {citta}?"
+    ],
+    "nome": [
+      "{nome} scuola {citta} recensioni"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "Sito ufficiale",
+    "Facebook",
+    "Emagister",
+    "Centri autorizzati",
+    "Catalogo regionale",
+    "PagineGialle"
+  ],
+  "metriche": [
+    "presenza per corso",
+    "certificazioni e attestati citati",
+    "orari e prezzi citati"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Google Maps",
+      "quando": "Google Maps è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

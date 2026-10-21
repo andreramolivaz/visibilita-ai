@@ -1,69 +1,86 @@
 {
   "id": "dentista",
-  "nome": "Dentista, medico, fisioterapista",
+  "nome": "Dentisti e studi odontoiatrici",
+  "imprese": 52500,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
   "categorieGoogle": [
     "Dentista",
     "Studio dentistico",
-    "Fisioterapista",
-    "Medico",
-    "Poliambulatorio",
-    "Nutrizionista"
+    "Odontoiatra",
+    "Ortodontista",
+    "Clinica dentale",
+    "Igienista dentale"
   ],
+  "famiglia": "sanita",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
   "domande": {
     "generica": [
-      "Miglior {categoria} a {citta}",
-      "{categoria} consigliato a {citta}",
-      "{categoria} migliore a {citta} secondo le recensioni",
-      "{categoria} in {zona} a {citta}"
+      "miglior dentista a {citta} per {specialita}",
+      "dentista consigliato in {zona} a {citta}",
+      "studio dentistico a {citta} con buone recensioni"
     ],
     "bisogno": [
-      "{categoria} urgente a {citta}",
-      "{categoria} convenzionato a {citta}",
-      "{categoria} che riceve il sabato a {citta}",
-      "{categoria} per bambini a {citta}",
-      "{categoria} economico a {citta}",
-      "{categoria} che riceve la sera a {citta}",
-      "{categoria} con pagamento a rate a {citta}",
-      "{categoria} con prima visita gratuita a {citta}"
+      "dentista a {citta} per un'urgenza, mi fa molto male un dente, oggi",
+      "dentista economico ma serio a {citta}, devo fare una devitalizzazione",
+      "igiene dentale a {citta}: prezzo e dove andare",
+      "studio dentistico in {zona} a {citta} aperto il sabato"
     ],
     "specialita": [
-      "{categoria} per {specialita} a {citta}",
-      "{specialita} a {citta} prezzi"
+      "dentista a {citta} specializzato in {specialita}",
+      "dentista per bambini a {citta} che sappia trattare un bimbo pauroso"
     ],
-    "nome": "Com'è {nome} a {citta}?"
+    "requisito": [
+      "dentista a {citta} che fa {requisito}",
+      "dentista a {citta} che parli inglese"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per impianti dentali a {citta}?"
+    ],
+    "nome": [
+      "{nome} dentista {citta} recensioni, è bravo?"
+    ]
   },
   "fonti": [
     "MioDottore",
+    "Dottori.it",
     "Google Maps",
     "Sito ufficiale",
-    "Dottori.it",
-    "Ordine professionale"
+    "iDoctors",
+    "Ordine professionale",
+    "PagineGialle"
   ],
   "metriche": [
     "presenza per prestazione",
-    "urgenze e orari",
-    "titoli e convenzioni corretti"
+    "pagamenti e convenzioni citati",
+    "orari corretti"
   ],
   "azioni": [
     {
-      "codice": "miodottore",
-      "titolo": "Apri il profilo MioDottore",
-      "quando": "fonte MioDottore assente"
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su MioDottore con prestazioni, convenzioni e orari",
+      "quando": "MioDottore è tra le fonti citate e tu non ci sei"
     },
     {
-      "codice": "pagina-prestazione",
-      "titolo": "Una pagina per ogni prestazione sul sito",
-      "quando": "invisibile sulle domande per prestazione"
+      "codice": "scheda-google",
+      "titolo": "Completa la scheda Google: categoria precisa, prestazioni, orari, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
     },
     {
-      "codice": "prenotazione",
-      "titolo": "Attiva la prenotazione online",
-      "quando": "prenotazione online non citata"
+      "codice": "sito-prestazioni",
+      "titolo": "Una pagina in testo per ogni prestazione, con convenzioni e tempi di attesa",
+      "quando": "domande per specialità o requisito senza citazioni"
     },
     {
-      "codice": "titoli",
-      "titolo": "Correggi titoli e convenzioni sulle schede",
-      "quando": "l'AI riporta dati sbagliati"
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino la prestazione",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
     }
   ]
 }

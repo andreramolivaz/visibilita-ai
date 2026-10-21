@@ -1,0 +1,84 @@
+{
+  "id": "fotografo",
+  "nome": "Fotografi, videomaker ed eventi",
+  "imprese": 23518,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Fotografo",
+    "Studio fotografico",
+    "Videomaker",
+    "Agenzia eventi",
+    "Wedding planner",
+    "Service audio luci"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "fotografo di matrimonio in {regione} consigliato",
+      "studio fotografico a {citta} per ritratti professionali",
+      "agenzia eventi a {citta} con buone recensioni"
+    ],
+    "bisogno": [
+      "fotografo a {citta} per foto prodotto per un e-commerce, prezzo",
+      "videomaker a {citta} per un video aziendale",
+      "service audio e luci in provincia di {provincia} per un evento"
+    ],
+    "specialita": [
+      "fotografo a {citta} per {specialita}",
+      "fotografo di matrimonio in {regione} con stile {specialita}"
+    ],
+    "requisito": [
+      "fotografo a {citta} disponibile {requisito} con album incluso",
+      "agenzia eventi a {citta} per {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per il matrimonio in {regione}?"
+    ],
+    "nome": [
+      "{nome} fotografo {citta} recensioni"
+    ]
+  },
+  "fonti": [
+    "Instagram",
+    "Sito ufficiale",
+    "Google Maps",
+    "Matrimonio.com",
+    "Facebook",
+    "Pinterest"
+  ],
+  "metriche": [
+    "presenza per genere fotografico",
+    "prezzi e disponibilità citati",
+    "portfolio citato"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Instagram",
+      "quando": "Instagram è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

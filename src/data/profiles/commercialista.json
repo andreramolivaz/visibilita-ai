@@ -1,0 +1,85 @@
+{
+  "id": "commercialista",
+  "nome": "Commercialisti e consulenti del lavoro",
+  "imprese": 133140,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Commercialista",
+    "Studio commercialista",
+    "Consulente del lavoro",
+    "Consulente fiscale",
+    "CAF",
+    "Revisore"
+  ],
+  "famiglia": "professionista",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "commercialista consigliato a {citta}",
+      "studio commercialista in {zona} a {citta} che risponda alle mail",
+      "consulente del lavoro a {citta} per una ditta con cinque dipendenti"
+    ],
+    "bisogno": [
+      "commercialista a {citta} per partita IVA forfettaria, quanto chiede?",
+      "commercialista economico per freelance a {citta}, anche online",
+      "commercialista per aprire una srl a {citta}, costi",
+      "commercialista a {citta} per il 730, prezzo"
+    ],
+    "specialita": [
+      "commercialista a {citta} specializzato in {specialita}",
+      "studio a {citta} esperto di {specialita}"
+    ],
+    "requisito": [
+      "commercialista a {citta} che faccia anche {requisito}",
+      "commercialista a {citta} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} come commercialista a {citta}?"
+    ],
+    "nome": [
+      "{nome} commercialista {citta} recensioni"
+    ]
+  },
+  "fonti": [
+    "Sito ufficiale",
+    "Google Maps",
+    "Ordine professionale",
+    "LinkedIn",
+    "PagineGialle",
+    "Trustpilot"
+  ],
+  "metriche": [
+    "presenza per specializzazione",
+    "costi e online citati",
+    "dati di contatto corretti"
+  ],
+  "azioni": [
+    {
+      "codice": "albo",
+      "titolo": "Verifica i dati sull'albo dell'Ordine e su LinkedIn",
+      "quando": "dati di contatto o specializzazione sbagliati in una risposta"
+    },
+    {
+      "codice": "sito-materie",
+      "titolo": "Una pagina sul sito per ogni materia o prestazione, con primo contatto e costi indicativi",
+      "quando": "domande per specialità senza citazioni"
+    },
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa la scheda Google con prestazioni, orari e modalità di contatto",
+      "quando": "scheda incompleta o categoria generica"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino la materia o la prestazione",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "linkedin",
+      "titolo": "Aggiorna il profilo LinkedIn con specializzazioni e casi seguiti",
+      "quando": "LinkedIn tra le fonti citate"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "id": "metalmeccanica",
+  "nome": "Metalmeccanica, carpenteria e lavorazioni conto terzi",
+  "imprese": 142457,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Carpenteria metallica",
+    "Officina meccanica",
+    "Lavorazioni meccaniche",
+    "Taglio laser",
+    "Tornitura",
+    "Fresatura",
+    "Saldatura",
+    "Stampaggio",
+    "Costruzione macchine",
+    "Azienda metalmeccanica"
+  ],
+  "famiglia": "b2b",
+  "b2b": true,
+  "inglese": true,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "azienda che fa taglio laser lamiera vicino a {citta}",
+      "fornitore di carpenteria metallica conto terzi in {regione}",
+      "officina meccanica di precisione in provincia di {provincia} per piccole serie"
+    ],
+    "bisogno": [
+      "azienda metalmeccanica in {regione} che produca {specialita} su disegno, lotti da 50 pezzi, consegna in due settimane",
+      "contoterzista in provincia di {provincia} che faccia anche progettazione"
+    ],
+    "specialita": [
+      "chi fa {specialita} in provincia di {provincia}?",
+      "azienda di {specialita} in {regione} per conto terzi",
+      "costruttore di macchine per {specialita} nel nord Italia"
+    ],
+    "requisito": [
+      "carpenteria con certificazione {requisito} in {regione}",
+      "officina meccanica in provincia di {provincia} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per lavorazioni meccaniche conto terzi in provincia di {provincia}?"
+    ],
+    "nome": [
+      "{nome} di {citta}: che lavorazioni fanno, sono affidabili come fornitore?"
+    ],
+    "inglese": [
+      "Italian contract manufacturer for CNC machined parts, small batches, ISO 9001, near {citta}",
+      "sheet metal fabrication supplier in {regione}, Italy, laser cutting and bending"
+    ]
+  },
+  "fonti": [
+    "Sito ufficiale",
+    "Europages",
+    "Kompass",
+    "DirectIndustry",
+    "LinkedIn",
+    "PagineGialle",
+    "Registro Imprese",
+    "Elenchi espositori",
+    "Associazione di categoria"
+  ],
+  "metriche": [
+    "presenza per lavorazione e materiale",
+    "certificazioni citate",
+    "presenza nelle directory e in inglese"
+  ],
+  "azioni": [
+    {
+      "codice": "directory",
+      "titolo": "Inserisci l'azienda su Europages, Kompass e DirectIndustry con lavorazioni, materiali e certificazioni",
+      "quando": "le directory sono citate dagli assistenti e tu non ci sei"
+    },
+    {
+      "codice": "catalogo",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni lavorazione: materiali, spessori, lotti minimi, tempi",
+      "quando": "catalogo solo in PDF o lavorazioni non descritte"
+    },
+    {
+      "codice": "certificazioni",
+      "titolo": "Metti le certificazioni sul sito e sulle schede, con numero ed ente",
+      "quando": "domande per requisito senza citazioni"
+    },
+    {
+      "codice": "linkedin",
+      "titolo": "Aggiorna la pagina LinkedIn aziendale con settori serviti e referenze",
+      "quando": "LinkedIn tra le fonti citate e pagina ferma"
+    },
+    {
+      "codice": "inglese",
+      "titolo": "Versione inglese delle pagine chiave del sito",
+      "quando": "domande in inglese senza citazioni"
+    },
+    {
+      "codice": "elenchi",
+      "titolo": "Fatti elencare dall'associazione di categoria e negli elenchi espositori delle fiere",
+      "quando": "concorrenti citati da elenchi di settore"
+    }
+  ]
+}

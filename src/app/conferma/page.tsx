@@ -43,7 +43,12 @@ async function Profilo({ searchParams }: { searchParams: PageProps<"/conferma">[
       categoria: attivita.categoriaGoogle,
       citta: attivita.citta,
       zona: attivita.zona,
+      provincia: attivita.provincia,
+      regione: attivita.regione,
       specialita: attivita.specialita,
+      requisiti: attivita.servizi,
+      // TODO: il concorrente più citato o più vicino, da Google Places.
+      concorrente: undefined,
     },
     TEST_GRATUITO.domande,
   );

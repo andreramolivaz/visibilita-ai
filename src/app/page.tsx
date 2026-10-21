@@ -7,6 +7,7 @@ import { elencoMotori, motoriAttivi, motoriInArrivo } from "@/lib/engines";
 import { Pipeline } from "@/components/metodo/Pipeline";
 import { GLOSSARIO } from "@/lib/glossario";
 import { PIANI, SISTEMAZIONE, euro } from "@/lib/prezzi";
+import { profiliPerNumerosita } from "@/lib/profiles";
 
 const PASSI = [
   {
@@ -23,28 +24,8 @@ const PASSI = [
   },
 ];
 
-const CATEGORIE = [
-  "Negozi al dettaglio",
-  "Ristoranti, pizzerie e bar",
-  "Imprese edili e artigiani",
-  "Carpenterie e metalmeccanica",
-  "Avvocati e commercialisti",
-  "Dentisti e studi medici",
-  "Hotel, B&B e agriturismi",
-  "Autofficine e gommisti",
-  "Idraulici ed elettricisti",
-  "Parrucchieri ed estetiste",
-  "Agenzie immobiliari",
-  "Logistica e trasporti",
-  "Agenzie di comunicazione",
-  "Scuole di lingue e formazione",
-  "Palestre e centri sportivi",
-  "Fisioterapisti e nutrizionisti",
-  "Farmacie e ottici",
-  "Veterinari e toelettature",
-  "Musei e attrazioni",
-  "Aziende agricole e cantine",
-];
+/** «532 mila», «1.282». */
+const migliaia = (n: number) => (n >= 10000 ? `${Math.round(n / 1000)} mila` : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."));
 
 const FAQ = [
   {
@@ -53,7 +34,7 @@ const FAQ = [
   },
   {
     d: "Da dove prendete le domande?",
-    r: "Da quello che un cliente chiede davvero: le generiamo dalla tua categoria, dalla tua città e dalle tue specialità, con modelli scritti per ogni mestiere. Una la scegli tu.",
+    r: "Da uno studio dei prompt reali: le domande agli assistenti sono frasi di 8–25 parole con un luogo e almeno un vincolo, non parole chiave. Sei tipi (generiche, per bisogno, per specialità, per requisito, di confronto, sul nome), con modelli scritti per 36 categorie e riempiti con la tua città, la tua zona o provincia, le tue specialità e i tuoi servizi. Una la scegli tu.",
   },
   {
     d: "Serve registrarsi per il test?",
@@ -61,7 +42,7 @@ const FAQ = [
   },
   {
     d: "Cosa succede se risulto invisibile?",
-    r: "È la situazione più comune: oggi gli assistenti citano una piccola parte delle attività locali. Il report ti dice chi citano al posto tuo, da quali fonti prendono le informazioni e le tre cose da fare, in ordine di impatto. Se preferisci, le facciamo noi.",
+    r: "È la situazione più comune: ChatGPT raccomanda l'1,2% delle sedi monitorate da SOCi (2026) e il 40,9% delle attività locali non viene mai raccomandato (Insites, 10.000 attività, 2026). Il report ti dice chi citano al posto tuo, da quali fonti prendono le informazioni e le tre cose da fare, in ordine di impatto. Se preferisci, le facciamo noi.",
   },
   {
     d: "Come faccio a fidarmi dei numeri?",
@@ -208,10 +189,11 @@ export default function Landing() {
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
             <div>
-              <h2 className="text-2xl font-bold sm:text-3xl">Come raccogliamo i dati, senza fuffa</h2>
+              <h2 className="text-2xl font-bold sm:text-3xl">Come raccogliamo i dati</h2>
               <p className="mt-3 text-white/75">
-                Nessuna stima a occhio. Ogni numero del report si ricava dalla mappa domanda × assistente, e ogni metrica ha la sua
-                definizione: cos&apos;è, come si calcola, come si legge. Le {GLOSSARIO.length} voci sono in fondo a ogni report.
+                Ogni numero del report si ricava dalla mappa domanda × assistente, e ogni metrica ha la sua definizione: cos&apos;è, come si
+                calcola, come si legge. Le {GLOSSARIO.length} voci sono nelle note tecniche di ogni report. Nessuna previsione e nessuna
+                stima senza campione.
               </p>
               <p className="mt-4">
                 <Link href="/metodo" className="font-semibold text-[#9fe8c6] underline underline-offset-2">
@@ -221,12 +203,12 @@ export default function Landing() {
             </div>
             <dl className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3">
               {[
-                ["2–3×", "ogni domanda, perché le risposte cambiano"],
+                ["2–3×", "ogni domanda, in giorni diversi, perché le risposte cambiano"],
                 ["95%", "intervallo di confidenza dichiarato sulle quote"],
+                ["6", "tipi di domanda, dallo studio dei prompt reali"],
                 ["90 gg", "finestra della mediana di categoria"],
                 ["50", "domande confrontate ogni trimestre con le app vere"],
-                ["1º–5º", "posizione contata nell'elenco"],
-                ["0", "numeri stimati a occhio"],
+                ["0", "previsioni: mostriamo l'andamento, non il futuro"],
               ].map(([n, t]) => (
                 <div key={t}>
                   <dt className="tabular text-3xl font-bold tracking-tight text-[#9fe8c6]">{n}</dt>
@@ -248,18 +230,19 @@ export default function Landing() {
             <div>
               <h2 className="text-2xl font-bold sm:text-3xl">Per qualsiasi attività che i clienti cercano, dal bar alla carpenteria</h2>
               <p className="mt-3 text-muted">
-                Le domande, le fonti e le azioni cambiano con il mestiere: un ristorante si gioca su piatti e orari, un dentista sulle
-                prestazioni, una carpenteria su lavorazioni, certificazioni e provincia. Il report mostra solo quello che serve alla tua
-                categoria; per i mestieri non previsti, il profilo lo costruiamo dal tuo sito.
+                Trentasei categorie con domande, fonti e azioni proprie, dalla più numerosa alla più piccola: un ristorante si gioca su
+                piatti e orari, un dentista sulle prestazioni, una carpenteria su lavorazioni, certificazioni, provincia e domande in inglese.
+                Per i mestieri non previsti il profilo lo costruiamo dal tuo sito e dalla tua scheda Google.
               </p>
+              <p className="mt-3 text-xs text-faint">Imprese attive per categoria: ISTAT, registro ASIA 2023 (via Eurostat).</p>
             </div>
-            <ul className="flex flex-wrap gap-2">
-              {CATEGORIE.map((c) => (
-                <li key={c} className="rounded-full border border-line px-3.5 py-1.5 text-[15px]">
-                  {c}
+            <ul className="flex flex-wrap gap-1.5">
+              {profiliPerNumerosita().map((p) => (
+                <li key={p.id} className="rounded-full border border-line px-3 py-1 text-[14px]">
+                  {p.nome} <span className="tabular text-[13px] text-faint">{migliaia(p.imprese)}</span>
                 </li>
               ))}
-              <li className="rounded-full border border-dashed border-line px-3.5 py-1.5 text-[15px] text-muted">
+              <li className="rounded-full border border-dashed border-line px-3 py-1 text-[14px] text-muted">
                 e qualsiasi altro mestiere
               </li>
             </ul>

@@ -1,60 +1,90 @@
 {
   "id": "museo",
-  "nome": "Museo, attrazione, esperienza",
+  "nome": "Musei, attrazioni ed esperienze",
+  "imprese": 1282,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
   "categorieGoogle": [
     "Museo",
-    "Attrazione turistica",
     "Galleria d'arte",
+    "Attrazione turistica",
     "Parco",
-    "Castello"
+    "Castello",
+    "Sito archeologico",
+    "Mostra"
   ],
+  "famiglia": "cultura",
+  "b2b": false,
+  "inglese": true,
+  "generatoDaAI": false,
   "domande": {
     "generica": [
-      "Cosa vedere a {citta}",
-      "Musei a {citta}",
-      "Cosa fare a {citta} in un giorno",
-      "Attrazioni imperdibili a {citta}"
+      "cosa vedere a {citta} in un giorno, musei da non perdere",
+      "musei consigliati a {citta}",
+      "mostre a {citta} questo weekend"
     ],
     "bisogno": [
-      "Cosa fare a {citta} con i bambini",
-      "Mostre in corso a {citta}",
-      "{nome} orari e biglietti",
-      "Cosa vedere a {citta} quando piove",
-      "Musei gratuiti a {citta}",
-      "Cosa fare a {citta} la domenica",
-      "Visite guidate a {citta}"
+      "museo a {citta} adatto ai bambini",
+      "cosa fare a {citta} se piove",
+      "musei gratis a {citta} la prima domenica del mese"
     ],
     "specialita": [
-      "{specialita} a {citta}"
+      "museo di {specialita} vicino a {citta}",
+      "dove vedere {specialita} a {citta}"
     ],
-    "nome": "Com'è {nome} a {citta}?"
+    "requisito": [
+      "musei a {citta} con {requisito}",
+      "museo a {citta} accessibile in carrozzina"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} se ho solo mezza giornata a {citta}?"
+    ],
+    "nome": [
+      "{nome} a {citta} vale la pena? quanto tempo ci vuole",
+      "{nome} biglietti: conviene prenotare online, orari, quanto costa"
+    ],
+    "inglese": [
+      "best museums in {citta}, Italy, for first-time visitors, skip the line"
+    ]
   },
   "fonti": [
+    "Wikipedia",
     "Sito ufficiale",
     "TripAdvisor",
     "Google Maps",
+    "GetYourGuide",
     "Portale turistico del Comune",
-    "Wikipedia"
+    "Giornale locale"
   ],
   "metriche": [
-    "inclusione negli itinerari suggeriti",
-    "orari, prezzi ed eventi corretti"
+    "presenza su «cosa vedere»",
+    "orari e biglietti corretti",
+    "accessibilità e bambini citati"
   ],
   "azioni": [
     {
-      "codice": "orari-biglietti",
-      "titolo": "Pagina orari e biglietti leggibile",
-      "quando": "orari o prezzi sbagliati"
-    },
-    {
-      "codice": "eventi",
-      "titolo": "Aggiorna gli eventi in corso",
-      "quando": "eventi non citati"
-    },
-    {
       "codice": "wikipedia",
-      "titolo": "Allinea la voce Wikipedia",
-      "quando": "voce assente o diversa"
+      "titolo": "Verifica e completa la voce Wikipedia: orari, collezioni, come arrivare",
+      "quando": "Wikipedia è tra le fonti citate e la voce è incompleta"
+    },
+    {
+      "codice": "sito-visita",
+      "titolo": "Pagina «Visita» in testo: orari, biglietti, accessibilità, bambini, pioggia",
+      "quando": "domande per bisogno o requisito senza citazioni"
+    },
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa la scheda Google con orari, biglietti e accessibilità",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "tripadvisor",
+      "titolo": "Aggiorna la scheda TripAdvisor e rispondi alle recensioni",
+      "quando": "TripAdvisor tra le fonti citate"
+    },
+    {
+      "codice": "inglese",
+      "titolo": "Versione inglese delle pagine chiave del sito",
+      "quando": "domande in inglese senza citazioni"
     }
   ]
 }

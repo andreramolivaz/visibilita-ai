@@ -1,11 +1,22 @@
 import { engine } from "./engines";
 import { pesoPosizione } from "./score";
-import type { Concorrente, EngineId, ProfiloAttivita, RigaDomanda } from "./types";
+import type { Concorrente, EngineId, ProfiloAttivita, RigaDomanda, TipoDomanda } from "./types";
 
 /**
  * Statistiche del report. Tutte derivate dalle celle domanda × assistente,
  * così ogni numero si può ricalcolare a mano dalla mappa.
+ *
+ * Punteggio e numeri chiave usano solo le domande «spontanee», quelle in cui
+ * il cliente non fa il nome dell'attività (generiche, per bisogno, per
+ * specialità, per requisito): misurano se gli assistenti ti consigliano da
+ * soli. Le domande sul nome e di confronto, in cui compari quasi per forza,
+ * sono riportate a parte (nella mappa, per tipo, in «cosa dicono di te»).
+ * È la distinzione tra ricordo spontaneo e sollecitato delle ricerche di marca.
  */
+
+export const TIPI_SPONTANEI: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito"];
+
+export const spontanee = (righe: RigaDomanda[]) => righe.filter((r) => TIPI_SPONTANEI.includes(r.domanda.tipo));
 
 const volteDi = (c: { posizione: number | null; volte?: number; frequenza: string }) =>
   c.posizione === null ? 0 : (c.volte ?? Number(c.frequenza.split(" ")[0]));
@@ -20,15 +31,17 @@ export function wilson(k: number, n: number, z = 1.96): { basso: number; alto: n
   return { basso: Math.max(0, centro - semi), alto: Math.min(1, centro + semi) };
 }
 
-/** Risposte in cui compari, sul totale, con intervallo al 95%. */
-export function tassoCitazione(righe: RigaDomanda[], ripetizioni: number) {
+/** Risposte in cui compari, sul totale delle domande spontanee, con intervallo al 95%. */
+export function tassoCitazione(tutte: RigaDomanda[], ripetizioni: number) {
+  const righe = spontanee(tutte);
   const n = righe.length * (righe[0]?.celle.length ?? 0) * ripetizioni;
   const k = righe.reduce((acc, r) => acc + r.celle.reduce((a, c) => a + volteDi(c), 0), 0);
   return { k, n, quota: n ? k / n : 0, ic: wilson(k, n) };
 }
 
-/** Domande in cui compari almeno una volta, sul totale. */
-export function copertura(righe: RigaDomanda[]) {
+/** Domande spontanee in cui compari almeno una volta, sul totale. */
+export function copertura(tutte: RigaDomanda[]) {
+  const righe = spontanee(tutte);
   const k = righe.filter((r) => r.celle.some((c) => c.posizione !== null)).length;
   return { k, n: righe.length, quota: righe.length ? k / righe.length : 0 };
 }
@@ -37,8 +50,8 @@ export function copertura(righe: RigaDomanda[]) {
  * Stabilità: quota di celle in cui le ripetizioni concordano tutte
  * (sempre citato o mai citato). Bassa stabilità = risposte che cambiano.
  */
-export function stabilita(righe: RigaDomanda[], ripetizioni: number) {
-  const celle = righe.flatMap((r) => r.celle);
+export function stabilita(tutte: RigaDomanda[], ripetizioni: number) {
+  const celle = spontanee(tutte).flatMap((r) => r.celle);
   const concordi = celle.filter((c) => {
     const v = volteDi(c);
     return v === 0 || v === ripetizioni;
@@ -46,11 +59,11 @@ export function stabilita(righe: RigaDomanda[], ripetizioni: number) {
   return { concordi, totale: celle.length, quota: celle.length ? concordi / celle.length : 0 };
 }
 
-/** Posizione media quando compari, pesata per quante volte. */
-export function posizioneMedia(righe: RigaDomanda[]): number | null {
+/** Posizione media quando compari (domande spontanee), pesata per quante volte. */
+export function posizioneMedia(tutte: RigaDomanda[]): number | null {
   let somma = 0;
   let n = 0;
-  for (const r of righe) {
+  for (const r of spontanee(tutte)) {
     for (const c of r.celle) {
       const v = volteDi(c);
       if (!v || c.posizione === null) continue;
@@ -61,8 +74,9 @@ export function posizioneMedia(righe: RigaDomanda[]): number | null {
   return n ? somma / n : null;
 }
 
-/** Punteggio 0–100 per ogni assistente: media del peso-posizione sulle sue risposte. */
-export function punteggioPerMotore(righe: RigaDomanda[], ripetizioni: number): Record<EngineId, number> {
+/** Punteggio 0–100 per ogni assistente: media del peso-posizione sulle sue risposte alle domande spontanee. */
+export function punteggioPerMotore(tutte: RigaDomanda[], ripetizioni: number): Record<EngineId, number> {
+  const righe = spontanee(tutte);
   const out = {} as Record<EngineId, number>;
   const motori = righe[0]?.celle.map((c) => c.motore) ?? [];
   for (const m of motori) {
@@ -107,22 +121,71 @@ export function coerenzaDati(attivita: ProfiloAttivita) {
 }
 
 /**
- * Proiezione lineare del punteggio sui prossimi mesi (minimi quadrati).
- * È indicativa: serve a vedere la direzione, non a promettere un numero.
+ * Quota di voce: le citazioni di un'attività su tutte le citazioni di attività
+ * nelle stesse risposte (Peec, Profound, Semrush, BrightLocal la definiscono così).
+ * Se il totale non è noto, si usa la somma dei nomi elencati.
  */
-export function proiezione(punti: { mese: string; punteggio: number }[], mesi = 3): { pendenza: number; valori: number[] } {
-  const n = punti.length;
-  if (n < 3) return { pendenza: 0, valori: [] };
-  const xs = punti.map((_, i) => i);
-  const ys = punti.map((p) => p.punteggio);
-  const mx = xs.reduce((a, b) => a + b, 0) / n;
-  const my = ys.reduce((a, b) => a + b, 0) / n;
-  const sxy = xs.reduce((acc, x, i) => acc + (x - mx) * (ys[i] - my), 0);
-  const sxx = xs.reduce((acc, x) => acc + (x - mx) ** 2, 0);
-  const pendenza = sxx ? sxy / sxx : 0;
-  const intercetta = my - pendenza * mx;
-  const valori = Array.from({ length: mesi }, (_, k) => Math.max(0, Math.min(100, Math.round(intercetta + pendenza * (n + k)))));
-  return { pendenza, valori };
+export function quotaVoce(concorrenti: Concorrente[], citazioniTotali?: number): Record<string, number> {
+  const totale = citazioniTotali ?? concorrenti.reduce((acc, c) => acc + c.citazioni, 0);
+  const out: Record<string, number> = {};
+  for (const c of concorrenti) out[c.nome] = totale ? c.citazioni / totale : 0;
+  return out;
+}
+
+/**
+ * Nei primi tre: quota delle tue citazioni in cui sei tra i primi tre nomi.
+ * La posizione esatta oscilla tra una risposta e l'altra; «primi tre o oltre» è stabile.
+ */
+export function primiTre(tutte: RigaDomanda[]) {
+  let k = 0;
+  let n = 0;
+  for (const r of spontanee(tutte)) {
+    for (const c of r.celle) {
+      const v = volteDi(c);
+      if (!v || c.posizione === null) continue;
+      n += v;
+      if (c.posizione <= 3) k += v;
+    }
+  }
+  return { k, n, quota: n ? k / n : 0 };
+}
+
+/**
+ * Territorio: ogni domanda del set è in uno di tre stati.
+ * «tue»: compari almeno una volta; «contese»: non compari e c'è almeno un
+ * concorrente; «libere»: non compare nessuno in modo riconoscibile.
+ */
+export function territorio(tutte: RigaDomanda[]) {
+  const righe = spontanee(tutte);
+  const tue: RigaDomanda[] = [];
+  const contese: RigaDomanda[] = [];
+  const libere: RigaDomanda[] = [];
+  for (const r of righe) {
+    if (r.celle.some((c) => c.posizione !== null)) tue.push(r);
+    else if ((r.concorrentiCitati ?? 1) > 0) contese.push(r);
+    else libere.push(r);
+  }
+  return { tue, contese, libere, n: righe.length };
+}
+
+/**
+ * Il confronto diretto: alle domande «meglio tu o X?», in quanti assistenti
+ * sei il primo nome (cioè ti preferiscono). Una riga per domanda di confronto.
+ */
+export function confrontoDiretto(righe: RigaDomanda[]) {
+  return righe
+    .filter((r) => r.domanda.tipo === "confronto")
+    .map((r) => {
+      const risposte = r.celle.filter((c) => c.posizione !== null);
+      const preferito = r.celle.filter((c) => c.posizione === 1);
+      return { domanda: r.domanda, concorrente: r.domanda.concorrente, preferito: preferito.map((c) => c.motore), assistenti: r.celle.length, risposte: risposte.length };
+    });
+}
+
+/** Assistenti che riportano i tuoi dati senza errori, sul totale. */
+export function datiCorretti(descrizioni: { datiCorretti?: boolean }[]) {
+  const noti = descrizioni.filter((d) => d.datiCorretti !== undefined);
+  return { k: noti.filter((d) => d.datiCorretti).length, n: noti.length };
 }
 
 export const percentuale = (x: number) => `${Math.round(x * 100)}%`;

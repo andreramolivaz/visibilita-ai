@@ -1,6 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+
+/** «Riduci movimento» del sistema, letto come store esterno: sul server è falso. */
+const QUERY_MOVIMENTO = "(prefers-reduced-motion: reduce)";
+function sottoscriviMovimento(onChange: () => void) {
+  const mq = window.matchMedia(QUERY_MOVIMENTO);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+const leggiMovimento = () => window.matchMedia(QUERY_MOVIMENTO).matches;
+const leggiMovimentoServer = () => false;
 
 /**
  * La hero: una chat simulata. Scrive la domanda come la scriverebbe un cliente,
@@ -67,7 +77,7 @@ export function ChatSimulata() {
   const [fase, setFase] = useState<Fase>("scrivo");
   const [caratteri, setCaratteri] = useState(0);
   const [righe, setRighe] = useState(0);
-  const [ridotto, setRidotto] = useState(false);
+  const ridotto = useSyncExternalStore(sottoscriviMovimento, leggiMovimento, leggiMovimentoServer);
   const scena = SCENARI[i];
   const timer = useRef<number | null>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -80,14 +90,6 @@ export function ChatSimulata() {
     const py = (e.clientY - r.top) / r.height - 0.5;
     setTilt({ x: -py * 7, y: px * 9 });
   }
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setRidotto(mq.matches);
-    const onChange = () => setRidotto(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
 
   useEffect(() => {
     if (ridotto) return;

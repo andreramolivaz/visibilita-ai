@@ -3,18 +3,15 @@ import { GLOSSARIO } from "@/lib/glossario";
 /** Guida alla lettura: ogni metrica e ogni visual, cos'è, come si calcola, come si legge. */
 export function Guida() {
   return (
-    <section id="guida" className="scroll-mt-20 py-7 sm:py-9">
-      <h2 className="text-xl font-semibold sm:text-2xl">Guida alla lettura</h2>
-      <p className="mt-1 max-w-prose text-[15px] text-muted">
-        Cosa misura ogni numero di questo report, come lo calcoliamo e come usarlo. Nessun numero è stimato a occhio: tutto si ricava dalla
-        mappa domanda × assistente.
-      </p>
-      <dl className="mt-5 divide-y divide-line border-y border-line">
+    <div id="guida" className="scroll-mt-20">
+      <h3 className="font-semibold">Definizioni</h3>
+      <p className="mt-1 text-sm text-muted">Cosa misura ogni numero del report, come lo calcoliamo e come si legge. Tutto si ricava dalla mappa domanda × assistente.</p>
+      <dl className="mt-3 divide-y divide-line border-y border-line">
         {GLOSSARIO.map((v) => (
           <details key={v.id} id={`guida-${v.id}`} className="group py-3">
-            <summary className="flex cursor-pointer list-none items-start justify-between gap-4 font-semibold [&::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-[15px] font-medium [&::-webkit-details-marker]:hidden">
               <dt>{v.nome}</dt>
-              <span className="mt-1 shrink-0 text-faint transition-transform group-open:rotate-45" aria-hidden="true">
+              <span className="mt-0.5 shrink-0 text-faint transition-transform group-open:rotate-45" aria-hidden="true">
                 +
               </span>
             </summary>
@@ -35,6 +32,6 @@ export function Guida() {
           </details>
         ))}
       </dl>
-    </section>
+    </div>
   );
 }

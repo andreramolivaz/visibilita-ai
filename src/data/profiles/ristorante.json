@@ -1,45 +1,55 @@
 {
   "id": "ristorante",
-  "nome": "Ristorante, pizzeria, bar",
+  "nome": "Ristoranti, pizzerie e trattorie",
+  "imprese": 161510,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
   "categorieGoogle": [
     "Ristorante",
     "Pizzeria",
-    "Bar",
     "Trattoria",
     "Osteria",
-    "Pub"
+    "Pub",
+    "Sushi",
+    "Take away",
+    "Agriturismo con ristorante"
   ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
   "domande": {
     "generica": [
-      "Miglior {categoria} a {citta}",
+      "miglior {categoria} a {citta}",
       "{categoria} consigliata in {zona} a {citta}",
-      "{categoria} più apprezzata a {citta} secondo le recensioni",
-      "Dove mangiare bene a {citta}",
-      "{categoria} a {citta} vicino a me",
-      "{categoria} più famosa di {citta}"
+      "dove mangiare bene a {citta}",
+      "trattoria tipica a {citta} dove vanno quelli del posto, non turistica"
     ],
     "bisogno": [
-      "Dove mangiare bene a {citta} stasera",
-      "{categoria} aperta la domenica a {citta}",
-      "{categoria} economica a {citta}",
-      "{categoria} con dehors a {citta}",
+      "dove mangiare bene a {citta} spendendo poco, stasera, zona {zona}",
+      "{categoria} aperta la domenica sera a {citta}",
+      "{categoria} a {citta} per una cena romantica",
+      "{categoria} a {citta} per un compleanno con dodici persone",
       "{categoria} con delivery a {citta}",
       "{categoria} per famiglie con bambini a {citta}",
-      "{categoria} aperta a pranzo a {citta}",
-      "{categoria} con asporto a {citta}",
-      "{categoria} per una cena romantica a {citta}",
-      "{categoria} per gruppi numerosi a {citta}",
-      "{categoria} con parcheggio a {citta}",
-      "{categoria} aperta fino a tardi a {citta}",
-      "{categoria} che accetta cani a {citta}",
-      "{categoria} con menu vegetariano a {citta}"
+      "pizza d'asporto a {citta}",
+      "{categoria} economica a {citta}"
     ],
     "specialita": [
       "{categoria} con {specialita} a {citta}",
-      "Miglior {categoria} {specialita} a {citta}",
-      "{categoria} {specialita} in {zona} a {citta}"
+      "miglior {categoria} {specialita} a {citta}",
+      "dove mangiare {specialita} vicino a me a {citta}"
     ],
-    "nome": "Com'è {nome} a {citta}?"
+    "requisito": [
+      "{categoria} a {citta} con {requisito}",
+      "{categoria} con forno a legna a {citta} che faccia anche senza glutine"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} a {citta} per la pizza?",
+      "meglio {nome} o {concorrente} per mangiare a {citta}?"
+    ],
+    "nome": [
+      "com'è {nome} a {citta}? ne vale la pena, recensioni"
+    ]
   },
   "fonti": [
     "TheFork",
@@ -48,38 +58,39 @@
     "Gambero Rosso",
     "Michelin",
     "Giornale locale",
-    "Sito ufficiale"
+    "Sito ufficiale",
+    "Instagram"
   ],
   "metriche": [
     "presenza per specialità",
     "orari e menu coerenti",
-    "delivery citato"
+    "delivery e asporto citati"
   ],
   "azioni": [
     {
-      "codice": "thefork",
-      "titolo": "Apri la scheda su TheFork",
-      "quando": "fonte TheFork assente e citata dai concorrenti"
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
     },
     {
-      "codice": "menu-testo",
-      "titolo": "Metti il menu in testo sul sito",
-      "quando": "menu solo in PDF o immagine"
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su TheFork",
+      "quando": "TheFork è tra le fonti citate e tu non ci sei"
     },
     {
-      "codice": "recensioni-specialita",
-      "titolo": "Chiedi recensioni che citino la specialità",
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
       "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
     },
     {
-      "codice": "categoria-google",
-      "titolo": "Correggi la categoria su Google",
-      "quando": "un motore ti descrive con una categoria diversa"
-    },
-    {
-      "codice": "orari",
-      "titolo": "Allinea gli orari tra sito e Google",
-      "quando": "incoerenza orari"
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
     }
   ]
 }

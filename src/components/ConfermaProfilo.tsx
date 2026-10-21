@@ -25,6 +25,14 @@ const TIPO: Record<TipoDomanda, { titolo: string; descrizione: (a: ProfiloAttivi
     titolo: "Domanda per specialità",
     descrizione: (a) => `su ${a.specialita[1] ?? a.specialita[0] ?? "quello che fai meglio"}`,
   },
+  requisito: {
+    titolo: "Domanda per requisito",
+    descrizione: (a) => `un vincolo preciso: ${a.servizi[0] ?? "certificazione, convenzione, servizio"}`,
+  },
+  confronto: {
+    titolo: "Domanda di confronto",
+    descrizione: () => "tu contro il concorrente più citato: chi preferiscono",
+  },
   nome: {
     titolo: "Domanda sul tuo nome",
     descrizione: () => "cosa dice l'AI di te, e se i dati sono giusti",

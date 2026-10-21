@@ -1,62 +1,83 @@
 {
   "id": "idraulico",
-  "nome": "Idraulico, elettricista, fabbro",
+  "nome": "Idraulici e termoidraulici",
+  "imprese": 62786,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
   "categorieGoogle": [
     "Idraulico",
-    "Elettricista",
-    "Fabbro",
-    "Termoidraulico",
-    "Antennista"
+    "Termoidraulica",
+    "Installatore caldaie",
+    "Impianti idraulici"
   ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
   "domande": {
     "generica": [
-      "{categoria} a {citta}",
-      "{categoria} consigliato a {citta}",
-      "{categoria} affidabile a {citta}",
-      "{categoria} vicino a me a {citta}"
+      "idraulico onesto a {citta}, prezzi chiari",
+      "idraulico vicino a me a {citta} per sostituire un rubinetto, prezzo",
+      "miglior termoidraulico in provincia di {provincia}"
     ],
     "bisogno": [
-      "{categoria} urgente a {citta}",
-      "{categoria} 24 ore a {citta}",
-      "{categoria} a {citta} preventivo gratuito",
-      "{categoria} per una perdita d'acqua a {citta}",
-      "{categoria} economico a {citta}",
-      "{categoria} che lavora il sabato a {citta}",
-      "{categoria} per caldaie a {citta}",
-      "{categoria} con fattura e garanzia a {citta}"
+      "idraulico a {citta} che venga oggi, ho una perdita sotto il lavandino",
+      "idraulico urgente {zona} {citta} anche di sera",
+      "idraulico a {citta} per sbloccare uno scarico otturato, quanto costa?"
     ],
     "specialita": [
-      "{categoria} in zona {zona} a {citta}",
-      "{specialita} a {citta}"
+      "chi installa {specialita} a {citta}?",
+      "termoidraulico in provincia di {provincia} per {specialita}"
     ],
-    "nome": "Com'è {nome} a {citta}?"
+    "requisito": [
+      "idraulico a {citta} che rilascia fattura e fa il preventivo prima",
+      "idraulico a {citta} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} come idraulico a {citta}?"
+    ],
+    "nome": [
+      "{nome} idraulico {citta} com'è? recensioni"
+    ]
   },
   "fonti": [
     "Google Maps",
-    "PagineGialle",
+    "Sito ufficiale",
     "ProntoPro",
     "Instapro",
-    "Habitissimo"
+    "Habitissimo",
+    "PagineGialle",
+    "Facebook"
   ],
   "metriche": [
-    "copertura per quartiere",
-    "reperibilità citata"
+    "presenza su urgenza",
+    "presenza per impianto",
+    "fattura e preventivo citati"
   ],
   "azioni": [
     {
-      "codice": "paginegialle",
-      "titolo": "Apri la scheda PagineGialle o ProntoPro",
-      "quando": "fonte assente"
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
     },
     {
-      "codice": "pagina-zona",
-      "titolo": "Una pagina per ogni zona servita",
-      "quando": "invisibile sulle domande per quartiere"
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su ProntoPro",
+      "quando": "ProntoPro è tra le fonti citate e tu non ci sei"
     },
     {
-      "codice": "numero",
-      "titolo": "Numero e orari in evidenza sul sito e su Google",
-      "quando": "reperibilità non citata"
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
     }
   ]
 }

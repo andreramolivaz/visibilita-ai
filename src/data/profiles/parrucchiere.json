@@ -1,62 +1,83 @@
 {
   "id": "parrucchiere",
-  "nome": "Parrucchiere, estetista, benessere",
+  "nome": "Parrucchieri e barbieri",
+  "imprese": 90000,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
   "categorieGoogle": [
     "Parrucchiere",
     "Salone di bellezza",
-    "Estetista",
     "Barbiere",
-    "Centro estetico",
-    "Spa"
+    "Hair stylist"
   ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
   "domande": {
     "generica": [
-      "Miglior {categoria} a {citta}",
-      "{categoria} consigliato in {zona} a {citta}",
-      "{categoria} migliore a {citta} secondo le recensioni",
-      "{categoria} a {citta} vicino a me"
+      "miglior parrucchiere a {citta} per {specialita}",
+      "parrucchiere consigliato in {zona} a {citta}",
+      "barbiere in {zona} a {citta} per barba e taglio, prezzo"
     ],
     "bisogno": [
-      "{categoria} senza appuntamento a {citta}",
-      "{categoria} aperto il lunedì a {citta}",
-      "{categoria} economico a {citta}",
-      "{categoria} aperto la domenica a {citta}",
-      "{categoria} con prenotazione online a {citta}",
-      "{categoria} per uomo a {citta}",
-      "{categoria} per bambini a {citta}"
+      "parrucchiere a {citta} senza appuntamento, oggi",
+      "parrucchiere economico ma bravo a {citta}",
+      "parrucchiere aperto la domenica a {citta}",
+      "dove tagliare i capelli a un bambino a {citta}"
     ],
     "specialita": [
-      "{categoria} per {specialita} a {citta}",
-      "{specialita} a {citta}"
+      "parrucchiere a {citta} specializzato in {specialita}",
+      "parrucchiere per capelli ricci a {citta}"
     ],
-    "nome": "Com'è {nome} a {citta}?"
+    "requisito": [
+      "parrucchiere a {citta} che usi {requisito}",
+      "parrucchiere a {citta} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per un colore a {citta}?"
+    ],
+    "nome": [
+      "{nome} parrucchiere {citta} recensioni"
+    ]
   },
   "fonti": [
     "Google Maps",
     "Treatwell",
-    "Fresha",
     "Instagram",
-    "Sito ufficiale"
+    "Facebook",
+    "Sito ufficiale",
+    "PagineGialle"
   ],
   "metriche": [
-    "presenza per servizio",
-    "prenotazione online citata"
+    "presenza per trattamento",
+    "prenotazione online citata",
+    "orari coerenti"
   ],
   "azioni": [
     {
-      "codice": "treatwell",
-      "titolo": "Apri la scheda Treatwell o Fresha",
-      "quando": "fonte assente"
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
     },
     {
-      "codice": "listino",
-      "titolo": "Metti il listino sul sito",
-      "quando": "prezzi non citati"
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Treatwell",
+      "quando": "Treatwell è tra le fonti citate e tu non ci sei"
     },
     {
-      "codice": "foto",
-      "titolo": "Carica foto recenti su Google e Instagram",
-      "quando": "foto vecchie o assenti"
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
     }
   ]
 }

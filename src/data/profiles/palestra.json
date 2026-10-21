@@ -1,54 +1,87 @@
 {
   "id": "palestra",
-  "nome": "Palestra, piscina, yoga",
+  "nome": "Palestre, piscine e personal trainer",
+  "imprese": 33374,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
   "categorieGoogle": [
     "Palestra",
-    "Piscina",
-    "Centro yoga",
     "Centro fitness",
-    "Crossfit"
+    "Piscina",
+    "Personal trainer",
+    "Studio di pilates",
+    "Crossfit",
+    "Scuola di danza",
+    "Arti marziali"
   ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
   "domande": {
     "generica": [
-      "Miglior {categoria} a {citta}",
-      "{categoria} consigliata a {citta}",
-      "{categoria} migliore a {citta} secondo le recensioni",
-      "{categoria} in {zona} a {citta}"
+      "palestra a {citta} zona {zona} con abbonamento mensile senza vincoli",
+      "palestra consigliata a {citta}",
+      "miglior studio di pilates a {citta}"
     ],
     "bisogno": [
-      "{categoria} aperta 24 ore a {citta}",
-      "{categoria} con prova gratuita a {citta}",
-      "{categoria} economica a {citta}",
-      "{categoria} con personal trainer a {citta}",
-      "{categoria} per principianti a {citta}",
-      "{categoria} con abbonamento mensile a {citta}",
-      "{categoria} aperta la domenica a {citta}"
+      "palestra a {citta} aperta la domenica",
+      "palestra economica a {citta}, meno di 40 euro al mese",
+      "piscina a {citta} per un corso di nuoto per bambini"
     ],
     "specialita": [
-      "{categoria} con corsi di {specialita} a {citta}",
-      "{categoria} con piscina a {citta}"
+      "dove fare {specialita} a {citta}",
+      "personal trainer a {citta} per {specialita}"
     ],
-    "nome": "Com'è {nome} a {citta}?"
+    "requisito": [
+      "palestra a {citta} con {requisito}",
+      "palestra a {citta} aperta 24 ore"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} come palestra a {citta}?"
+    ],
+    "nome": [
+      "{nome} palestra {citta} recensioni"
+    ]
   },
   "fonti": [
     "Google Maps",
+    "Instagram",
     "Sito ufficiale",
-    "Instagram"
+    "Facebook",
+    "Wellhub",
+    "ClassPass",
+    "PagineGialle"
   ],
   "metriche": [
-    "presenza per corso",
-    "orari e prova gratuita citati"
+    "presenza per disciplina",
+    "orari e prezzi citati",
+    "servizi citati"
   ],
   "azioni": [
     {
-      "codice": "pagina-corsi",
-      "titolo": "Pagina corsi con orari e listino",
-      "quando": "corsi non citati"
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
     },
     {
-      "codice": "prova",
-      "titolo": "Metti la prova gratuita in evidenza",
-      "quando": "prova non citata"
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Google Maps",
+      "quando": "Google Maps è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
     }
   ]
 }

@@ -1,51 +1,86 @@
 {
   "id": "immobiliare",
-  "nome": "Agenzia immobiliare",
+  "nome": "Agenzie immobiliari e amministratori di condominio",
+  "imprese": 55825,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
   "categorieGoogle": [
-    "Agenzia immobiliare"
+    "Agenzia immobiliare",
+    "Agente immobiliare",
+    "Amministratore di condominio",
+    "Gestione immobiliare",
+    "Affitti brevi"
   ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
   "domande": {
     "generica": [
-      "Miglior agenzia immobiliare a {citta}",
-      "Agenzia immobiliare consigliata a {citta}",
-      "Agenzia immobiliare affidabile a {citta}",
-      "Agenzia immobiliare in {zona} a {citta}"
+      "agenzia immobiliare seria a {citta} per vendere casa",
+      "agenzia immobiliare consigliata in {zona} a {citta}",
+      "amministratore di condominio a {citta} con buone recensioni"
     ],
     "bisogno": [
-      "Vendere casa a {citta}: quale agenzia",
-      "Affitti in zona {zona} a {citta}",
-      "Valutazione casa gratuita a {citta}",
-      "Affittare casa a {citta}: quale agenzia",
-      "Agenzia immobiliare con commissioni basse a {citta}",
-      "Agenzia immobiliare per studenti a {citta}",
-      "Comprare casa a {citta}: a chi rivolgersi"
+      "chi mi fa una valutazione gratuita dell'appartamento a {citta}?",
+      "agenzia a {citta} per vendere casa con provvigione bassa",
+      "agenzie a {citta} che trattano case in {zona} sotto i 200 mila euro",
+      "amministratore di condominio a {citta} per un palazzo di venti unità, preventivo"
     ],
     "specialita": [
-      "Agenzia immobiliare {specialita} a {citta}"
+      "agenzia a {zona} {citta} specializzata in {specialita}",
+      "agenzia immobiliare a {citta} che gestisca {specialita}"
     ],
-    "nome": "Com'è {nome} a {citta}?"
+    "requisito": [
+      "agenzia immobiliare a {citta} con {requisito}",
+      "agenzia immobiliare a {citta} che parli inglese per acquirenti stranieri"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per vendere casa a {citta}?"
+    ],
+    "nome": [
+      "{nome} immobiliare {citta} recensioni, sono affidabili?"
+    ]
   },
   "fonti": [
     "Immobiliare.it",
     "Idealista",
     "Casa.it",
-    "Google Maps"
+    "Google Maps",
+    "Sito ufficiale",
+    "Subito",
+    "Facebook",
+    "FIAIP"
   ],
   "metriche": [
     "presenza per zona",
-    "presenza per vendita o affitto",
-    "annunci citati"
+    "servizi citati (valutazione, affitti)",
+    "recensioni citate"
   ],
   "azioni": [
     {
-      "codice": "annunci",
-      "titolo": "Completa gli annunci sui portali",
-      "quando": "annunci non citati"
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
     },
     {
-      "codice": "pagina-zona",
-      "titolo": "Una pagina per ogni zona",
-      "quando": "invisibile sulle domande per zona"
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Immobiliare.it",
+      "quando": "Immobiliare.it è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
     }
   ]
 }

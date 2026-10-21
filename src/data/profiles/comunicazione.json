@@ -1,0 +1,92 @@
+{
+  "id": "comunicazione",
+  "nome": "Agenzie di comunicazione, marketing e pubblicità",
+  "imprese": 39835,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Agenzia di comunicazione",
+    "Agenzia di marketing",
+    "Agenzia pubblicitaria",
+    "Agenzia SEO",
+    "Studio grafico",
+    "Ufficio stampa"
+  ],
+  "famiglia": "b2b",
+  "b2b": true,
+  "inglese": true,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "agenzia di comunicazione a {citta} per una PMI",
+      "migliori agenzie di branding in {regione}",
+      "studio grafico a {citta} per logo e cataloghi"
+    ],
+    "bisogno": [
+      "agenzia social media a {citta} con prezzi per piccole attività",
+      "agenzia che segua il marketing di un'azienda B2B in {regione}"
+    ],
+    "specialita": [
+      "agenzia a {citta} specializzata in {specialita}",
+      "agenzia in provincia di {provincia} con casi studio nel settore {specialita}"
+    ],
+    "requisito": [
+      "agenzia di comunicazione a {citta} che faccia anche {requisito}",
+      "agenzia a {citta} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per il marketing di un ristorante a {citta}?"
+    ],
+    "nome": [
+      "{nome} agenzia {citta} com'è? recensioni dei clienti"
+    ],
+    "inglese": [
+      "marketing agency in {citta}, Italy, for a foreign brand entering the Italian market"
+    ]
+  },
+  "fonti": [
+    "Sito ufficiale",
+    "LinkedIn",
+    "Sortlist",
+    "Clutch",
+    "Google Maps",
+    "Instagram",
+    "Premi di settore"
+  ],
+  "metriche": [
+    "presenza per servizio",
+    "settori e casi studio citati",
+    "prezzi per piccole attività citati"
+  ],
+  "azioni": [
+    {
+      "codice": "directory",
+      "titolo": "Inserisci l'azienda su Sortlist, Clutch e LinkedIn con lavorazioni, materiali e certificazioni",
+      "quando": "le directory sono citate dagli assistenti e tu non ci sei"
+    },
+    {
+      "codice": "catalogo",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni lavorazione: materiali, spessori, lotti minimi, tempi",
+      "quando": "catalogo solo in PDF o lavorazioni non descritte"
+    },
+    {
+      "codice": "certificazioni",
+      "titolo": "Metti le certificazioni sul sito e sulle schede, con numero ed ente",
+      "quando": "domande per requisito senza citazioni"
+    },
+    {
+      "codice": "linkedin",
+      "titolo": "Aggiorna la pagina LinkedIn aziendale con settori serviti e referenze",
+      "quando": "LinkedIn tra le fonti citate e pagina ferma"
+    },
+    {
+      "codice": "inglese",
+      "titolo": "Versione inglese delle pagine chiave del sito",
+      "quando": "domande in inglese senza citazioni"
+    },
+    {
+      "codice": "elenchi",
+      "titolo": "Fatti elencare dall'associazione di categoria e negli elenchi espositori delle fiere",
+      "quando": "concorrenti citati da elenchi di settore"
+    }
+  ]
+}

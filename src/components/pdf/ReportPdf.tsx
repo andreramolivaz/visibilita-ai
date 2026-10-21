@@ -2,14 +2,16 @@ import { Document, Page, Text, View, StyleSheet, Font, Svg, Rect, Circle, Path }
 import type { Report, TipoDomanda, Verdetto } from "@/lib/types";
 import { ENGINES } from "@/lib/engines";
 import { distribuzionePosizioni } from "@/components/report/Posizioni";
-import { coerenzaDati, concentrazione, copertura, percentuale, punteggioPerMotore, stabilita, tassoCitazione } from "@/lib/stats";
+import { coerenzaDati, concentrazione, confrontoDiretto, copertura, datiCorretti, percentuale, posizioneMedia, primiTre, punteggioPerMotore, quotaVoce, spontanee, stabilita, tassoCitazione, territorio } from "@/lib/stats";
 import { GLOSSARIO } from "@/lib/glossario";
+import { RIFERIMENTI } from "@/lib/riferimenti";
 
 /**
- * Il report in PDF: un rapporto tecnico. Intestazione con il marchio e
- * l'identificativo del documento, sezioni numerate, tabelle con righe,
- * numeri tabellari, metodo in allegato. Un solo colore, come il sito.
- * In white-label `logo` è il nome dell'agenzia al posto del nostro.
+ * Il report in PDF: cinque pagine. Sintesi e azioni, concorrenti e dove ti
+ * trovano, mappa e fonti, descrizioni e metodo, riferimenti e definizioni.
+ * Rapporto tecnico: intestazione con marchio e identificativo, sezioni
+ * numerate, tabelle, numeri tabellari, un solo colore. In white-label
+ * `logo` è il nome dell'agenzia al posto del nostro.
  */
 
 Font.registerHyphenationCallback((parola) => [parola]);
@@ -26,16 +28,16 @@ const C = {
   danger: "#b3261e",
   warn: "#9a6400",
   grey: "#b9c2be",
-  entrambi: "#7fa99a",
 };
 
 const POS: Record<1 | 2 | 3 | 4 | 5, string> = { 1: "#0a4537", 2: "#0e5a47", 3: "#3f7f6b", 4: "#7fa99a", 5: "#b7d1c7" };
-const PESO_POSIZIONE = [1, 0.85, 0.7, 0.55, 0.4];
 
 const NOME_TIPO: Record<TipoDomanda, string> = {
   generica: "Generica",
   bisogno: "Per bisogno",
   specialita: "Per specialità",
+  requisito: "Per requisito",
+  confronto: "Confronto",
   nome: "Sul nome",
 };
 
@@ -49,8 +51,9 @@ const s = StyleSheet.create({
   pie: { position: "absolute", bottom: 22, left: 40, right: 40, flexDirection: "row", justifyContent: "space-between", borderTopWidth: 0.5, borderTopColor: C.line, paddingTop: 5, fontSize: 7, color: C.faint },
   h1: { fontSize: 22, fontFamily: "Helvetica-Bold", letterSpacing: -0.4, lineHeight: 1.15 },
   sopratitolo: { fontSize: 8, color: C.muted, letterSpacing: 0.3, marginBottom: 3 },
-  h2: { fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 14, marginBottom: 5, paddingBottom: 3, borderBottomWidth: 0.75, borderBottomColor: C.ink },
+  h2: { fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 14, marginBottom: 4, paddingBottom: 3, borderBottomWidth: 0.75, borderBottomColor: C.ink },
   h3: { fontSize: 9.5, fontFamily: "Helvetica-Bold", marginTop: 8, marginBottom: 3 },
+  lettura: { fontSize: 9, lineHeight: 1.4, marginBottom: 5 },
   p: { fontSize: 9, lineHeight: 1.45 },
   nota: { fontSize: 7.5, color: C.muted, lineHeight: 1.35 },
   riga: { flexDirection: "row", alignItems: "center" },
@@ -81,9 +84,17 @@ const dataLunga = (iso: string) => new Date(iso.length === 10 ? iso + "T12:00:00
 const oraIt = (iso: string) => new Date(iso).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" });
 const pct = (a: number, b: number) => (b > 0 ? `${Math.round((a / b) * 100)}%` : "–");
 const n1 = (x: number) => x.toLocaleString("it-IT", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-const n2 = (x: number) => x.toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const maiuscola = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
 const volteDi = (c: { posizione: number | null; volte?: number; frequenza: string }) => (c.posizione === null ? 0 : (c.volte ?? Number(c.frequenza.split(" ")[0])));
+
+/** «18–20 ottobre 2026» oppure «20 ottobre 2026, 10:12–10:14». */
+function periodo(inizio: string, fine: string) {
+  const a = new Date(inizio);
+  const b = new Date(fine);
+  if (a.toDateString() === b.toDateString()) return `${dataLunga(inizio)}, ${oraIt(inizio)}–${oraIt(fine)}`;
+  if (a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear()) return `${a.getDate()}–${dataLunga(fine)}`;
+  return `${dataLunga(inizio)} – ${dataLunga(fine)}`;
+}
 
 function coloreVerdetto(v: Verdetto) {
   if (v === "Invisibile") return C.danger;
@@ -94,19 +105,6 @@ function coloreVerdetto(v: Verdetto) {
 /** Identificativo del documento: VAI-AAAAMMGG-ID. */
 function docId(r: Report) {
   return `VAI-${r.data.replaceAll("-", "")}-${r.id.toUpperCase().replace(/[^A-Z0-9]/g, "")}`;
-}
-
-/** Posizione media quando compari, pesata per quante volte. */
-function posizioneMedia(celle: { posizione: number | null; volte?: number; frequenza: string }[]) {
-  let somma = 0;
-  let n = 0;
-  for (const c of celle) {
-    const v = volteDi(c);
-    if (!v || c.posizione === null) continue;
-    somma += c.posizione * v;
-    n += v;
-  }
-  return n ? somma / n : null;
 }
 
 function Marchio({ nome }: { nome: string }) {
@@ -131,7 +129,7 @@ function Testata({ r, logo }: { r: Report; logo?: string }) {
     <View style={s.testata} fixed>
       <View>
         <Marchio nome={logo ?? "Visibilità AI"} />
-        <Text style={[s.mono, { marginTop: 2 }]}>Report di visibilità AI · metodo v1.0</Text>
+        <Text style={[s.mono, { marginTop: 2 }]}>Report di visibilità AI · metodo v1.1</Text>
       </View>
       <View style={s.testataDestra}>
         <Text style={{ fontSize: 8.5, fontFamily: "Helvetica-Bold" }}>
@@ -195,7 +193,7 @@ function BarraCella({ valore, massimo, pieno = true }: { valore: number; massimo
   );
 }
 
-function Scala({ punteggio }: { punteggio: number }) {
+function Scala({ punteggio, riferimento }: { punteggio: number; riferimento?: number }) {
   const fasce = [
     { nome: "Invisibile", da: 0, a: 10, colore: C.danger },
     { nome: "Poco visibile", da: 11, a: 40, colore: C.warn },
@@ -211,6 +209,7 @@ function Scala({ punteggio }: { punteggio: number }) {
       </View>
       <View style={{ position: "relative", height: 7 }}>
         <View style={{ position: "absolute", left: `${punteggio}%`, top: -9, width: 1.5, height: 12, backgroundColor: C.ink }} />
+        {riferimento !== undefined && <View style={{ position: "absolute", left: `${riferimento}%`, top: -8, width: 1.5, height: 10, backgroundColor: C.faint }} />}
       </View>
       <View style={{ flexDirection: "row" }}>
         {fasce.map((f) => {
@@ -236,7 +235,7 @@ function Segmenti({ parti, totale, altezza = 10 }: { parti: { v: number; colore:
         .filter((p) => p.v > 0)
         .map((p, i) => (
           <View key={i} style={{ width: `${(p.v / totale) * 100}%`, backgroundColor: p.colore, alignItems: "center", justifyContent: "center" }}>
-            {p.testo && (p.v / totale) * 100 >= 9 && <Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", color: p.chiaro ? C.ink : "#fff", lineHeight: 1 }}>{p.testo}</Text>}
+            {p.testo && (p.v / totale) * 100 >= 7 && <Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", color: p.chiaro ? C.ink : "#fff", lineHeight: 1 }}>{p.testo}</Text>}
           </View>
         ))}
     </View>
@@ -258,15 +257,14 @@ function Chiavi({ voci }: { voci: [string, string][] }) {
 
 export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }) {
   const totale = r.domande * r.motori.length * r.ripetizioni;
+  const spont = r.domandeSpontanee * r.motori.length * r.ripetizioni;
+  const confronti = confrontoDiretto(r.righe);
   const col = coloreVerdetto(r.verdetto);
   const dist = distribuzionePosizioni(r.righe);
   const distTot = Object.values(dist).reduce((a, b) => a + b, 0);
   const tue = r.concorrenti.find((c) => c.seiTu);
   const tueCitazioni = tue?.citazioni ?? 0;
-  const domandeInCuiCompari = r.righe.filter((x) => x.celle.some((c) => c.posizione !== null)).length;
-  const posMedia = posizioneMedia(r.righe.flatMap((x) => x.celle));
   const gratuito = r.piano === "gratuito";
-  const durata = Math.max(0, Math.round((new Date(r.metodo.fine).getTime() - new Date(r.metodo.inizio).getTime()) / 1000));
   const indiceTuo = r.concorrenti.findIndex((c) => c.seiTu);
   const testa = (nome: string) => r.testaATesta.find((t) => t.nome === nome);
   const guadagno = r.azioni.reduce((acc, a) => acc + (a.impattoStimato ?? 0), 0);
@@ -277,23 +275,23 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
   const conc = concentrazione(r.concorrenti);
   const coer = coerenzaDati(r.attivita);
   const parziali = punteggioPerMotore(r.righe, r.ripetizioni);
-
-  const sezioni = [
-    "1. Sintesi dei risultati",
-    "2. Azioni consigliate",
-    "3. Concorrenti citati e confronto diretto",
-    "4. Visibilità per assistente e per tipo di domanda",
-    "5. Mappa domanda × assistente",
-    gratuito ? "6. Fonti citate" : "6. Fonti citate e terminologia",
-    "7. Descrizione dell'attività secondo gli assistenti",
-    "Allegato A. Metodo, dati della scansione e limiti",
-    "Allegato B. Elenco delle domande",
-    "Allegato C. Guida alla lettura delle metriche",
-  ];
+  const qv = quotaVoce(r.concorrenti, r.citazioniTotali);
+  const top3 = primiTre(r.righe);
+  const posMedia = posizioneMedia(r.righe);
+  const terr = territorio(r.righe);
+  const dc = datiCorretti(r.descrizioniPerMotore);
+  const critici = r.descrizioniPerMotore.filter((d) => d.tono === "critico");
+  const primo = r.concorrenti.filter((c) => !c.seiTu)[0];
+  const piuForte = (nome: string) => {
+    const chi = r.citaChi.find((x) => x.nome === nome);
+    if (!chi) return "–";
+    const [m, n] = Object.entries(chi.perMotore).sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0))[0] ?? [];
+    return m && n ? `${nomeMotore(m)} (${n})` : "–";
+  };
 
   return (
     <Document title={`${docId(r)} – ${r.attivita.nome}, ${r.attivita.citta}`} author={logo ?? "Visibilità AI"} subject="Report di visibilità AI" language="it">
-      {/* Pagina 1: frontespizio e sintesi */}
+      {/* Pagina 1: sintesi e azioni */}
       <Page size="A4" style={s.page}>
         <Testata r={r} logo={logo} />
 
@@ -305,12 +303,11 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           {r.attivita.categoriaGoogle} · {r.attivita.indirizzo}
           {r.attivita.telefono ? ` · ${r.attivita.telefono}` : ""}
         </Text>
-
         <Text style={[s.mono, { marginTop: 6, color: C.muted }]}>
-          {docId(r)} · {dataLunga(r.metodo.inizio)}, {oraIt(r.metodo.inizio)}–{oraIt(r.metodo.fine)} · {r.metodo.posizione} · {r.domande} domande × {r.motori.length} assistenti × {r.ripetizioni} ripetizioni = {totale} risposte · {gratuito ? "test gratuito" : `piano ${r.piano}`} · metodo v1.0
+          {docId(r)} · {periodo(r.metodo.inizio, r.metodo.fine)} · {r.metodo.posizione} · {r.domande} domande × {r.motori.length} assistenti × {r.ripetizioni} ripetizioni = {totale} risposte · punteggio sulle {r.domandeSpontanee} domande spontanee ({spont} risposte) · {gratuito ? "test gratuito" : `piano ${r.piano}`}
         </Text>
 
-        {/* In 30 secondi: dove sei, chi ti passa davanti, cosa fare prima */}
+        {/* In 30 secondi */}
         <View style={[s.riga, { marginTop: 12, gap: 6, alignItems: "stretch" }]}>
           <View style={[s.kpi, { flex: 1 }]}>
             <Text style={s.kpiTesto}>Dove sei</Text>
@@ -319,16 +316,17 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
               <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold", color: col, marginBottom: 2 }}>{r.verdetto}</Text>
             </View>
             <Text style={[s.p, { fontSize: 8.5, marginTop: 3 }]}>
-              {r.contesto ? `Più alto del ${r.contesto.percentile}% delle ${r.contesto.categoria} analizzate a ${r.contesto.citta} (mediana ${r.contesto.mediana}).` : `Compari in ${tueCitazioni} risposte su ${totale}.`}
+              Compari in {tueCitazioni} risposte su {spont} alle domande senza il tuo nome; quota di voce {percentuale(qv[tue?.nome ?? ""] ?? 0)}.
+              {r.contesto ? ` Più alto del ${r.contesto.percentile}% delle ${r.contesto.categoria} analizzate a ${r.contesto.citta} (mediana ${r.contesto.mediana}).` : ""}
             </Text>
           </View>
           <View style={[s.kpi, { flex: 1.2 }]}>
             <Text style={s.kpiTesto}>Chi ti passa davanti</Text>
             {r.concorrenti.filter((c) => !c.seiTu).slice(0, 3).map((c, i) => {
-              const t = r.testaATesta.find((x) => x.nome === c.nome);
+              const t = testa(c.nome);
               return (
                 <Text key={c.nome} style={[s.p, { fontSize: 8.5, marginTop: i === 0 ? 2 : 1 }]}>
-                  <Text style={{ fontFamily: "Helvetica-Bold" }}>{i + 1}. {c.nome}</Text> · {c.citazioni} citazioni (tu {tueCitazioni}){t ? `, in ${t.loroSenzaTe} domande senza di te` : ""}
+                  <Text style={{ fontFamily: "Helvetica-Bold" }}>{i + 1}. {c.nome}</Text> · {c.citazioni} citazioni, quota di voce {percentuale(qv[c.nome] ?? 0)}{t ? `; in ${t.loroSenzaTe} domande su ${r.domandeSpontanee} c'è lui e non tu` : ""}
                 </Text>
               );
             })}
@@ -341,7 +339,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
                 <Text style={[s.p, { fontSize: 8.5, marginTop: 2 }]}>{r.azioni[0].dato}</Text>
                 {r.azioni[0].impattoStimato !== undefined && (
                   <Text style={{ fontSize: 8.5, marginTop: 3, fontFamily: "Helvetica-Bold", color: C.accent }}>
-                    Vale circa +{r.azioni[0].impattoStimato} punti{potenziale !== null ? `; con tutte e tre, ${potenziale}.` : "."}
+                    Stima +{r.azioni[0].impattoStimato} punti{potenziale !== null ? `; con tutte e tre, ${potenziale}.` : "."}
                   </Text>
                 )}
               </>
@@ -349,7 +347,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           </View>
         </View>
 
-        <Text style={s.h2}>1. Sintesi dei risultati</Text>
+        <Text style={s.h2}>1. Sintesi</Text>
         <View style={s.colonne}>
           <View style={[s.col, { flex: 0.9 }]}>
             <View style={[s.riga, { alignItems: "flex-end", gap: 10 }]}>
@@ -359,18 +357,23 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
                 <Text style={s.nota}>su 100</Text>
               </View>
             </View>
-            <Scala punteggio={r.punteggio} />
-            {r.contesto && (
-              <Text style={[s.p, { marginTop: 6, fontSize: 8.5 }]}>
-                Contesto: su {r.contesto.attivitaAnalizzate} {r.contesto.categoria} analizzate a {r.contesto.citta} la mediana è {r.contesto.mediana}; questo punteggio è più alto del {r.contesto.percentile}% di loro.
-              </Text>
+            <Scala punteggio={r.punteggio} riferimento={r.contesto?.mediana} />
+            {r.contesto && <Text style={[s.nota, { marginTop: 3 }]}>Segno grigio: mediana delle {r.contesto.attivitaAnalizzate} {r.contesto.categoria} analizzate a {r.contesto.citta} ({r.contesto.mediana}).</Text>}
+            {distTot > 0 && (
+              <View style={{ marginTop: 8 }}>
+                <Text style={{ fontSize: 8.5, fontFamily: "Helvetica-Bold", marginBottom: 2 }}>Quando compari, dove ti mettono</Text>
+                <Segmenti totale={distTot} parti={([1, 2, 3, 4, 5] as const).map((p) => ({ v: dist[p], colore: POS[p], testo: `${p}°`, chiaro: p >= 4 }))} />
+                <Text style={[s.nota, { marginTop: 2 }]}>
+                  {([1, 2, 3, 4, 5] as const).filter((p) => dist[p] > 0).map((p) => `${p}° ${dist[p]}`).join(" · ")} su {distTot} citazioni; nei primi tre {percentuale(top3.quota)}.
+                </Text>
+              </View>
             )}
             {potenziale !== null && (
-              <View style={{ marginTop: 6 }}>
+              <View style={{ marginTop: 8 }}>
                 <View style={[s.riga, { justifyContent: "space-between", marginBottom: 2 }]}>
                   <Text style={{ fontSize: 8.5, fontFamily: "Helvetica-Bold" }}>Stima con le azioni della sezione 2</Text>
                   <Text style={{ fontSize: 8.5 }}>
-                    {r.punteggio} → <Text style={{ fontFamily: "Helvetica-Bold", color: C.accent }}>{potenziale}</Text>
+                    da {r.punteggio} a <Text style={{ fontFamily: "Helvetica-Bold", color: C.accent }}>{potenziale}</Text>
                   </Text>
                 </View>
                 <Segmenti
@@ -383,166 +386,146 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
                 />
               </View>
             )}
-            <Text style={[s.nota, { marginTop: 5 }]}>
-              Punteggio = media, pesata per quota d&apos;uso di ogni assistente, del peso della posizione in cui compari (1° = 1,00 · 2° = 0,85 · 3° = 0,70 · 4° = 0,55 · 5° = 0,40 · assente = 0). Dettagli in Allegato A.
-            </Text>
           </View>
           <View style={[s.col, { flex: 1.1 }]}>
-            {gratuito ? (
-              <View style={s.riquadro}>
-                <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: C.accent }}>1.1 Sintesi scritta: disponibile nel piano Base</Text>
-                <Text style={[s.nota, { marginTop: 3 }]}>Nel piano Base il report include la sintesi in breve scritta dai dati, la terminologia usata dagli assistenti, 15 domande e 3 ripetizioni, scansione mensile e andamento del punteggio.</Text>
-              </View>
-            ) : (
-              <>
-                <Text style={[s.h3, { marginTop: 0 }]}>1.1 In breve</Text>
-                <Text style={s.p}>{r.sintesi}</Text>
-              </>
-            )}
+            <Text style={[s.h3, { marginTop: 0 }]}>1.1 Numeri chiave</Text>
+            <Tabella
+              colonne={[
+                { testo: "Metrica", larghezza: 1.5 },
+                { testo: "Valore", larghezza: 0.6, num: true },
+                { testo: "Campione e nota", larghezza: 2 },
+              ]}
+              righe={[
+                ["Risposte in cui compari", percentuale(cit.quota), `${cit.k} su ${cit.n}; intervallo al 95%: ${percentuale(cit.ic.basso)}–${percentuale(cit.ic.alto)}`],
+                ["Quota di voce", percentuale(qv[tue?.nome ?? ""] ?? 0), `${tueCitazioni} su ${r.citazioniTotali ?? conc.totale} citazioni di attività; primo: ${primo ? percentuale(qv[primo.nome] ?? 0) : "–"}`],
+                ["Domande in cui compari", percentuale(cop.quota), `${cop.k} su ${cop.n}; ${terr.contese.length} con un concorrente e non tu, ${terr.libere.length} senza nessuno`],
+                ["Nei primi tre, quando compari", percentuale(top3.quota), `${top3.k} su ${top3.n}; posizione media ${posMedia ? n1(posMedia) : "–"}`],
+                ["Stabilità delle risposte", percentuale(stab.quota), `${stab.concordi} celle su ${stab.totale} concordano su ${r.ripetizioni} ripetizioni`],
+                ["Dati corretti", dc.n ? `${dc.k} su ${dc.n}` : `${coer.coerenti} su ${coer.totale}`, dc.n ? `assistenti che riportano i tuoi dati senza errori; ${r.errori.length} errori (sezione 7)` : coer.coerenti === coer.totale ? "nessuna incoerenza" : r.attivita.incoerenze.join(" ")],
+              ]}
+            />
+            <Text style={[s.nota, { marginTop: 4 }]}>
+              Punteggio = media, pesata per quota d&apos;uso di ogni assistente, del peso della posizione in cui compari (1° = 1,00 · 2° = 0,85 · 3° = 0,70 · 4° = 0,55 · 5° = 0,40 · assente = 0). Definizioni in Allegato C.
+            </Text>
           </View>
         </View>
 
-        {distTot > 0 && (
-          <>
-            <Text style={s.h3}>1.2 Distribuzione delle posizioni quando compari</Text>
-            <Segmenti totale={distTot} parti={([1, 2, 3, 4, 5] as const).map((p) => ({ v: dist[p], colore: POS[p], testo: `${p}°`, chiaro: p >= 4 }))} />
-            <Text style={[s.nota, { marginTop: 3 }]}>
-              {([1, 2, 3, 4, 5] as const)
-                .filter((p) => dist[p] > 0)
-                .map((p) => `${p}° posto: ${dist[p]} risposte (${pct(dist[p], distTot)}, peso ${n2(PESO_POSIZIONE[p - 1])})`)
-                .join(" · ")}
-              . Totale {distTot} risposte in cui compari.
-            </Text>
-          </>
-        )}
-
-        <Text style={s.h3}>1.3 Numeri chiave</Text>
-        <Tabella
-          colonne={[
-            { testo: "Metrica", larghezza: 1.6 },
-            { testo: "Valore", larghezza: 0.7, num: true },
-            { testo: "Campione", larghezza: 1.2, num: true },
-            { testo: "Nota", larghezza: 2.6 },
-          ]}
-          righe={[
-            ["Risposte in cui compari", percentuale(cit.quota), `${cit.k} / ${cit.n}`, `Intervallo al 95%: ${percentuale(cit.ic.basso)}–${percentuale(cit.ic.alto)}`],
-            ["Domande in cui compari", percentuale(cop.quota), `${cop.k} / ${cop.n}`, `${cop.n - cop.k} domande vuote per tutti gli assistenti`],
-            ["Posizione media quando compari", posMedia ? `${n1(posMedia)}°` : "–", `${tueCitazioni} risposte`, "1° = primo nome dell'elenco"],
-            ["Stabilità delle risposte", percentuale(stab.quota), `${stab.concordi} / ${stab.totale} celle`, `Celle in cui tutte le ${r.ripetizioni} ripetizioni concordano`],
-            ["Concentrazione dei consigli", percentuale(conc.quotaTop3), `${conc.totale} citazioni`, "Quota dei tre nomi più citati"],
-            ["Dati di scheda coerenti", `${coer.coerenti} / ${coer.totale}`, "campi", coer.coerenti === coer.totale ? "Nessuna incoerenza" : r.attivita.incoerenze.join(" ")],
-          ]}
-        />
-
-        <Text style={s.h3}>Indice</Text>
-        <View style={{ flexDirection: "row", gap: 16 }}>
-          {[sezioni.slice(0, Math.ceil(sezioni.length / 2)), sezioni.slice(Math.ceil(sezioni.length / 2))].map((col, i) => (
-            <View key={i} style={{ flex: 1 }}>
-              {col.map((x) => (
-                <Text key={x} style={[s.p, { fontSize: 8.5, lineHeight: 1.45 }]}>
-                  {x}
-                </Text>
-              ))}
-            </View>
-          ))}
-        </View>
-        <Pie r={r} />
-      </Page>
-
-      {/* Pagina 2: azioni e concorrenti */}
-      <Page size="A4" style={s.page}>
-        <Testata r={r} logo={logo} />
-        <Text style={[s.h2, { marginTop: 0 }]}>2. Azioni consigliate</Text>
+        <Text style={s.h2}>2. Azioni, in ordine di impatto</Text>
         <Tabella
           colonne={[
             { testo: "Priorità", larghezza: 0.5 },
             { testo: "Azione", larghezza: 2 },
             { testo: "Dato di riferimento", larghezza: 2.6 },
-            { testo: "Impatto atteso", larghezza: 0.8 },
+            { testo: "Impatto", larghezza: 0.6 },
             { testo: "Punti stimati", larghezza: 0.7, num: true },
           ]}
           righe={r.azioni.map((a, i) => [String(i + 1), a.titolo, a.dato, maiuscola(a.impatto), a.impattoStimato !== undefined ? `+${a.impattoStimato}` : "–"])}
         />
-        <Text style={[s.nota, { marginTop: 4 }]}>Le azioni sono scelte tra quelle previste per la categoria dell&apos;attività e ordinate per impatto atteso. I punti stimati sono una stima dai dati di questo report{potenziale !== null ? ` (punteggio stimato dopo le azioni: ${potenziale})` : ""}; la verifica avviene alla scansione successiva.</Text>
-        <Text style={s.h2}>3. Concorrenti citati e confronto diretto</Text>
+        <Pie r={r} />
+      </Page>
+
+      {/* Pagina 2: concorrenti e dove ti trovano */}
+      <Page size="A4" style={s.page}>
+        <Testata r={r} logo={logo} />
+        <Text style={[s.h2, { marginTop: 0 }]}>3. Chi consigliano al posto tuo</Text>
+        {primo && tue && (
+          <Text style={s.lettura}>
+            {primo.nome}: {primo.citazioni} citazioni contro le tue {tueCitazioni}; quota di voce {percentuale(qv[primo.nome] ?? 0)} contro {percentuale(qv[tue.nome] ?? 0)}.
+            {testa(primo.nome) ? ` In ${testa(primo.nome)!.loroSenzaTe} domande su ${r.domandeSpontanee} c'è lui e non tu.` : ""}
+          </Text>
+        )}
         <Tabella
           colonne={[
             { testo: "#", larghezza: 0.3 },
             { testo: "Attività", larghezza: 2 },
-            { testo: `Citazioni (su ${totale})`, larghezza: 1, num: true },
-            { testo: "Quota", larghezza: 0.7, num: true },
-            { testo: "Domande: solo lui", larghezza: 0.9, num: true },
-            { testo: "Entrambi", larghezza: 0.8, num: true },
-            { testo: "Solo tu", larghezza: 0.7, num: true },
-            { testo: "", larghezza: 1.3 },
+            { testo: `Citazioni (su ${spont})`, larghezza: 1, num: true },
+            { testo: "Quota di voce", larghezza: 0.9, num: true },
+            { testo: "Nei primi 3", larghezza: 0.8, num: true },
+            { testo: "Domande senza di te", larghezza: 1, num: true },
+            { testo: "Più forte su", larghezza: 1.2 },
+            { testo: "", larghezza: 1.1 },
           ]}
           evidenzia={indiceTuo}
           righe={r.concorrenti.map((c, i) => {
             const t = c.seiTu ? undefined : testa(c.nome);
-            return [String(i + 1), c.seiTu ? `${c.nome} (questa attività)` : c.nome, String(c.citazioni), pct(c.citazioni, c.totale), t ? String(t.loroSenzaTe) : "–", t ? String(t.entrambi) : "–", t ? String(t.tuSenzaLoro) : "–", <BarraCella key={c.nome} valore={c.citazioni} massimo={r.concorrenti[0]?.totale ?? 1} pieno={Boolean(c.seiTu)} />];
+            return [
+              String(i + 1),
+              c.seiTu ? `${c.nome} (questa attività)` : c.nome,
+              String(c.citazioni),
+              percentuale(qv[c.nome] ?? 0),
+              c.primiTre !== undefined && c.citazioni > 0 ? pct(c.primiTre, c.citazioni) : "–",
+              t ? `${t.loroSenzaTe} su ${r.domandeSpontanee}` : "–",
+              piuForte(c.nome),
+              <BarraCella key={c.nome} valore={c.citazioni} massimo={r.concorrenti[0]?.citazioni ?? 1} pieno={Boolean(c.seiTu)} />,
+            ];
           })}
         />
         <Text style={[s.nota, { marginTop: 4 }]}>
-          «Solo lui»: domande, su {r.domande}, in cui il concorrente compare e questa attività no; «Entrambi» e «Solo tu» a specchio. I concorrenti seguiti nel confronto diretto sono i tre più citati.
+          Risposte alle {r.domandeSpontanee} domande senza il tuo nome. Quota di voce: citazioni dell&apos;attività su tutte le citazioni di attività in quelle risposte ({r.citazioniTotali ?? conc.totale}); i tre nomi più citati ne raccolgono il {percentuale(conc.quotaTop3)} tra i primi cinque. Nei primi 3: quota delle sue citazioni in 1ª, 2ª o 3ª posizione. Più forte su: assistente che lo cita in più domande (su {r.domandeSpontanee}).
         </Text>
+        {confronti.map((c) => (
+          <Text key={c.domanda.id} style={[s.p, { marginTop: 4 }]}>
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Confronto diretto{c.concorrente ? ` con ${c.concorrente}` : ""}:</Text> ti mettono per primo {c.preferito.length} {c.preferito.length === 1 ? "assistente" : "assistenti"} su {c.assistenti}
+            {c.preferito.length > 0 ? ` (${c.preferito.map(nomeMotore).join(", ")})` : ""}. Non entra nel punteggio.
+          </Text>
+        ))}
 
-        {r.citaChi.length > 0 && (
-          <>
-            <Text style={s.h3}>3.1 Chi cita chi: domande (su {r.domande}) in cui ogni assistente cita l&apos;attività</Text>
-            <Tabella
-              colonne={[{ testo: "Attività", larghezza: 2 }, ...r.motori.map((m) => ({ testo: nomeMotore(m), larghezza: 0.8, num: true }))]}
-              evidenzia={r.citaChi.findIndex((c) => c.seiTu)}
-              righe={r.citaChi.map((c) => [c.seiTu ? `${c.nome} (questa attività)` : c.nome, ...r.motori.map((m) => String(c.perMotore[m] ?? 0))])}
-            />
-          </>
-        )}
-        <Pie r={r} />
-      </Page>
+        <Text style={s.h2}>4. Dove ti trovano</Text>
+        <Text style={s.lettura}>
+          Ci sei in {terr.tue.length} domande su {terr.n}; in {terr.contese.length} c&apos;è un concorrente e tu no; in {terr.libere.length} non c&apos;è nessuno.
+        </Text>
+        <Segmenti
+          totale={terr.n}
+          altezza={12}
+          parti={[
+            { v: terr.tue.length, colore: C.accent, testo: `ci sei ${terr.tue.length}` },
+            { v: terr.contese.length, colore: C.grey, testo: `concorrente ${terr.contese.length}`, chiaro: true },
+            { v: terr.libere.length, colore: C.soft, testo: `nessuno ${terr.libere.length}`, chiaro: true },
+          ]}
+        />
+        <Text style={[s.nota, { marginTop: 3 }]}>Le domande con un concorrente e non tu sono da conquistare: l&apos;assistente ha già una risposta. Quelle senza nessuno sono libere: basta una fonte buona per essere l&apos;unico nome.</Text>
 
-      {/* Pagina 3: assistenti, tipi, mappa */}
-      <Page size="A4" style={s.page}>
-        <Testata r={r} logo={logo} />
-        <Text style={[s.h2, { marginTop: 0 }]}>4. Visibilità per assistente e per tipo di domanda</Text>
-        <Text style={[s.h3, { marginTop: 4 }]}>4.1 Per assistente</Text>
+        <Text style={s.h3}>4.1 Per assistente</Text>
         <Tabella
           colonne={[
             { testo: "Assistente", larghezza: 1.2 },
             { testo: "Utenti in Italia (mln)", larghezza: 1, num: true },
             { testo: "Peso", larghezza: 0.6, num: true },
-            { testo: `Domande in cui compari (su ${r.domande})`, larghezza: 1.3, num: true },
-            { testo: `Risposte in cui compari (su ${r.domande * r.ripetizioni})`, larghezza: 1.4, num: true },
-            { testo: "Posizione media", larghezza: 0.9, num: true },
+            { testo: `Domande in cui compari (su ${r.domandeSpontanee})`, larghezza: 1.3, num: true },
+            { testo: `Risposte in cui compari (su ${r.domandeSpontanee * r.ripetizioni})`, larghezza: 1.4, num: true },
             { testo: "Punteggio parziale", larghezza: 0.9, num: true },
             { testo: "", larghezza: 1.1 },
           ]}
           righe={r.perMotore.map((m) => {
-            const celle = r.righe.map((x) => x.celle.find((c) => c.motore === m.motore)!);
+            const celle = spontanee(r.righe).map((x) => x.celle.find((c) => c.motore === m.motore)!);
             const risposte = celle.reduce((acc, c) => acc + volteDi(c), 0);
-            const pm = posizioneMedia(celle);
             const e = motore(m.motore);
-            return [nomeMotore(m.motore), e ? n1(e.utentiMln) : "–", e ? pct(e.peso, 1) : "–", String(m.comparse), String(risposte), pm ? `${n1(pm)}°` : "–", String(parziali[m.motore] ?? 0), <BarraCella key={m.motore} valore={parziali[m.motore] ?? 0} massimo={100} />];
+            return [nomeMotore(m.motore), e ? n1(e.utentiMln) : "–", e ? pct(e.peso, 1) : "–", String(m.comparse), String(risposte), String(parziali[m.motore] ?? 0), <BarraCella key={m.motore} valore={parziali[m.motore] ?? 0} massimo={100} />];
           })}
         />
-        <Text style={[s.nota, { marginTop: 4 }]}>
-          In ordine di quota d&apos;uso in Italia (Audicom/Comscore, luglio 2026); peso rinormalizzato sugli assistenti interrogati. Punteggio parziale: la formula del punteggio, ristretta a quell&apos;assistente.
-        </Text>
+        <Text style={[s.nota, { marginTop: 3 }]}>Domande spontanee. In ordine di quota d&apos;uso in Italia (Audicom/Comscore, luglio 2026); peso rinormalizzato sugli assistenti interrogati. Punteggio parziale: la formula del punteggio, ristretta a quell&apos;assistente.</Text>
 
         <Text style={s.h3}>4.2 Per tipo di domanda</Text>
         <Tabella
           colonne={[
-            { testo: "Tipo di domanda", larghezza: 1.4 },
-            { testo: "Domande", larghezza: 0.8, num: true },
-            { testo: "Risposte analizzate", larghezza: 1, num: true },
-            { testo: "Risposte in cui compari", larghezza: 1.1, num: true },
-            { testo: "Quota", larghezza: 0.8, num: true },
+            { testo: "Tipo", larghezza: 1.2 },
+            { testo: "Domande", larghezza: 0.7, num: true },
+            { testo: "Risposte", larghezza: 0.8, num: true },
+            { testo: "In cui compari", larghezza: 0.9, num: true },
+            { testo: "Quota", larghezza: 0.7, num: true },
             { testo: "", larghezza: 1.6 },
           ]}
           righe={r.perTipo.map((t) => [NOME_TIPO[t.tipo], String(t.domande), String(t.totale), String(t.comparse), pct(t.comparse, t.totale), <BarraCella key={t.tipo} valore={t.comparse} massimo={t.totale} />])}
         />
-        <Text style={[s.nota, { marginTop: 3 }]}>Generica: «miglior pizzeria a Bergamo». Per bisogno: orario, prezzo, servizio. Per specialità: un piatto o una lavorazione. Sul nome: la domanda diretta sull&apos;attività.</Text>
+        <Text style={[s.nota, { marginTop: 3 }]}>Generica: categoria e luogo. Per bisogno: urgenza, orario, prezzo, situazione. Per specialità: la prestazione. Per requisito: certificazione, convenzione, servizio accessorio. Confronto: «meglio X o Y?». Sul nome: la verifica dell&apos;attività. Nelle ultime due compari quasi per forza: non entrano nel punteggio.</Text>
+        <Pie r={r} />
+      </Page>
 
-        <Text style={s.h2}>5. Mappa domanda × assistente</Text>
-        <Text style={[s.nota, { marginBottom: 6 }]}>Ogni cella è una domanda posta a un assistente: posizione media in cui compari e quante volte su {r.ripetizioni}. Più scura la cella, più in alto ti mettono. Vuota: non compari.</Text>
+      {/* Pagina 3: mappa, fonti, terminologia */}
+      <Page size="A4" style={s.page}>
+        <Testata r={r} logo={logo} />
+        <Text style={[s.h2, { marginTop: 0 }]}>5. Mappa domanda × assistente</Text>
+        <Text style={[s.nota, { marginBottom: 6 }]}>Ogni cella è una domanda posta a un assistente: posizione in cui compari e quante volte su {r.ripetizioni}. Più scura la cella, più in alto ti mettono. «Conc.»: concorrenti distinti citati per quella domanda.</Text>
         <View style={s.th}>
           <Text style={[s.thTesto, { width: 16 }]}>#</Text>
           <Text style={[s.thTesto, { flex: 2.8 }]}>Domanda</Text>
@@ -552,7 +535,8 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
               {nomeMotore(m)}
             </Text>
           ))}
-          <Text style={[s.thTesto, { flex: 0.7, textAlign: "right" }]}>Compari</Text>
+          <Text style={[s.thTesto, { flex: 0.6, textAlign: "right" }]}>Compari</Text>
+          <Text style={[s.thTesto, { flex: 0.5, textAlign: "right" }]}>Conc.</Text>
         </View>
         {r.righe.map((riga, i) => {
           const compari = riga.celle.reduce((acc, c) => acc + volteDi(c), 0);
@@ -579,9 +563,10 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
                   </View>
                 );
               })}
-              <Text style={[s.tdNum, { flex: 0.7 }]}>
+              <Text style={[s.tdNum, { flex: 0.6 }]}>
                 {compari}/{r.motori.length * r.ripetizioni}
               </Text>
+              <Text style={[s.tdNum, { flex: 0.5, color: C.muted }]}>{riga.concorrentiCitati ?? "–"}</Text>
             </View>
           );
         })}
@@ -599,57 +584,74 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           </View>
         </View>
 
-        <Pie r={r} />
-      </Page>
-
-      {/* Pagina 4: fonti, terminologia, descrizioni */}
-      <Page size="A4" style={s.page}>
-        <Testata r={r} logo={logo} />
-        <Text style={[s.h2, { marginTop: 0 }]}>{gratuito ? "6. Fonti citate" : "6. Fonti citate e terminologia"}</Text>
+        <Text style={s.h2}>{gratuito ? "6. Fonti citate" : "6. Fonti citate e terminologia"}</Text>
         <View style={s.colonne}>
           <View style={s.col}>
             <Text style={[s.h3, { marginTop: 0 }]}>6.1 Fonti citate dagli assistenti</Text>
+            {r.fonti[0] && (
+              <Text style={[s.lettura, { fontSize: 8.5 }]}>
+                {r.fonti[0].nome} è la fonte più citata ({r.fonti[0].citazioni} risposte): {r.fonti[0].ciSei ? "hai una scheda" : "non hai una scheda"}
+                {r.fonti[0].concorrentiPresenti !== undefined ? `; concorrenti presenti: ${r.fonti[0].concorrentiPresenti} su 5` : ""}.
+              </Text>
+            )}
             <Tabella
               colonne={[
                 { testo: "Fonte", larghezza: 1.5 },
                 { testo: "Citazioni", larghezza: 0.8, num: true },
                 { testo: "Quota", larghezza: 0.6, num: true },
-                { testo: "Presenza", larghezza: 0.8, num: true },
-                { testo: "Concorrenti presenti (su 5)", larghezza: 1.1, num: true },
+                { testo: "Ci sei", larghezza: 0.6, num: true },
+                { testo: "Concorrenti (su 5)", larghezza: 1, num: true },
               ]}
               righe={r.fonti.map((f) => [f.nome, String(f.citazioni), pct(f.citazioni, totale), f.ciSei ? "Sì" : "No", f.concorrentiPresenti !== undefined ? String(f.concorrentiPresenti) : "–"])}
             />
-            <Text style={[s.nota, { marginTop: 4 }]}>Presenza: l&apos;attività ha una scheda o una pagina su quella fonte. Dove è «No», gli assistenti non possono trovarla lì.</Text>
+            <Text style={[s.nota, { marginTop: 4 }]}>Ci sei: l&apos;attività ha una scheda o una pagina su quella fonte. Dove è «No», gli assistenti non possono trovarla lì. Il sito dell&apos;attività pesa più di ogni directory nelle domande sul nome (Insites, 2026).</Text>
           </View>
           <View style={s.col}>
             {gratuito ? (
               <View style={[s.riquadro, { marginTop: 14 }]}>
-                <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: C.accent }}>6.2 Terminologia: disponibile nel piano Base</Text>
+                <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: C.accent }}>6.2 Terminologia: nel piano Base</Text>
                 <Text style={[s.nota, { marginTop: 3 }]}>I termini più usati dagli assistenti quando consigliano nella categoria, e se compaiono già nelle recensioni e sul sito dell&apos;attività.</Text>
               </View>
             ) : (
               <>
                 <Text style={[s.h3, { marginTop: 0 }]}>6.2 Terminologia ricorrente</Text>
+                {r.termini.find((t) => !t.ceLHai) && (
+                  <Text style={[s.lettura, { fontSize: 8.5 }]}>
+                    «{r.termini.find((t) => !t.ceLHai)!.termine}»: {r.termini.find((t) => !t.ceLHai)!.volte} volte nelle risposte, {r.termini.find((t) => !t.ceLHai)!.volteTue ?? 0} nelle tue recensioni.
+                  </Text>
+                )}
                 <Tabella
                   colonne={[
                     { testo: "Termine", larghezza: 1.8 },
-                    { testo: "Occorrenze", larghezza: 0.9, num: true },
+                    { testo: "Nelle risposte", larghezza: 0.9, num: true },
                     { testo: "Nelle tue recensioni", larghezza: 1.1, num: true },
                   ]}
                   righe={r.termini.map((t) => [t.termine, String(t.volte), t.volteTue !== undefined ? String(t.volteTue) : t.ceLHai ? "Sì" : "No"])}
                 />
-                <Text style={[s.nota, { marginTop: 4 }]}>Occorrenze nelle {totale} risposte, e quante volte il termine compare nelle recensioni Google dell&apos;attività.</Text>
+                <Text style={[s.nota, { marginTop: 4 }]}>Occorrenze nelle {totale} risposte della categoria, e quante volte il termine compare nelle recensioni Google dell&apos;attività.</Text>
               </>
             )}
           </View>
         </View>
-        <Text style={s.h2}>7. Descrizione dell&apos;attività secondo gli assistenti</Text>
+        <Pie r={r} />
+      </Page>
+
+      {/* Pagina 4: descrizioni, errori, metodo */}
+      <Page size="A4" style={s.page}>
+        <Testata r={r} logo={logo} />
+        <Text style={[s.h2, { marginTop: 0 }]}>7. Cosa dicono di te</Text>
+        <Text style={s.lettura}>
+          {dc.n ? `Dati corretti in ${dc.k} assistenti su ${dc.n}; ` : ""}
+          {r.errori.length} {r.errori.length === 1 ? "errore" : "errori"}; {critici.length ? `tono critico su ${critici.map((d) => nomeMotore(d.motore)).join(", ")}` : "nessuna descrizione critica"}.
+        </Text>
         <Tabella
           colonne={[
             { testo: "Assistente", larghezza: 0.8 },
-            { testo: "Descrizione restituita alla domanda sul nome", larghezza: 4 },
+            { testo: "Descrizione restituita alla domanda sul nome", larghezza: 3.6 },
+            { testo: "Tono", larghezza: 0.6 },
+            { testo: "Dati", larghezza: 0.6 },
           ]}
-          righe={r.descrizioniPerMotore.map((d) => [nomeMotore(d.motore), d.testo])}
+          righe={r.descrizioniPerMotore.map((d) => [nomeMotore(d.motore), d.testo, d.tono ? maiuscola(d.tono) : "–", d.datiCorretti === undefined ? "–" : d.datiCorretti ? "Corretti" : "Da correggere"])}
         />
         <Text style={s.h3}>7.1 Errori rilevati nei dati</Text>
         {r.errori.length > 0 ? (
@@ -664,107 +666,83 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
         ) : (
           <Text style={s.p}>Nessun errore rilevato.</Text>
         )}
+        <Text style={[s.nota, { marginTop: 4 }]}>Il tono è segnalato solo quando è critico: negli studi di settore è positivo per quasi tutte le attività e un punteggio di sentiment non direbbe cosa fare. Un errore si corregge alla fonte da cui l&apos;assistente l&apos;ha preso.</Text>
 
-
-        <Text style={s.h2}>Allegato A. Metodo, dati della scansione e limiti</Text>
-        <View style={[s.colonne, { marginBottom: 6 }]}>
+        <Text style={s.h2}>Allegato A. Metodo e dati della scansione</Text>
+        <View style={[s.colonne, { marginBottom: 4 }]}>
           <View style={s.col}>
             <Chiavi
               voci={[
                 ["Identificativo", docId(r)],
-                ["Data scansione", `${dataLunga(r.metodo.inizio)}, ${oraIt(r.metodo.inizio)}–${oraIt(r.metodo.fine)} (${Math.floor(durata / 60)} min ${durata % 60} s)`],
-                ["Posizione impostata", r.metodo.posizione],
-                ["Lingua", r.metodo.lingua],
-                ["Piano", gratuito ? "Test gratuito" : maiuscola(r.piano)],
+                ["Scansione", periodo(r.metodo.inizio, r.metodo.fine)],
+                ["Posizione, lingua, canale", `${r.metodo.posizione}; ${r.metodo.lingua}${r.metodo.canale ? `; ${r.metodo.canale}` : ""}`],
+                ["Piano e metodo", `${gratuito ? "Test gratuito" : maiuscola(r.piano)} · v1.1 · pesi Audicom/Comscore, luglio 2026`],
               ]}
             />
           </View>
           <View style={s.col}>
             <Chiavi
               voci={[
-                ["Assistenti interrogati", `${r.motori.length}: ${r.motori.map(nomeMotore).join(", ")}`],
-                ["Domande", String(r.domande)],
-                ["Ripetizioni per domanda", String(r.ripetizioni)],
-                ["Risposte analizzate", `${totale} (${r.domande} × ${r.motori.length} × ${r.ripetizioni})`],
-                ["Metodo", "v1.0 · pesi Audicom/Comscore, luglio 2026"],
+                ["Assistenti e pesi", r.motori.map((m) => `${nomeMotore(m)} ${pct(motore(m)?.peso ?? 0, 1)}`).join(", ")],
+                ["Domande", `${r.domande} (${r.perTipo.map((t) => `${t.domande} ${NOME_TIPO[t.tipo].toLowerCase()}`).join(", ")})`],
+                ["Risposte analizzate", `${totale} (${r.domande} × ${r.motori.length} × ${r.ripetizioni}); ${spont} alle ${r.domandeSpontanee} domande spontanee`],
               ]}
             />
           </View>
         </View>
         <View style={s.colonne}>
           <View style={s.col}>
-            <Text style={[s.h3, { marginTop: 0 }]}>A.1 Raccolta</Text>
-            <Text style={s.p}>
-              Ogni domanda è stata posta {r.ripetizioni} volte a ciascun assistente tramite le interfacce ufficiali, con posizione impostata su «{r.metodo.posizione}» e lingua {r.metodo.lingua}, tra le {oraIt(r.metodo.inizio)} e le {oraIt(r.metodo.fine)} del {dataLunga(r.metodo.inizio)}.
+            <Text style={[s.h3, { marginTop: 0 }]}>A.1 Raccolta e riconoscimento</Text>
+            <Text style={[s.p, { fontSize: 8.5 }]}>
+              Ogni domanda è stata posta {r.ripetizioni} volte a ciascun assistente tramite le interfacce ufficiali, con posizione impostata su «{r.metodo.posizione}»; di ogni risposta sono registrati testo, ordine dei nomi citati e fonti consultate. L&apos;attività risulta citata quando nome, indirizzo o telefono coincidono con la scheda Google Business Profile; i concorrenti sono le attività della stessa categoria citate nelle risposte, aggregate per nome e indirizzo.
             </Text>
-            <Text style={s.h3}>A.2 Riconoscimento</Text>
-            <Text style={s.p}>L&apos;attività risulta citata quando nome, indirizzo o telefono coincidono con la scheda Google Business Profile. I concorrenti sono le attività della stessa categoria citate nelle risposte, aggregate per nome e indirizzo.</Text>
-            <Text style={s.h3}>A.3 Punteggio</Text>
-            <Text style={s.p}>Per ogni assistente si calcola la media del peso della posizione su tutte le sue risposte (1° = 1,00 · 2° = 0,85 · 3° = 0,70 · 4° = 0,55 · 5° = 0,40 · assente = 0). Il punteggio è la media di questi valori pesata per la quota d&apos;uso degli assistenti interrogati, su scala 0–100.</Text>
+            <Text style={s.h3}>A.2 Punteggio e quota di voce</Text>
+            <Text style={[s.p, { fontSize: 8.5 }]}>Solo sulle domande spontanee, quelle senza il nome dell&apos;attività. Per ogni assistente: media del peso della posizione sulle sue risposte (1° = 1,00 · 2° = 0,85 · 3° = 0,70 · 4° = 0,55 · 5° = 0,40 · assente = 0); punteggio = media di questi valori pesata per la quota d&apos;uso degli assistenti, su scala 0–100. Quota di voce = citazioni dell&apos;attività su tutte le citazioni di attività nelle stesse risposte.</Text>
           </View>
           <View style={s.col}>
-            <Text style={[s.h3, { marginTop: 0 }]}>A.4 Pesi degli assistenti</Text>
-            <Tabella
-              colonne={[
-                { testo: "Assistente", larghezza: 1.4 },
-                { testo: "Utenti IT (mln)", larghezza: 1, num: true },
-                { testo: "Peso", larghezza: 0.8, num: true },
-              ]}
-              righe={r.motori.map((m) => {
-                const e = motore(m);
-                return [nomeMotore(m), e ? n1(e.utentiMln) : "–", e ? pct(e.peso, 1) : "–"];
-              })}
-            />
-            <Text style={s.h3}>A.5 Limiti</Text>
+            <Text style={[s.h3, { marginTop: 0 }]}>A.3 Note e limiti</Text>
             {r.metodo.note.map((nota) => (
               <Text key={nota} style={[s.p, { fontSize: 8.5 }]}>
                 – {nota}
               </Text>
             ))}
-            <Text style={[s.p, { fontSize: 8.5 }]}>– Le interfacce ufficiali possono differire dalle app: lo scarto è misurato ogni trimestre su un campione di domande.</Text>
+            <Text style={[s.p, { fontSize: 8.5 }]}>– Le interfacce ufficiali possono differire dalle app: lo scarto è misurato ogni trimestre su un campione di domande e pubblicato.</Text>
+            <Text style={[s.p, { fontSize: 8.5 }]}>– Nessuna previsione: le risposte degli assistenti non hanno una base statistica che le renda prevedibili.</Text>
+            <Text style={[s.p, { fontSize: 8.5 }]}>– Le azioni (sezione 2) sono scelte tra quelle previste per la categoria, in ordine di impatto atteso; i punti stimati si verificano alla scansione successiva.</Text>
           </View>
         </View>
-
-        <Text style={s.h2}>Allegato B. Elenco delle domande</Text>
-        <Tabella
-          colonne={[
-            { testo: "#", larghezza: 0.3 },
-            { testo: "Domanda", larghezza: 3.5 },
-            { testo: "Tipo", larghezza: 1 },
-          ]}
-          righe={r.righe.map((x, i) => [String(i + 1), x.domanda.testo, NOME_TIPO[x.domanda.tipo]])}
-        />
         <Pie r={r} />
       </Page>
 
-      {/* Allegato C: guida alla lettura */}
+      {/* Pagina 5: riferimenti esterni e definizioni */}
       <Page size="A4" style={s.page}>
         <Testata r={r} logo={logo} />
-        <Text style={[s.h2, { marginTop: 0 }]}>Allegato C. Guida alla lettura delle metriche</Text>
-        <Text style={[s.nota, { marginBottom: 6 }]}>Per ogni metrica e visual del report: cos&apos;è, come si calcola, come si legge. Nessun numero è stimato a occhio: tutto si ricava dalla mappa domanda × assistente.</Text>
-        {GLOSSARIO.map((v) => (
-          <View key={v.id} style={{ marginBottom: 7, paddingBottom: 6, borderBottomWidth: 0.5, borderBottomColor: C.lineSoft }} wrap={false}>
-            <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold", marginBottom: 2 }}>{v.nome}</Text>
-            <Text style={[s.p, { fontSize: 8.5 }]}>
-              <Text style={{ fontFamily: "Helvetica-Bold", color: C.muted }}>Cos&apos;è. </Text>
-              {v.cosa}
-            </Text>
-            <Text style={[s.p, { fontSize: 8.5 }]}>
-              <Text style={{ fontFamily: "Helvetica-Bold", color: C.muted }}>Come si calcola. </Text>
-              {v.come}
-            </Text>
-            <Text style={[s.p, { fontSize: 8.5 }]}>
-              <Text style={{ fontFamily: "Helvetica-Bold", color: C.muted }}>Come si legge. </Text>
-              {v.lettura}
-            </Text>
-            {v.nonE && (
-              <Text style={[s.p, { fontSize: 8.5 }]}>
-                <Text style={{ fontFamily: "Helvetica-Bold", color: C.muted }}>Cosa non è. </Text>
-                {v.nonE}
-              </Text>
-            )}
-          </View>
-        ))}
+        <Text style={[s.h2, { marginTop: 0 }]}>Allegato B. Riferimenti esterni</Text>
+        <Text style={[s.nota, { marginBottom: 5 }]}>Quanto è normale non comparire, secondo gli studi di settore. Servono a leggere il numero di questo report, non a sostituirlo.</Text>
+        <Tabella
+          colonne={[
+            { testo: "Dato", larghezza: 3.4 },
+            { testo: "Fonte", larghezza: 1.5 },
+            { testo: "Campione", larghezza: 1.1 },
+          ]}
+          righe={RIFERIMENTI.map((x) => [x.dato, `${x.fonte}, ${x.anno}`, x.campione])}
+        />
+        <Text style={s.h2}>Allegato C. Definizioni</Text>
+        <Text style={[s.nota, { marginBottom: 5 }]}>Per ogni metrica del report, cos&apos;è. Nessun numero è stimato senza campione: tutto si ricava dalla mappa domanda × assistente. Formule e «come si legge» sono nelle note tecniche del report online.</Text>
+        <View style={s.colonne}>
+          {[GLOSSARIO.slice(0, Math.ceil(GLOSSARIO.length / 2)), GLOSSARIO.slice(Math.ceil(GLOSSARIO.length / 2))].map((colonna, i) => (
+            <View key={i} style={s.col}>
+              {colonna.map((v) => (
+                <View key={v.id} style={{ marginBottom: 3, paddingBottom: 2.5, borderBottomWidth: 0.5, borderBottomColor: C.lineSoft }} wrap={false}>
+                  <Text style={[s.p, { fontSize: 8, lineHeight: 1.35 }]}>
+                    <Text style={{ fontFamily: "Helvetica-Bold" }}>{v.nome}. </Text>
+                    {v.cosa}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ))}
+        </View>
         <Text style={[s.nota, { marginTop: 8 }]}>
           Funziona con ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok; non siamo affiliati a OpenAI, Google, Anthropic, Perplexity o xAI. I marchi citati appartengono ai rispettivi proprietari.
         </Text>

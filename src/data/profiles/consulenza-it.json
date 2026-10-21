@@ -1,0 +1,94 @@
+{
+  "id": "consulenza-it",
+  "nome": "Consulenza aziendale, IT e software house",
+  "imprese": 199059,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Software house",
+    "Consulenza informatica",
+    "Web agency",
+    "Consulenza aziendale",
+    "Assistenza informatica",
+    "Sicurezza informatica",
+    "Consulente privacy"
+  ],
+  "famiglia": "b2b",
+  "b2b": true,
+  "inglese": true,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "software house a {citta} per un gestionale su misura per una PMI",
+      "consulente IT in provincia di {provincia} consigliato",
+      "studio di consulenza in {regione} per bandi e finanza agevolata"
+    ],
+    "bisogno": [
+      "agenzia che faccia un sito e-commerce a {citta} con un budget di 5.000 euro",
+      "assistenza informatica a {citta} per un ufficio di dieci computer, canone mensile",
+      "consulente privacy per una clinica a {citta}"
+    ],
+    "specialita": [
+      "consulente IT in provincia di {provincia} per {specialita}",
+      "consulente aziendale a {citta} per {specialita}"
+    ],
+    "requisito": [
+      "azienda IT in {regione} con {requisito}",
+      "software house a {citta} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per sviluppare un'app a {citta}?"
+    ],
+    "nome": [
+      "{nome} {citta} recensioni dei clienti"
+    ],
+    "inglese": [
+      "software development company in {citta}, Italy, for custom ERP, SME"
+    ]
+  },
+  "fonti": [
+    "Sito ufficiale",
+    "LinkedIn",
+    "Clutch",
+    "Sortlist",
+    "Google Maps",
+    "G2",
+    "Registro Imprese"
+  ],
+  "metriche": [
+    "presenza per servizio",
+    "certificazioni e partnership citate",
+    "casi studio citati"
+  ],
+  "azioni": [
+    {
+      "codice": "directory",
+      "titolo": "Inserisci l'azienda su Clutch, Sortlist e LinkedIn con lavorazioni, materiali e certificazioni",
+      "quando": "le directory sono citate dagli assistenti e tu non ci sei"
+    },
+    {
+      "codice": "catalogo",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni lavorazione: materiali, spessori, lotti minimi, tempi",
+      "quando": "catalogo solo in PDF o lavorazioni non descritte"
+    },
+    {
+      "codice": "certificazioni",
+      "titolo": "Metti le certificazioni sul sito e sulle schede, con numero ed ente",
+      "quando": "domande per requisito senza citazioni"
+    },
+    {
+      "codice": "linkedin",
+      "titolo": "Aggiorna la pagina LinkedIn aziendale con settori serviti e referenze",
+      "quando": "LinkedIn tra le fonti citate e pagina ferma"
+    },
+    {
+      "codice": "inglese",
+      "titolo": "Versione inglese delle pagine chiave del sito",
+      "quando": "domande in inglese senza citazioni"
+    },
+    {
+      "codice": "elenchi",
+      "titolo": "Fatti elencare dall'associazione di categoria e negli elenchi espositori delle fiere",
+      "quando": "concorrenti citati da elenchi di settore"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "id": "fisioterapista",
+  "nome": "Fisioterapisti, osteopati, psicologi, poliambulatori",
+  "imprese": 142931,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Fisioterapista",
+    "Fisioterapia",
+    "Osteopata",
+    "Psicologo",
+    "Psicoterapeuta",
+    "Nutrizionista",
+    "Logopedista",
+    "Centro di riabilitazione",
+    "Poliambulatorio"
+  ],
+  "famiglia": "sanita",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "fisioterapista bravo a {citta} per {specialita}",
+      "{categoria} consigliato in {zona} a {citta}",
+      "centro di fisioterapia a {citta} con buone recensioni"
+    ],
+    "bisogno": [
+      "fisioterapia a domicilio a {citta} per una persona anziana",
+      "psicoterapeuta a {citta}: prezzo della seduta e chi mi consigli?",
+      "{categoria} a {citta} che riceva anche il sabato",
+      "osteopata in {zona} a {citta} con orario serale"
+    ],
+    "specialita": [
+      "{categoria} a {citta} specializzato in {specialita}",
+      "centro a {citta} con {specialita}"
+    ],
+    "requisito": [
+      "{categoria} a {citta} con {requisito}",
+      "psicologo a {citta} per {specialita}, anche online"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per {specialita} a {citta}?"
+    ],
+    "nome": [
+      "{nome} {citta} com'è? recensioni"
+    ]
+  },
+  "fonti": [
+    "MioDottore",
+    "Google Maps",
+    "Sito ufficiale",
+    "Dottori.it",
+    "Ordine professionale",
+    "PagineGialle",
+    "Instagram"
+  ],
+  "metriche": [
+    "presenza per trattamento",
+    "domicilio e online citati",
+    "convenzioni citate"
+  ],
+  "azioni": [
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su MioDottore con prestazioni, convenzioni e orari",
+      "quando": "MioDottore è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa la scheda Google: categoria precisa, prestazioni, orari, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "sito-prestazioni",
+      "titolo": "Una pagina in testo per ogni prestazione, con convenzioni e tempi di attesa",
+      "quando": "domande per specialità o requisito senza citazioni"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino la prestazione",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

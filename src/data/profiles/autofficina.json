@@ -1,0 +1,85 @@
+{
+  "id": "autofficina",
+  "nome": "Autofficine, carrozzerie e gommisti",
+  "imprese": 73249,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Autofficina",
+    "Officina meccanica auto",
+    "Carrozzeria",
+    "Gommista",
+    "Elettrauto",
+    "Centro revisioni",
+    "Autolavaggio"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "meccanico onesto a {citta} zona {zona}",
+      "officina consigliata a {citta}",
+      "carrozzeria a {citta} con buone recensioni"
+    ],
+    "bisogno": [
+      "gommista a {citta} per il cambio gomme oggi senza prenotare",
+      "officina a {citta} per la revisione auto, prezzo e tempi",
+      "elettrauto a {citta} per un problema alla centralina"
+    ],
+    "specialita": [
+      "officina a {citta} specializzata in {specialita}",
+      "meccanico a {citta} per {specialita}"
+    ],
+    "requisito": [
+      "carrozzeria a {citta} che lavori con le assicurazioni",
+      "officina a {citta} che faccia il tagliando {requisito} senza perdere la garanzia"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per riparare l'auto a {citta}?"
+    ],
+    "nome": [
+      "{nome} officina {citta} recensioni"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "Sito ufficiale",
+    "PagineGialle",
+    "Facebook",
+    "Rete di assistenza",
+    "Trustpilot"
+  ],
+  "metriche": [
+    "presenza per servizio",
+    "urgenza e tempi citati",
+    "assicurazioni e garanzia citate"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Google Maps",
+      "quando": "Google Maps è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

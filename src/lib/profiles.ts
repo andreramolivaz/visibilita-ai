@@ -1,14 +1,5 @@
 import type { Domanda, TipoDomanda } from "./types";
-import ristorante from "@/data/profiles/ristorante.json";
-import hotel from "@/data/profiles/hotel.json";
-import dentista from "@/data/profiles/dentista.json";
-import parrucchiere from "@/data/profiles/parrucchiere.json";
-import idraulico from "@/data/profiles/idraulico.json";
-import palestra from "@/data/profiles/palestra.json";
-import immobiliare from "@/data/profiles/immobiliare.json";
-import professionista from "@/data/profiles/professionista.json";
-import museo from "@/data/profiles/museo.json";
-import altro from "@/data/profiles/altro.json";
+import { PROFILI_JSON } from "@/data/profiles";
 
 export interface AzioneProfilo {
   codice: string;
@@ -16,16 +7,29 @@ export interface AzioneProfilo {
   quando: string;
 }
 
+export type FamigliaProfilo = "locale" | "b2b" | "professionista" | "sanita" | "ricettivo" | "cultura";
+
 export interface ProfiloCategoria {
   id: string;
   nome: string;
+  /** Imprese attive in Italia (ISTAT-ASIA 2023): ordina la copertura. 0 = non applicabile. */
+  imprese: number;
+  fonteImprese?: string;
   categorieGoogle: string[];
+  famiglia: FamigliaProfilo;
+  /** Le domande si fanno per provincia e regione, con requisiti e certificazioni. */
+  b2b: boolean;
+  /** Ha senso porre anche domande in inglese (export, turismo). */
+  inglese: boolean;
   generatoDaAI?: boolean;
   domande: {
     generica: string[];
     bisogno: string[];
     specialita: string[];
-    nome: string;
+    requisito?: string[];
+    confronto?: string[];
+    nome: string[];
+    inglese?: string[];
   };
   fonti: string[];
   metriche: string[];
@@ -33,29 +37,23 @@ export interface ProfiloCategoria {
   nota?: string;
 }
 
-export const PROFILI: ProfiloCategoria[] = [
-  ristorante,
-  hotel,
-  dentista,
-  parrucchiere,
-  idraulico,
-  palestra,
-  immobiliare,
-  professionista,
-  museo,
-  altro,
-];
+export const PROFILI: ProfiloCategoria[] = PROFILI_JSON as ProfiloCategoria[];
+
+const ALTRO = PROFILI.find((p) => p.id === "altro")!;
 
 export function profilo(id: string): ProfiloCategoria {
-  return PROFILI.find((p) => p.id === id) ?? altro;
+  return PROFILI.find((p) => p.id === id) ?? ALTRO;
 }
 
 /** Trova il profilo dalla categoria Google, altrimenti "altro". */
 export function profiloDaCategoriaGoogle(categoriaGoogle: string): ProfiloCategoria {
   const c = categoriaGoogle.toLowerCase();
-  return (
-    PROFILI.find((p) => p.categorieGoogle.some((g) => c.includes(g.toLowerCase()))) ?? altro
-  );
+  return PROFILI.find((p) => p.categorieGoogle.some((g) => c.includes(g.toLowerCase()))) ?? ALTRO;
+}
+
+/** I profili con un settore reale, dal più numeroso, per la landing. */
+export function profiliPerNumerosita(): ProfiloCategoria[] {
+  return PROFILI.filter((p) => p.imprese > 0).sort((a, b) => b.imprese - a.imprese);
 }
 
 interface Variabili {
@@ -68,6 +66,10 @@ interface Variabili {
   specialita?: string[];
   requisito?: string;
   requisiti?: string[];
+  /** Il concorrente più citato o più vicino: serve alle domande di confronto. */
+  concorrente?: string;
+  /** Aggiunge le domande in inglese se il profilo le prevede. */
+  inglese?: boolean;
 }
 
 function riempi(template: string, v: Variabili, specialita?: string, requisito?: string): string {
@@ -79,7 +81,8 @@ function riempi(template: string, v: Variabili, specialita?: string, requisito?:
     .replaceAll("{provincia}", v.provincia ?? v.citta)
     .replaceAll("{regione}", v.regione ?? v.provincia ?? v.citta)
     .replaceAll("{specialita}", specialita ?? v.specialita?.[0] ?? "")
-    .replaceAll("{requisito}", requisito ?? v.requisito ?? v.requisiti?.[0] ?? "");
+    .replaceAll("{requisito}", requisito ?? v.requisito ?? v.requisiti?.[0] ?? "")
+    .replaceAll("{concorrente}", v.concorrente ?? "");
   return (testo.charAt(0).toUpperCase() + testo.slice(1)).replace(/\s{2,}/g, " ").trim();
 }
 
@@ -87,35 +90,66 @@ function riempi(template: string, v: Variabili, specialita?: string, requisito?:
 function valido(testo: string, template: string, v: Variabili): boolean {
   if (template.includes("{specialita}") && !v.specialita?.length) return false;
   if (template.includes("{requisito}") && !v.requisito && !v.requisiti?.length) return false;
+  if (template.includes("{concorrente}") && !v.concorrente) return false;
   return testo.length > 0;
 }
 
+/** Ordine con cui i tipi si alternano: così 8, 15 e 30 domande hanno sempre un mix sensato. */
+const GIRO: TipoDomanda[] = ["generica", "specialita", "bisogno", "requisito", "generica", "bisogno", "specialita", "confronto"];
+
 /**
- * Genera le domande per un'attività: n domande (5 gratis, 10 Base, 20 Pro),
- * mescolando i tre tipi, più una sul nome. La prima "specialità" è modificabile.
+ * Genera le domande per un'attività: n domande (8 gratis, 15 Base, 30 Pro),
+ * alternando i tipi, più una sul nome in chiusura. La prima "specialità" è modificabile.
+ * Il testo esatto conta poco (SparkToro 2026: frasi diverse con lo stesso intento
+ * restituiscono gli stessi nomi); contano intento, luogo e vincoli.
  */
 export function generaDomande(p: ProfiloCategoria, v: Variabili, n: number): Domanda[] {
   const out: Domanda[] = [];
   const push = (testo: string, tipo: TipoDomanda, modificabile = false) => {
-    if (out.length >= n - 1 || out.some((d) => d.testo === testo)) return;
+    if (out.length >= n - 1 || out.some((d) => d.testo === testo)) return false;
     out.push({ id: `d${out.length + 1}`, testo, tipo, modificabile });
+    return true;
   };
 
-  // Alterna generica → bisogno → specialità finché c'è posto.
-  const generiche = p.domande.generica.map((t) => riempi(t, v)).filter((x, i) => valido(x, p.domande.generica[i], v));
-  const bisogni = p.domande.bisogno
-    .flatMap((t) => (t.includes("{requisito}") ? (v.requisiti?.length ? v.requisiti : [v.requisito ?? ""]).map((r) => [t, riempi(t, v, undefined, r)] as const) : [[t, riempi(t, v)] as const]))
-    .filter(([t, x]) => valido(x, t, v))
-    .map(([, x]) => x);
-  const spec = (v.specialita?.length ? v.specialita : []).flatMap((s) => p.domande.specialita.map((t) => riempi(t, v, s)));
+  const espandi = (templates: string[] | undefined, tipo: TipoDomanda): string[] => {
+    if (!templates) return [];
+    if (tipo === "specialita") {
+      const spec = v.specialita?.length ? v.specialita : [];
+      return spec.flatMap((s) => templates.map((t) => riempi(t, v, s))).filter((x, i) => valido(x, templates[i % templates.length], v));
+    }
+    if (tipo === "requisito") {
+      const req = v.requisiti?.length ? v.requisiti : v.requisito ? [v.requisito] : [];
+      return templates.flatMap((t) => (t.includes("{requisito}") ? req.map((r) => riempi(t, v, undefined, r)) : [riempi(t, v)])).filter((x) => x.length > 0);
+    }
+    return templates.map((t) => riempi(t, v)).filter((x, i) => valido(x, templates[i], v));
+  };
 
-  let i = 0;
-  while (out.length < n - 1 && i < Math.max(generiche.length, bisogni.length, spec.length)) {
-    if (generiche[i]) push(generiche[i], "generica");
-    if (spec[i]) push(spec[i], "specialita", i === 0);
-    if (bisogni[i]) push(bisogni[i], "bisogno");
-    i++;
+  const pool: Record<TipoDomanda, string[]> = {
+    generica: espandi(p.domande.generica, "generica"),
+    bisogno: espandi(p.domande.bisogno, "bisogno"),
+    specialita: espandi(p.domande.specialita, "specialita"),
+    requisito: espandi(p.domande.requisito, "requisito"),
+    confronto: espandi(p.domande.confronto, "confronto"),
+    nome: [],
+  };
+  if (v.inglese && p.inglese && p.domande.inglese) pool.generica.push(...espandi(p.domande.inglese, "generica"));
+
+  let primaSpecialita = true;
+  let giri = 0;
+  while (out.length < n - 1 && giri < 20) {
+    let aggiunta = false;
+    for (const tipo of GIRO) {
+      if (out.length >= n - 1) break;
+      const testo = pool[tipo].shift();
+      if (!testo) continue;
+      const ok = push(testo, tipo, tipo === "specialita" && primaSpecialita);
+      if (ok && tipo === "specialita") primaSpecialita = false;
+      aggiunta = aggiunta || ok;
+    }
+    if (!aggiunta) break;
+    giri++;
   }
-  out.push({ id: `d${out.length + 1}`, testo: riempi(p.domande.nome, v), tipo: "nome" });
+  const nome = p.domande.nome[0] ?? "Com'è {nome} a {citta}?";
+  out.push({ id: `d${out.length + 1}`, testo: riempi(nome, v), tipo: "nome" });
   return out;
 }

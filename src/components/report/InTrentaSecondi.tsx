@@ -1,8 +1,10 @@
 import type { Report, Verdetto } from "@/lib/types";
+import { percentuale, quotaVoce } from "@/lib/stats";
+import { ScalaPunteggio } from "./ScalaPunteggio";
 
 /**
  * La prima cosa che il titolare legge: dove sta, chi lo batte, cosa fare.
- * Tre colonne, una frase ciascuna, niente altro.
+ * Tre colonne, numeri e una frase ciascuna.
  */
 function coloreVerdetto(v: Verdetto) {
   if (v === "Invisibile") return "text-danger";
@@ -10,11 +12,14 @@ function coloreVerdetto(v: Verdetto) {
   return "text-accent";
 }
 
-export function InTrentaSecondi({ report: r }: { report: Report }) {
+export function InTrentaSecondi({ report: r, abbonato = false }: { report: Report; abbonato?: boolean }) {
   const tu = r.concorrenti.find((c) => c.seiTu);
   const avversari = r.concorrenti.filter((c) => !c.seiTu).slice(0, 3);
+  const qv = quotaVoce(r.concorrenti, r.citazioniTotali);
   const prima = r.azioni[0];
   const guadagno = r.azioni.reduce((acc, a) => acc + (a.impattoStimato ?? 0), 0);
+  const storico = abbonato && r.andamento && r.andamento.length >= 2 ? r.andamento : null;
+  const delta = storico ? storico[storico.length - 1].punteggio - storico[storico.length - 2].punteggio : null;
 
   return (
     <section id="trenta" className="scroll-mt-20 py-7 sm:py-9">
@@ -26,25 +31,32 @@ export function InTrentaSecondi({ report: r }: { report: Report }) {
           <p className="mt-2 flex items-end gap-3">
             <span className={`tabular text-5xl font-bold leading-none ${coloreVerdetto(r.verdetto)}`}>{r.punteggio}</span>
             <span className={`pb-0.5 text-lg font-semibold ${coloreVerdetto(r.verdetto)}`}>{r.verdetto}</span>
+            {delta !== null && (
+              <span className={`tabular pb-1 text-sm ${delta >= 0 ? "text-accent" : "text-danger"}`}>
+                {delta >= 0 ? "+" : ""}
+                {delta}
+              </span>
+            )}
           </p>
-          <p className="mt-3 text-[15px]">
-            {r.contesto ? (
+          <ScalaPunteggio punteggio={r.punteggio} compatta riferimento={r.contesto ? { valore: r.contesto.mediana, etichetta: "mediana della categoria" } : undefined} />
+          <p className="tabular mt-3 text-[15px]">
+            {tu && (
               <>
-                Più alto del <span className="tabular font-semibold">{r.contesto.percentile}%</span> delle {r.contesto.categoria} analizzate a{" "}
-                {r.contesto.citta}. Mediana: {r.contesto.mediana}.
+                Compari in {tu.citazioni} risposte su {tu.totale} alle domande in cui il cliente non fa il tuo nome; quota di voce {percentuale(qv[tu.nome] ?? 0)}.
               </>
-            ) : tu ? (
+            )}{" "}
+            {r.contesto && (
               <>
-                Compari in <span className="tabular font-semibold">{tu.citazioni}</span> risposte su {tu.totale}.
+                Più alto del {r.contesto.percentile}% delle {r.contesto.attivitaAnalizzate} {r.contesto.categoria} analizzate a {r.contesto.citta} (mediana {r.contesto.mediana}).
               </>
-            ) : null}
+            )}
           </p>
         </div>
 
         {/* Chi ti passa davanti */}
         <div className="bg-bg p-5 sm:p-6">
           <p className="text-sm text-muted">Chi ti passa davanti</p>
-          <ol className="mt-2 space-y-1.5">
+          <ol className="mt-2 space-y-2">
             {avversari.map((c, i) => {
               const t = r.testaATesta.find((x) => x.nome === c.nome);
               return (
@@ -53,14 +65,15 @@ export function InTrentaSecondi({ report: r }: { report: Report }) {
                   <span>
                     <span className="font-semibold">{c.nome}</span>
                     <span className="tabular block text-sm text-muted">
-                      {c.citazioni} citazioni{tu ? ` (tu ${tu.citazioni})` : ""}
-                      {t ? `, in ${t.loroSenzaTe} domande senza di te` : ""}
+                      {c.citazioni} citazioni, quota di voce {percentuale(qv[c.nome] ?? 0)}
+                      {t ? `; in ${t.loroSenzaTe} domande su ${r.domandeSpontanee} c'è lui e non tu` : ""}
                     </span>
                   </span>
                 </li>
               );
             })}
           </ol>
+          {tu && <p className="tabular mt-3 text-sm text-muted">Tu: {tu.citazioni} citazioni, quota di voce {percentuale(qv[tu.nome] ?? 0)}.</p>}
         </div>
 
         {/* Cosa fare prima */}
@@ -73,7 +86,7 @@ export function InTrentaSecondi({ report: r }: { report: Report }) {
               <p className="tabular mt-3 text-sm">
                 {prima.impattoStimato !== undefined && (
                   <>
-                    Vale circa <span className="font-semibold text-accent">+{prima.impattoStimato} punti</span>
+                    Stima <span className="font-semibold text-accent">+{prima.impattoStimato} punti</span>
                     {guadagno > prima.impattoStimato ? `; con tutte e tre, +${guadagno}.` : "."}
                   </>
                 )}{" "}

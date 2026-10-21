@@ -1,0 +1,93 @@
+{
+  "id": "negozio",
+  "nome": "Negozi al dettaglio",
+  "imprese": 532049,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Negozio",
+    "Abbigliamento",
+    "Alimentari",
+    "Ferramenta",
+    "Elettronica",
+    "Libreria",
+    "Gioielleria",
+    "Fiorista",
+    "Calzature",
+    "Articoli sportivi",
+    "Giocattoli",
+    "Arredamento"
+  ],
+  "famiglia": "locale",
+  "b2b": false,
+  "inglese": false,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "miglior negozio di {categoria} a {citta} zona {zona}",
+      "negozi di {categoria} vicino a me a {citta}, aperti ora",
+      "dove conviene comprare {specialita} a {citta}? negozio fisico, non online"
+    ],
+    "bisogno": [
+      "negozio di {categoria} aperto la domenica a {citta}",
+      "cerco un negozio a {citta} dove trovare {specialita} di qualità senza spendere troppo",
+      "negozio di {categoria} a {citta} con personale competente che mi consigli",
+      "un posto a {citta} dove comprare {specialita} per un regalo, budget 50 euro"
+    ],
+    "specialita": [
+      "dove posso comprare {specialita} a {citta}? cerco un negozio fisico",
+      "negozio di {categoria} a {citta} specializzato in {specialita}"
+    ],
+    "requisito": [
+      "{categoria} a {citta} che fa anche {requisito}",
+      "negozio di {categoria} a {citta} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per comprare {specialita} a {citta}?"
+    ],
+    "nome": [
+      "{nome} a {citta} è un buon negozio? recensioni",
+      "cosa vendono da {nome} a {citta} e che orari fa?"
+    ]
+  },
+  "fonti": [
+    "Google Maps",
+    "Sito ufficiale",
+    "Instagram",
+    "Facebook",
+    "PagineGialle",
+    "Trustpilot",
+    "Subito"
+  ],
+  "metriche": [
+    "presenza per prodotto cercato",
+    "orari e aperture coerenti",
+    "servizi accessori citati"
+  ],
+  "azioni": [
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa e correggi la scheda Google: categoria, orari, servizi, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "portale",
+      "titolo": "Apri o aggiorna la scheda su Google Maps",
+      "quando": "Google Maps è tra le fonti citate e tu non ci sei"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio o specialità",
+      "quando": "termini usati dagli assistenti assenti dal tuo sito"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio o la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "coerenza",
+      "titolo": "Allinea orari e telefono tra sito, Google e portali",
+      "quando": "incoerenza tra le fonti"
+    }
+  ]
+}

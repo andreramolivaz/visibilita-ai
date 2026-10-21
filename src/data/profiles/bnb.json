@@ -1,0 +1,89 @@
+{
+  "id": "bnb",
+  "nome": "B&B, affitti brevi e agriturismi",
+  "imprese": 63512,
+  "fonteImprese": "ISTAT-ASIA 2023 via Eurostat sbs_ovw_act; agriturismi ISTAT 2024",
+  "categorieGoogle": [
+    "Bed & Breakfast",
+    "B&B",
+    "Affittacamere",
+    "Casa vacanze",
+    "Agriturismo",
+    "Appartamento turistico",
+    "Residence"
+  ],
+  "famiglia": "ricettivo",
+  "b2b": false,
+  "inglese": true,
+  "generatoDaAI": false,
+  "domande": {
+    "generica": [
+      "B&B carino a {citta} zona {zona}, non troppo caro",
+      "agriturismo consigliato vicino a {citta}",
+      "casa vacanze in {zona} per sei persone ad agosto"
+    ],
+    "bisogno": [
+      "agriturismo vicino a {citta} con piscina e ristorante, per bambini",
+      "agriturismo in {regione} dove mangiare la domenica, menù fisso",
+      "appartamento per lavoratori a {citta} per un mese"
+    ],
+    "specialita": [
+      "agriturismo in provincia di {provincia} che fa {specialita}",
+      "B&B a {citta} con {specialita}"
+    ],
+    "requisito": [
+      "B&B a {citta} con {requisito}",
+      "agriturismo in {regione} con {requisito}"
+    ],
+    "confronto": [
+      "meglio {nome} o {concorrente} per un weekend in {zona}?"
+    ],
+    "nome": [
+      "{nome} {citta} recensioni"
+    ],
+    "inglese": [
+      "farm stay in {regione}, Italy, with cooking classes, family friendly"
+    ]
+  },
+  "fonti": [
+    "Booking",
+    "Airbnb",
+    "TripAdvisor",
+    "Google Maps",
+    "Agriturismo.it",
+    "Sito ufficiale",
+    "Portale turistico del Comune"
+  ],
+  "metriche": [
+    "presenza per servizio richiesto",
+    "prezzo e zona citati",
+    "esperienze citate"
+  ],
+  "azioni": [
+    {
+      "codice": "ota",
+      "titolo": "Completa la scheda su Booking: servizi, foto con didascalia, politiche",
+      "quando": "Booking è la fonte più citata e la tua scheda è incompleta"
+    },
+    {
+      "codice": "scheda-google",
+      "titolo": "Completa la scheda Google: servizi, orari di check-in, telefono",
+      "quando": "un assistente riporta un dato diverso dalla tua scheda"
+    },
+    {
+      "codice": "sito-servizi",
+      "titolo": "Pubblica sul sito una pagina in testo per ogni servizio: parcheggio, animali, famiglie, colazione",
+      "quando": "domande per requisito senza citazioni"
+    },
+    {
+      "codice": "recensioni-termini",
+      "titolo": "Chiedi recensioni che citino il servizio richiesto",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "inglese",
+      "titolo": "Versione inglese delle pagine chiave del sito",
+      "quando": "domande in inglese senza citazioni"
+    }
+  ]
+}
