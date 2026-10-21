@@ -59,6 +59,20 @@ Il PDF è un rapporto tecnico di 5 pagine: sintesi e azioni · concorrenti e dov
 Test gratuito: 8 domande × 2 ripetizioni, senza "Le parole che usano" e PDF; al loro posto "Nel piano Base trovi anche".
 Domande per piano: 8 nel test gratuito, 15 nel Base, 30 nel Pro e Agenzia (`src/lib/prezzi.ts`). Nell'abbonamento le ripetizioni sono in giorni diversi.
 
+## Il profilo e le domande (`src/lib/profilo/`)
+
+Da «nome, città» (o link di Google Maps) a profilo e domande, con dati veri:
+
+1. **Scheda Google** (`places.ts`, Places API New: Text Search con recensioni e attributi, Nearby Search): nome, indirizzo, città/zona/provincia/regione, telefono, sito, categoria, fascia di prezzo, orari, rating, le 5 recensioni più rilevanti, gli attributi (asporto, dehors, prenotazione, cani, parcheggio, aperto la domenica…) che diventano **requisiti**, e i concorrenti della stessa categoria entro 3 km, dal più noto: il primo è il **concorrente del confronto diretto**.
+2. **Recensioni** (`termini.ts`): termini ricorrenti (parole e frasi di 2–3 parole, senza le comuni, senza attraversare la punteggiatura), contati per recensione: «forno a legna: in 12 recensioni». Diventano **specialità**.
+3. **Sito** (`sito.ts`): pagina iniziale più fino a 4 pagine chiave (menu, servizi, lavorazioni, prodotti, chi siamo); i termini vengono prima da intestazioni e voci di elenco (frasi già intere), poi dal testo. Note: menu o listino solo in PDF, sito assente o quasi vuoto.
+4. **Ricerche Google** (`suggerimenti.ts`): i suggerimenti per «categoria città», tolti categoria, città e parole di luogo: restano i vincoli che la gente aggiunge («senza glutine», «aperta ora»). Diventano requisiti.
+5. **Generazione** (`profiles.ts`): i modelli della categoria riempiti con specialità, requisiti e concorrente; ogni domanda porta la sua **origine** (scheda, recensioni, sito, ricerche, modello, titolare), mostrata nella conferma. Nei set da 30 le ultime tre spontanee sono «esplora» e possono ruotare; le altre restano fisse per il confronto nel tempo.
+6. **Varianti** (`varianti.ts`, Anthropic Messages API, `ANTHROPIC_MODEL`): le domande spontanee riscritte come prompt veri, stesso luogo e stessi vincoli; una variante che perde il luogo o esce dalle 6–30 parole viene scartata. Senza chiave, restano i modelli.
+7. **Il titolare**: nella conferma può scrivere cosa gli chiedono al telefono; diventa una delle domande.
+
+Senza `GOOGLE_PLACES_API_KEY` il profilo è quello di esempio con il nome digitato. Cache in memoria (7 giorni scheda e suggerimenti, 3 il sito); in produzione va nel database. Costi Places: Text Search con recensioni e attributi è nello SKU «Enterprise + Atmosphere» (circa 40 $ per 1.000 richieste), Nearby «Pro» (circa 35 $ per 1.000); con la cache, una richiesta di ciascuno per attività.
+
 ## Le domande e i settori
 
 Sei tipi di domanda, dallo studio dei prompt reali (Semrush 2025–26, Otterly, Citations.press, BrightLocal): generica, per bisogno, per specialità, per requisito, di confronto, sul nome; più l'inglese per chi esporta o riceve stranieri. I modelli sono scritti per 36 categorie in ordine di numerosità (ISTAT-ASIA 2023 via Eurostat), da «Negozi al dettaglio» (532 mila imprese) a «Musei» (1.282), in `src/data/profiles/`; ogni profilo ha anche fonti attese, metriche e azioni ammesse. Lo studio completo («Visibilità AI per tutte le attività italiane: settori, domande reali, fonti, metriche e metodo di raccolta») è in `docs/studio-settori-domande.md`; `docs/genera-profili.mjs` riscrive i profili da un'unica tabella (`node docs/genera-profili.mjs src/data/profiles`, poi rigenerare `index.ts`).
@@ -78,8 +92,8 @@ Una risposta di un assistente (la bolla con l'elenco) la cui coda è un segnapos
 
 ## Prossimi passi
 
-1. **Profilo attività**: Google Places + lettura del sito + verifica portali → JSON (Claude).
-2. **Scansione**: coda con un worker per motore (OpenAI Responses, Gemini grounding, DataForSEO), ripetizioni, cache 7 giorni.
+1. **Profilo attività**: fatto (`src/lib/profilo/`); manca la verifica della presenza sui portali di categoria e il salvataggio nel database.
+2. **Scansione**: coda con un worker per motore (OpenAI Responses, Gemini grounding, DataForSEO), ripetizioni in giorni diversi, cache 7 giorni.
 3. **Analisi risposte**: riconoscimento dell'attività e dei concorrenti (nome + indirizzo + telefono, alias), estrazione fonti.
 4. **Consigli**: prompt Claude con JSON in ingresso e in uscita, azioni solo dal profilo della categoria.
 5. **Abbonamento**: Stripe Checkout, link magico via Resend, area personale minima.

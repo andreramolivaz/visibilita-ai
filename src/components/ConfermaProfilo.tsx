@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { Domanda, ProfiloAttivita, TipoDomanda } from "@/lib/types";
-import { Bottone, Etichetta, Scheda } from "@/components/ui";
+import type { Domanda, OrigineDomanda, ProfiloAttivita, SegnaliProfilo, TipoDomanda } from "@/lib/types";
+import { Bottone, Campo, Etichetta, Scheda } from "@/components/ui";
+import { TIPI_SPONTANEI } from "@/lib/stats";
 import { motoriAttivi } from "@/lib/engines";
 import { TEST_GRATUITO } from "@/lib/prezzi";
 
@@ -31,7 +32,7 @@ const TIPO: Record<TipoDomanda, { titolo: string; descrizione: (a: ProfiloAttivi
   },
   confronto: {
     titolo: "Domanda di confronto",
-    descrizione: () => "tu contro il concorrente più citato: chi preferiscono",
+    descrizione: () => "tu contro il concorrente più noto vicino a te: chi preferiscono",
   },
   nome: {
     titolo: "Domanda sul tuo nome",
@@ -39,16 +40,40 @@ const TIPO: Record<TipoDomanda, { titolo: string; descrizione: (a: ProfiloAttivi
   },
 };
 
+/** Da dove viene il contenuto di una domanda, detto al titolare. */
+const ORIGINE: Record<OrigineDomanda, (a: ProfiloAttivita) => string> = {
+  modello: () => "dal modello della categoria",
+  scheda: () => "dalla scheda Google",
+  recensioni: () => "dalle tue recensioni",
+  sito: () => "dal tuo sito",
+  ricerche: (a) => `dalle ricerche a ${a.citta}`,
+  titolare: () => "la tua",
+};
+
 export function ConfermaProfilo({
   attivita,
   domande: iniziali,
+  segnali,
 }: {
   attivita: ProfiloAttivita;
   domande: Domanda[];
+  segnali: SegnaliProfilo;
 }) {
   const router = useRouter();
   const [domande, setDomande] = useState(iniziali);
   const [modifica, setModifica] = useState<string | null>(null);
+  const [telefono, setTelefono] = useState("");
+
+  /** La domanda che i clienti fanno al telefono diventa una delle domande del test. */
+  function usaTelefono() {
+    const testo = telefono.trim();
+    if (!testo) return;
+    setDomande((ds) => {
+      const bersaglio = ds.find((d) => d.origine === "titolare") ?? ds.find((d) => d.modificabile) ?? [...ds].reverse().find((d) => TIPI_SPONTANEI.includes(d.tipo));
+      if (!bersaglio) return ds;
+      return ds.map((d) => (d.id === bersaglio.id ? { ...d, testo, origine: "titolare", modificabile: true } : d));
+    });
+  }
 
   function avvia() {
     // TODO: POST /api/scansioni con profilo e domande; qui si simula.
@@ -110,12 +135,94 @@ export function ConfermaProfilo({
         )}
       </Scheda>
 
+      <Scheda>
+        <h2 className="font-semibold">Da dove vengono le domande</h2>
+        <p className="mt-1 text-sm text-muted">
+          I modelli della categoria vengono riempiti con quello che dicono di te i clienti, il tuo sito e le ricerche nella tua città.
+        </p>
+        <dl className="mt-3 space-y-2.5 text-sm">
+          {segnali.recensioni.length > 0 && (
+            <div>
+              <dt className="text-xs text-muted">Dalle tue recensioni Google</dt>
+              <dd className="mt-1 flex flex-wrap gap-1.5">
+                {segnali.recensioni.slice(0, 6).map((t) => (
+                  <Etichetta key={t.termine} tono="accento">
+                    {t.termine} <span className="tabular font-normal opacity-70">{t.volte}</span>
+                  </Etichetta>
+                ))}
+              </dd>
+            </div>
+          )}
+          {segnali.sito.length > 0 && (
+            <div>
+              <dt className="text-xs text-muted">Dal tuo sito</dt>
+              <dd className="mt-1 flex flex-wrap gap-1.5">
+                {segnali.sito.slice(0, 6).map((t) => (
+                  <Etichetta key={t.termine}>{t.termine}</Etichetta>
+                ))}
+              </dd>
+            </div>
+          )}
+          {segnali.ricerche.length > 0 && (
+            <div>
+              <dt className="text-xs text-muted">Dalle ricerche Google a {attivita.citta}: i vincoli che la gente aggiunge</dt>
+              <dd className="mt-1 flex flex-wrap gap-1.5">
+                {segnali.ricerche.map((r) => (
+                  <Etichetta key={r}>{r}</Etichetta>
+                ))}
+              </dd>
+            </div>
+          )}
+          {segnali.concorrenti.length > 0 && (
+            <div>
+              <dt className="text-xs text-muted">Confronto diretto con il concorrente più noto vicino a te</dt>
+              <dd className="mt-1">
+                <span className="font-medium">{segnali.concorrenti[0].nome}</span>
+                <span className="tabular text-muted">
+                  {segnali.concorrenti[0].recensioni ? ` · ${segnali.concorrenti[0].recensioni.toLocaleString("it-IT")} recensioni` : ""}
+                  {segnali.concorrenti[0].rating ? ` · ${segnali.concorrenti[0].rating.toLocaleString("it-IT")}` : ""}
+                  {segnali.concorrenti[0].distanzaM ? ` · a ${segnali.concorrenti[0].distanzaM} m` : ""}
+                </span>
+              </dd>
+            </div>
+          )}
+        </dl>
+        {segnali.note.length > 0 && (
+          <ul className="mt-3 space-y-1 text-sm">
+            {segnali.note.map((n) => (
+              <li key={n} className="flex gap-2">
+                <Etichetta tono={segnali.fonte === "esempio" ? "neutro" : "attenzione"}>{segnali.fonte === "esempio" ? "esempio" : "nota"}</Etichetta>
+                <span className="text-muted">{n}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Scheda>
+
       <div>
         <h2 className="font-semibold">Le {domande.length} domande che faremo</h2>
         <p className="text-sm text-muted">
-          Quelle che un cliente farebbe davvero, generate per la tua categoria e la tua zona. Il testo
-          esatto lo vedi nel report. Una la scegli tu.
+          Sei tipi, come le domande vere: generiche, per bisogno, per specialità, per requisito, di confronto, sul nome. Il testo esatto lo vedi nel report. Una la scegli tu.
         </p>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <label className="sr-only" htmlFor="telefono">
+            Cosa ti chiedono più spesso al telefono?
+          </label>
+          <Campo
+            id="telefono"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
+            onBlur={usaTelefono}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                usaTelefono();
+              }
+            }}
+            placeholder="Cosa ti chiedono più spesso al telefono? Diventa una delle domande"
+            className="sm:py-2.5 sm:text-[15px]"
+          />
+        </div>
         <ol className="mt-3 space-y-2">
           {domande.map((d, i) => (
             <li key={d.id} className="flex items-start gap-3 rounded-lg border border-line px-3 py-2 text-sm">
@@ -124,6 +231,8 @@ export function ConfermaProfilo({
                 <span className="flex-1">
                   <span className="font-medium">{TIPO[d.tipo].titolo}</span>
                   <span className="text-muted"> · {TIPO[d.tipo].descrizione(attivita, domande.slice(0, i).filter((x) => x.tipo === d.tipo).length)}</span>
+                  {d.tipo === "confronto" && d.concorrente && <span className="text-muted"> ({d.concorrente})</span>}
+                  {d.origine && d.origine !== "modello" && <span className="ml-2 text-xs text-faint">{ORIGINE[d.origine](attivita)}</span>}
                 </span>
               ) : modifica === d.id ? (
                 <input

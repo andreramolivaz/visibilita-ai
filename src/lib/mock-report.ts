@@ -338,11 +338,11 @@ export const REPORT_ESEMPIO: Report = {
 };
 
 /**
- * Il report del test gratuito: 8 domande (come le genera il profilo:
- * generica, specialità, bisogno, …, nome), 2 ripetizioni, senza sintesi,
- * parole e PDF. Quelli arrivano con il piano Base.
+ * Il report del test gratuito: 8 domande nell'ordine del generatore
+ * (generica, specialità, bisogno, requisito, confronto, generica, bisogno, nome),
+ * 2 ripetizioni, senza parole e PDF. Quelli arrivano con il piano Base.
  */
-const INDICI_GRATUITO = [0, 4, 3, 7, 6, 9, 12, 14];
+const INDICI_GRATUITO = [0, 4, 3, 7, 13, 1, 9, 14];
 const GRATUITO = costruisci({ id: "gratuito", piano: "gratuito", indici: INDICI_GRATUITO, ripetizioni: 2 });
 
 export const REPORT_GRATUITO: Report = {

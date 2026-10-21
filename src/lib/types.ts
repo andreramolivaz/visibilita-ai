@@ -69,6 +69,9 @@ export type TipoDomanda = "generica" | "bisogno" | "specialita" | "requisito" | 
 
 export const TIPI_DOMANDA: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "confronto", "nome"];
 
+/** Da dove viene una domanda: dal modello di categoria, da un segnale dell'attività (scheda Google, recensioni, sito, ricerche), dal titolare. */
+export type OrigineDomanda = "modello" | "scheda" | "recensioni" | "sito" | "ricerche" | "titolare";
+
 export interface Domanda {
   id: string;
   testo: string;
@@ -77,6 +80,10 @@ export interface Domanda {
   modificabile?: boolean;
   /** Per le domande di confronto: il concorrente nominato. */
   concorrente?: string;
+  /** Da dove viene il contenuto della domanda (specialità, requisito, testo). */
+  origine?: OrigineDomanda;
+  /** Nei set grandi: domanda che può ruotare da una scansione all'altra; le altre restano fisse per il confronto nel tempo. */
+  esplora?: boolean;
 }
 
 export interface ProfiloAttivita {
@@ -105,6 +112,43 @@ export interface ProfiloAttivita {
   portaliPresenti: Portale[];
   portaliAssenti: Portale[];
   incoerenze: string[];
+  /** Coordinate della scheda Google, per la posizione nelle API e i concorrenti vicini. */
+  coordinate?: { lat: number; lng: number };
+  /** Identificativo Google Places, quando il profilo viene da lì. */
+  placeId?: string;
+}
+
+/** Un termine ricorrente e in quanti documenti (recensioni, pagine) compare. */
+export interface TermineRicorrente {
+  termine: string;
+  volte: number;
+}
+
+/** Un concorrente vicino, dalla scheda Google. */
+export interface ConcorrenteVicino {
+  nome: string;
+  rating?: number;
+  recensioni?: number;
+  distanzaM?: number;
+}
+
+/**
+ * I segnali raccolti per costruire le domande: da dove vengono specialità,
+ * requisiti e concorrente. Si mostrano al titolare nella conferma.
+ */
+export interface SegnaliProfilo {
+  /** Termini ricorrenti nelle recensioni Google, in ordine di frequenza. */
+  recensioni: TermineRicorrente[];
+  /** Termini ricorrenti nelle pagine chiave del sito. */
+  sito: TermineRicorrente[];
+  /** Modificatori usati nelle ricerche Google per categoria e città («senza glutine», «aperta ora»). */
+  ricerche: string[];
+  /** Concorrenti vicini della stessa categoria, dal più noto. */
+  concorrenti: ConcorrenteVicino[];
+  /** Note sul sito: menu o listino solo in PDF, sito assente. */
+  note: string[];
+  /** Fonte del profilo. */
+  fonte: "google" | "esempio";
 }
 
 /** Posizione in cui compari nella risposta: 1 = primo nome citato. */

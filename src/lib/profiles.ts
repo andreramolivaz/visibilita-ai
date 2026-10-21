@@ -1,4 +1,4 @@
-import type { Domanda, TipoDomanda } from "./types";
+import type { Domanda, OrigineDomanda, TipoDomanda } from "./types";
 import { PROFILI_JSON } from "@/data/profiles";
 
 export interface AzioneProfilo {
@@ -70,6 +70,8 @@ interface Variabili {
   concorrente?: string;
   /** Aggiunge le domande in inglese se il profilo le prevede. */
   inglese?: boolean;
+  /** Da dove viene ogni specialità o requisito (chiave: il termine in minuscolo). */
+  origini?: Record<string, OrigineDomanda>;
 }
 
 function riempi(template: string, v: Variabili, specialita?: string, requisito?: string): string {
@@ -95,7 +97,7 @@ function valido(testo: string, template: string, v: Variabili): boolean {
 }
 
 /** Ordine con cui i tipi si alternano: così 8, 15 e 30 domande hanno sempre un mix sensato. */
-const GIRO: TipoDomanda[] = ["generica", "specialita", "bisogno", "requisito", "generica", "bisogno", "specialita", "confronto"];
+const GIRO: TipoDomanda[] = ["generica", "specialita", "bisogno", "requisito", "confronto", "generica", "bisogno", "specialita"];
 
 /**
  * Genera le domande per un'attività: n domande (8 gratis, 15 Base, 30 Pro),
@@ -105,26 +107,33 @@ const GIRO: TipoDomanda[] = ["generica", "specialita", "bisogno", "requisito", "
  */
 export function generaDomande(p: ProfiloCategoria, v: Variabili, n: number): Domanda[] {
   const out: Domanda[] = [];
-  const push = (testo: string, tipo: TipoDomanda, modificabile = false) => {
-    if (out.length >= n - 1 || out.some((d) => d.testo === testo)) return false;
-    out.push({ id: `d${out.length + 1}`, testo, tipo, modificabile });
+  const origineDi = (termine?: string): OrigineDomanda | undefined => (termine ? v.origini?.[termine.toLowerCase()] : undefined);
+  const push = (c: Candidata, tipo: TipoDomanda, modificabile = false) => {
+    if (out.length >= n - 1 || out.some((d) => d.testo === c.testo)) return false;
+    out.push({ id: `d${out.length + 1}`, testo: c.testo, tipo, modificabile, origine: c.origine, concorrente: c.concorrente });
     return true;
   };
 
-  const espandi = (templates: string[] | undefined, tipo: TipoDomanda): string[] => {
+  type Candidata = { testo: string; origine?: OrigineDomanda; concorrente?: string };
+  const espandi = (templates: string[] | undefined, tipo: TipoDomanda): Candidata[] => {
     if (!templates) return [];
     if (tipo === "specialita") {
       const spec = v.specialita?.length ? v.specialita : [];
-      return spec.flatMap((s) => templates.map((t) => riempi(t, v, s))).filter((x, i) => valido(x, templates[i % templates.length], v));
+      return spec.flatMap((s) => templates.map((t) => ({ testo: riempi(t, v, s), origine: origineDi(s) }))).filter((x, i) => valido(x.testo, templates[i % templates.length], v));
     }
     if (tipo === "requisito") {
       const req = v.requisiti?.length ? v.requisiti : v.requisito ? [v.requisito] : [];
-      return templates.flatMap((t) => (t.includes("{requisito}") ? req.map((r) => riempi(t, v, undefined, r)) : [riempi(t, v)])).filter((x) => x.length > 0);
+      return templates
+        .flatMap((t) => (t.includes("{requisito}") ? req.map((r) => ({ testo: riempi(t, v, undefined, r), origine: origineDi(r) })) : [{ testo: riempi(t, v) }]))
+        .filter((x) => x.testo.length > 0);
     }
-    return templates.map((t) => riempi(t, v)).filter((x, i) => valido(x, templates[i], v));
+    if (tipo === "confronto") {
+      return templates.map((t) => ({ testo: riempi(t, v), origine: "scheda" as const, concorrente: v.concorrente })).filter((x, i) => valido(x.testo, templates[i], v));
+    }
+    return templates.map((t) => ({ testo: riempi(t, v) })).filter((x, i) => valido(x.testo, templates[i], v));
   };
 
-  const pool: Record<TipoDomanda, string[]> = {
+  const pool: Record<TipoDomanda, Candidata[]> = {
     generica: espandi(p.domande.generica, "generica"),
     bisogno: espandi(p.domande.bisogno, "bisogno"),
     specialita: espandi(p.domande.specialita, "specialita"),
@@ -140,9 +149,9 @@ export function generaDomande(p: ProfiloCategoria, v: Variabili, n: number): Dom
     let aggiunta = false;
     for (const tipo of GIRO) {
       if (out.length >= n - 1) break;
-      const testo = pool[tipo].shift();
-      if (!testo) continue;
-      const ok = push(testo, tipo, tipo === "specialita" && primaSpecialita);
+      const c = pool[tipo].shift();
+      if (!c) continue;
+      const ok = push(c, tipo, tipo === "specialita" && primaSpecialita);
       if (ok && tipo === "specialita") primaSpecialita = false;
       aggiunta = aggiunta || ok;
     }

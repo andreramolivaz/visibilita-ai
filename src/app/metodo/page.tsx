@@ -79,9 +79,11 @@ export default function Metodo() {
           <h2 className="text-2xl font-bold">1. Il profilo e le domande</h2>
           <div className="mt-4 space-y-3 text-[16px]">
             <p>
-              Scrivi il nome e la città (o il link di Google Maps). Da Google Places prendiamo nome, indirizzo, telefono, categoria, orari, rating e
-              recensioni; dal sito leggiamo le pagine chiave (menu, servizi, listino); con una ricerca web verifichiamo se hai una scheda sui portali
-              della tua categoria. Un modello linguistico unisce tutto in un profilo che tu confermi con un tocco.
+              Scrivi il nome e la città (o il link di Google Maps). Dalla scheda Google prendiamo nome, indirizzo, telefono, categoria, orari,
+              rating, recensioni e attributi (asporto, dehors, prenotazione, parcheggio…); dal sito leggiamo la pagina iniziale e le pagine chiave
+              (menu, servizi, lavorazioni); dai suggerimenti di ricerca Google per la tua categoria e città prendiamo i vincoli che la gente
+              aggiunge («senza glutine», «aperta ora»); dalle attività vicine della stessa categoria, il concorrente del confronto diretto. Tu
+              confermi con un tocco, e vedi da dove viene ogni domanda.
             </p>
             <p>
               Le domande sono quelle che un cliente fa davvero. Le abbiamo studiate sui prompt reali: sono frasi di 8–25 parole con un luogo e
@@ -89,8 +91,11 @@ export default function Metodo() {
               («miglior pizzeria a Bergamo»), per bisogno («aperta la domenica sera»), per specialità («con forno a legna»), per requisito («con
               dehors», «certificata EN 1090»), di confronto («meglio X o Y?»), sul nome («com&apos;è la Pizzeria Da Gino?»). I modelli sono
               scritti per {PROFILI.filter((p) => p.imprese > 0).length} categorie, in ordine di numerosità, e riempiti con città, zona o
-              provincia, specialità e servizi dell&apos;attività; per chi esporta o riceve stranieri ci sono anche domande in inglese. 8 nel test
-              gratuito, 15 nel Base, 30 nel Pro. Una la scegli tu.
+              provincia, con le specialità che emergono dalle tue recensioni e dal tuo sito e con i requisiti della scheda e delle ricerche; per chi
+              esporta o riceve stranieri ci sono anche domande in inglese. Un modello linguistico riscrive le domande spontanee come le scriverebbe
+              un cliente, con lo stesso luogo e gli stessi vincoli: contano intento e vincoli, non la frase (SparkToro 2026). 8 nel test gratuito,
+              15 nel Base, 30 nel Pro; nel Pro tre domande possono ruotare ogni mese per esplorare, le altre restano fisse per il confronto. Una la
+              scegli tu, o scrivi cosa ti chiedono al telefono.
             </p>
           </div>
         </div>
