@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps<"/report/[id]">): P
 
 export default function PaginaReport(props: PageProps<"/report/[id]">) {
   return (
-    <Pagina>
+    <Pagina className="max-w-4xl">
       <Suspense fallback={<p className="text-muted">Carico il report…</p>}>
         <Contenuto {...props} />
       </Suspense>

@@ -22,8 +22,9 @@ export function AnteprimaReport() {
           </span>
         </div>
         <ScalaPunteggio punteggio={r.punteggio} compatta />
+        <p className="mt-5 text-[15px]">{r.sintesi.split(". ").slice(0, 2).join(". ")}.</p>
 
-        <div className="mt-6">
+        <div className="mt-5">
           {r.perMotore.map((m) => (
             <Barra
               key={m.motore}
@@ -70,7 +71,10 @@ export function AnteprimaReport() {
           <Link href="/report/esempio" className="font-semibold text-accent underline underline-offset-2">
             Apri il report completo
           </Link>
-          <span className="text-muted">, con la tabella domanda per domanda e le fonti.</span>
+          <span className="text-muted">
+            : per tipo di domanda, testa a testa con i concorrenti, le 15 domande una per una, le parole e le
+            fonti, cosa dice ogni assistente di te.
+          </span>
         </p>
       </div>
     </div>

@@ -44,6 +44,12 @@ src/
   data/profiles/       un JSON per categoria: domande, fonti, metriche, azioni
 ```
 
+## Il report
+
+Sezioni, nell'ordine: intestazione con il campione (domande × assistenti × ripetizioni) · punteggio con scala a fasce e distribuzione delle posizioni · "In breve" (sintesi scritta dai dati) · per assistente · per tipo di domanda · chi consigliano al posto tuo + testa a testa · mappa domanda × assistente (heatmap, un solo colore: più scuro = posizione migliore) · le parole che usano · da dove prendono le informazioni · cosa dice ogni assistente di te + errori · tre azioni · come è stato fatto.
+Grafici ammessi: barre orizzontali, barre a segmenti, mappa a celle, una linea per l'andamento. Niente torte, radar, gauge.
+Domande per piano: 8 nel test gratuito, 15 nel Base, 30 nel Pro e Agenzia (`src/lib/prezzi.ts`).
+
 ## Regole di prodotto (dalla roadmap)
 
 - Italiano del tu, frasi corte, zero inglese nell'interfaccia. "GEO" solo nelle pagine per le agenzie.

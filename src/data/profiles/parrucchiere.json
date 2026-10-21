@@ -1,18 +1,62 @@
 {
   "id": "parrucchiere",
   "nome": "Parrucchiere, estetista, benessere",
-  "categorieGoogle": ["Parrucchiere", "Salone di bellezza", "Estetista", "Barbiere", "Centro estetico", "Spa"],
+  "categorieGoogle": [
+    "Parrucchiere",
+    "Salone di bellezza",
+    "Estetista",
+    "Barbiere",
+    "Centro estetico",
+    "Spa"
+  ],
   "domande": {
-    "generica": ["Miglior {categoria} a {citta}", "{categoria} consigliato in {zona} a {citta}"],
-    "bisogno": ["{categoria} senza appuntamento a {citta}", "{categoria} aperto il lunedì a {citta}"],
-    "specialita": ["{categoria} per {specialita} a {citta}", "{specialita} a {citta}"],
+    "generica": [
+      "Miglior {categoria} a {citta}",
+      "{categoria} consigliato in {zona} a {citta}",
+      "{categoria} migliore a {citta} secondo le recensioni",
+      "{categoria} a {citta} vicino a me"
+    ],
+    "bisogno": [
+      "{categoria} senza appuntamento a {citta}",
+      "{categoria} aperto il lunedì a {citta}",
+      "{categoria} economico a {citta}",
+      "{categoria} aperto la domenica a {citta}",
+      "{categoria} con prenotazione online a {citta}",
+      "{categoria} per uomo a {citta}",
+      "{categoria} per bambini a {citta}"
+    ],
+    "specialita": [
+      "{categoria} per {specialita} a {citta}",
+      "{specialita} a {citta}"
+    ],
     "nome": "Com'è {nome} a {citta}?"
   },
-  "fonti": ["Google Maps", "Treatwell", "Fresha", "Instagram", "Sito ufficiale"],
-  "metriche": ["presenza per servizio", "prenotazione online citata"],
+  "fonti": [
+    "Google Maps",
+    "Treatwell",
+    "Fresha",
+    "Instagram",
+    "Sito ufficiale"
+  ],
+  "metriche": [
+    "presenza per servizio",
+    "prenotazione online citata"
+  ],
   "azioni": [
-    { "codice": "treatwell", "titolo": "Apri la scheda Treatwell o Fresha", "quando": "fonte assente" },
-    { "codice": "listino", "titolo": "Metti il listino sul sito", "quando": "prezzi non citati" },
-    { "codice": "foto", "titolo": "Carica foto recenti su Google e Instagram", "quando": "foto vecchie o assenti" }
+    {
+      "codice": "treatwell",
+      "titolo": "Apri la scheda Treatwell o Fresha",
+      "quando": "fonte assente"
+    },
+    {
+      "codice": "listino",
+      "titolo": "Metti il listino sul sito",
+      "quando": "prezzi non citati"
+    },
+    {
+      "codice": "foto",
+      "titolo": "Carica foto recenti su Google e Instagram",
+      "quando": "foto vecchie o assenti"
+    }
   ]
 }

@@ -13,6 +13,8 @@ export interface Piano {
   perChi: string;
   mensile: number;
   annuale: number;
+  /** Domande per scansione. */
+  domande: number;
   include: string[];
   /** Nome prodotto su Stripe e in fattura. */
   stripeNome: string;
@@ -26,9 +28,10 @@ export const PIANI: Piano[] = [
     perChi: "Per una sola attività che vuole sapere ogni mese dove sta.",
     mensile: 29,
     annuale: 290,
+    domande: 15,
     include: [
       "1 attività",
-      "10 domande su 6 motori, 3 ripetizioni ciascuna",
+      "15 domande su 6 assistenti AI, 3 ripetizioni ciascuna",
       "Scansione ogni mese",
       "Email mensile con punteggio e variazione",
       "Storico dei report",
@@ -42,9 +45,10 @@ export const PIANI: Piano[] = [
     perChi: "Per chi vuole muoversi in fretta e tenere d'occhio i concorrenti.",
     mensile: 59,
     annuale: 590,
+    domande: 30,
     include: [
       "1 attività",
-      "20 domande su 6 motori, 3 ripetizioni ciascuna",
+      "30 domande su 6 assistenti AI, 3 ripetizioni ciascuna",
       "Scansione ogni settimana",
       "5 concorrenti seguiti, avviso se ne entra uno nuovo",
       "Azioni spuntate e verificate il mese dopo",
@@ -59,6 +63,7 @@ export const PIANI: Piano[] = [
     perChi: "Per web agency e freelance che lo rivendono con il proprio logo.",
     mensile: 179,
     annuale: 1790,
+    domande: 30,
     include: [
       "10 attività con report Pro",
       "PDF con il tuo logo",
@@ -78,7 +83,7 @@ export const SISTEMAZIONE = {
 };
 
 export const TEST_GRATUITO = {
-  domande: 5,
+  domande: 8,
   motori: 6,
   ripetizioni: 2,
   ogniGiorni: 30,

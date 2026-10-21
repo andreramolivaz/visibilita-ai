@@ -1,18 +1,58 @@
 {
   "id": "professionista",
   "nome": "Avvocato, commercialista, consulenti",
-  "categorieGoogle": ["Avvocato", "Studio legale", "Commercialista", "Consulente del lavoro", "Notaio"],
+  "categorieGoogle": [
+    "Avvocato",
+    "Studio legale",
+    "Commercialista",
+    "Consulente del lavoro",
+    "Notaio"
+  ],
   "domande": {
-    "generica": ["Miglior {categoria} a {citta}", "{categoria} consigliato a {citta}"],
-    "bisogno": ["{categoria} online a {citta}", "{categoria} primo colloquio gratuito a {citta}"],
-    "specialita": ["{categoria} per {specialita} a {citta}"],
+    "generica": [
+      "Miglior {categoria} a {citta}",
+      "{categoria} consigliato a {citta}",
+      "{categoria} affidabile a {citta}",
+      "{categoria} in {zona} a {citta}"
+    ],
+    "bisogno": [
+      "{categoria} online a {citta}",
+      "{categoria} primo colloquio gratuito a {citta}",
+      "{categoria} economico a {citta}",
+      "{categoria} per piccole imprese a {citta}",
+      "{categoria} che riceve il sabato a {citta}",
+      "{categoria} con consulenza a distanza a {citta}"
+    ],
+    "specialita": [
+      "{categoria} per {specialita} a {citta}"
+    ],
     "nome": "Com'è {nome} a {citta}?"
   },
-  "fonti": ["Google Maps", "Sito ufficiale", "LinkedIn", "Ordine professionale"],
-  "metriche": ["presenza per area di competenza", "titoli e sede corretti"],
+  "fonti": [
+    "Google Maps",
+    "Sito ufficiale",
+    "LinkedIn",
+    "Ordine professionale"
+  ],
+  "metriche": [
+    "presenza per area di competenza",
+    "titoli e sede corretti"
+  ],
   "azioni": [
-    { "codice": "pagina-area", "titolo": "Una pagina per ogni area di competenza", "quando": "invisibile sulle domande per area" },
-    { "codice": "linkedin", "titolo": "Allinea il profilo LinkedIn", "quando": "LinkedIn assente o diverso dal sito" },
-    { "codice": "articoli", "titolo": "Pubblica articoli sul sito", "quando": "nessuna fonte propria citata" }
+    {
+      "codice": "pagina-area",
+      "titolo": "Una pagina per ogni area di competenza",
+      "quando": "invisibile sulle domande per area"
+    },
+    {
+      "codice": "linkedin",
+      "titolo": "Allinea il profilo LinkedIn",
+      "quando": "LinkedIn assente o diverso dal sito"
+    },
+    {
+      "codice": "articoli",
+      "titolo": "Pubblica articoli sul sito",
+      "quando": "nessuna fonte propria citata"
+    }
   ]
 }

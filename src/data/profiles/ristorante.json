@@ -1,26 +1,85 @@
 {
   "id": "ristorante",
   "nome": "Ristorante, pizzeria, bar",
-  "categorieGoogle": ["Ristorante", "Pizzeria", "Bar", "Trattoria", "Osteria", "Pub"],
+  "categorieGoogle": [
+    "Ristorante",
+    "Pizzeria",
+    "Bar",
+    "Trattoria",
+    "Osteria",
+    "Pub"
+  ],
   "domande": {
-    "generica": ["Miglior {categoria} a {citta}", "{categoria} consigliata in {zona} a {citta}"],
+    "generica": [
+      "Miglior {categoria} a {citta}",
+      "{categoria} consigliata in {zona} a {citta}",
+      "{categoria} più apprezzata a {citta} secondo le recensioni",
+      "Dove mangiare bene a {citta}",
+      "{categoria} a {citta} vicino a me",
+      "{categoria} più famosa di {citta}"
+    ],
     "bisogno": [
       "Dove mangiare bene a {citta} stasera",
       "{categoria} aperta la domenica a {citta}",
       "{categoria} economica a {citta}",
       "{categoria} con dehors a {citta}",
-      "{categoria} con delivery a {citta}"
+      "{categoria} con delivery a {citta}",
+      "{categoria} per famiglie con bambini a {citta}",
+      "{categoria} aperta a pranzo a {citta}",
+      "{categoria} con asporto a {citta}",
+      "{categoria} per una cena romantica a {citta}",
+      "{categoria} per gruppi numerosi a {citta}",
+      "{categoria} con parcheggio a {citta}",
+      "{categoria} aperta fino a tardi a {citta}",
+      "{categoria} che accetta cani a {citta}",
+      "{categoria} con menu vegetariano a {citta}"
     ],
-    "specialita": ["{categoria} con {specialita} a {citta}", "{specialita} vicino a me"],
+    "specialita": [
+      "{categoria} con {specialita} a {citta}",
+      "Miglior {categoria} {specialita} a {citta}",
+      "{categoria} {specialita} in {zona} a {citta}"
+    ],
     "nome": "Com'è {nome} a {citta}?"
   },
-  "fonti": ["TheFork", "TripAdvisor", "Google Maps", "Gambero Rosso", "Michelin", "Giornale locale", "Sito ufficiale"],
-  "metriche": ["presenza per specialità", "orari e menu coerenti", "delivery citato"],
+  "fonti": [
+    "TheFork",
+    "TripAdvisor",
+    "Google Maps",
+    "Gambero Rosso",
+    "Michelin",
+    "Giornale locale",
+    "Sito ufficiale"
+  ],
+  "metriche": [
+    "presenza per specialità",
+    "orari e menu coerenti",
+    "delivery citato"
+  ],
   "azioni": [
-    { "codice": "thefork", "titolo": "Apri la scheda su TheFork", "quando": "fonte TheFork assente e citata dai concorrenti" },
-    { "codice": "menu-testo", "titolo": "Metti il menu in testo sul sito", "quando": "menu solo in PDF o immagine" },
-    { "codice": "recensioni-specialita", "titolo": "Chiedi recensioni che citino la specialità", "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni" },
-    { "codice": "categoria-google", "titolo": "Correggi la categoria su Google", "quando": "un motore ti descrive con una categoria diversa" },
-    { "codice": "orari", "titolo": "Allinea gli orari tra sito e Google", "quando": "incoerenza orari" }
+    {
+      "codice": "thefork",
+      "titolo": "Apri la scheda su TheFork",
+      "quando": "fonte TheFork assente e citata dai concorrenti"
+    },
+    {
+      "codice": "menu-testo",
+      "titolo": "Metti il menu in testo sul sito",
+      "quando": "menu solo in PDF o immagine"
+    },
+    {
+      "codice": "recensioni-specialita",
+      "titolo": "Chiedi recensioni che citino la specialità",
+      "quando": "termine ricorrente nelle risposte non presente nelle tue recensioni"
+    },
+    {
+      "codice": "categoria-google",
+      "titolo": "Correggi la categoria su Google",
+      "quando": "un motore ti descrive con una categoria diversa"
+    },
+    {
+      "codice": "orari",
+      "titolo": "Allinea gli orari tra sito e Google",
+      "quando": "incoerenza orari"
+    }
   ]
 }

@@ -77,8 +77,9 @@ export function Bottone({ children, href, secondario, className = "", ...rest }:
 }
 
 /**
- * Barra orizzontale: l'unico grafico del prodotto.
- * `tu` colora la barra con l'accento e aggiunge l'etichetta "tu".
+ * Barra orizzontale: il grafico di base del prodotto.
+ * `tu` colora la barra con l'accento e aggiunge l'etichetta "tu";
+ * `accento` solo il colore; `stato` un'etichetta a destra (es. "ci sei").
  */
 export function Barra({
   etichetta,
@@ -88,6 +89,7 @@ export function Barra({
   tu,
   accento,
   sotto,
+  stato,
 }: {
   etichetta: string;
   valore: number;
@@ -97,6 +99,8 @@ export function Barra({
   accento?: boolean;
   /** Riga piccola sotto l'etichetta. */
   sotto?: string;
+  /** Etichetta di stato a destra del valore, es. "ci sei". */
+  stato?: { testo: string; tono: "accento" | "errore" | "neutro" | "attenzione" };
 }) {
   const pct = massimo > 0 ? Math.max(0, Math.min(100, (valore / massimo) * 100)) : 0;
   const pieno = tu || accento;
@@ -112,7 +116,10 @@ export function Barra({
           )}
           {sotto && <span className="ml-2 text-sm text-faint">{sotto}</span>}
         </span>
-        <span className="tabular shrink-0 text-sm text-muted">{testo ?? valore}</span>
+        <span className="flex shrink-0 items-center gap-2">
+          <span className="tabular text-sm text-muted">{testo ?? valore}</span>
+          {stato && <Etichetta tono={stato.tono}>{stato.testo}</Etichetta>}
+        </span>
       </div>
       <div className="h-2 w-full overflow-hidden rounded-full bg-soft">
         <div

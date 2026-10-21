@@ -4,6 +4,7 @@ import { Pagina, Titolo } from "@/components/ui";
 import { ATTIVITA_ESEMPIO } from "@/lib/mock-report";
 import { generaDomande, profilo } from "@/lib/profiles";
 import { ConfermaProfilo } from "@/components/ConfermaProfilo";
+import { TEST_GRATUITO } from "@/lib/prezzi";
 
 export const metadata: Metadata = { title: "È giusto?" };
 
@@ -44,7 +45,7 @@ async function Profilo({ searchParams }: { searchParams: PageProps<"/conferma">[
       zona: attivita.zona,
       specialita: attivita.specialita,
     },
-    5,
+    TEST_GRATUITO.domande,
   );
 
   return <ConfermaProfilo attivita={attivita} domande={domande} />;

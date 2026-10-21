@@ -128,6 +128,8 @@ export interface CellaDomanda {
   posizione: Posizione;
   /** "2 su 3" */
   frequenza: string;
+  /** Quante volte compari, su `ripetizioni`. */
+  volte?: number;
 }
 
 export interface RigaDomanda {
@@ -154,6 +156,50 @@ export interface Azione {
   fatta?: boolean;
 }
 
+/** Visibilità per tipo di domanda: dove compari e dove no. */
+export interface RisultatoTipo {
+  tipo: TipoDomanda;
+  /** Risposte in cui compari. */
+  comparse: number;
+  totale: number;
+  /** Domande di questo tipo nel set. */
+  domande: number;
+}
+
+/** Confronto diretto con un concorrente, in numero di domande. */
+export interface TestaATesta {
+  nome: string;
+  /** Domande in cui c'è lui e non tu. */
+  loroSenzaTe: number;
+  /** Domande in cui ci siete entrambi. */
+  entrambi: number;
+  /** Domande in cui ci sei tu e non lui. */
+  tuSenzaLoro: number;
+}
+
+/** Parole che i motori usano quando consigliano nella tua categoria. */
+export interface Termine {
+  termine: string;
+  volte: number;
+  /** Compare nelle tue recensioni o sul tuo sito. */
+  ceLHai: boolean;
+}
+
+export interface DescrizioneMotore {
+  motore: EngineId;
+  testo: string;
+}
+
+export interface Metodo {
+  /** Inizio e fine della scansione, ISO. */
+  inizio: string;
+  fine: string;
+  /** Posizione impostata nelle API. */
+  posizione: string;
+  lingua: string;
+  note: string[];
+}
+
 export interface Report {
   id: string;
   attivita: ProfiloAttivita;
@@ -163,13 +209,20 @@ export interface Report {
   ripetizioni: number;
   punteggio: number;
   verdetto: Verdetto;
+  /** In breve: tre o quattro frasi scritte dai dati. */
+  sintesi: string;
   perMotore: RisultatoMotore[];
+  perTipo: RisultatoTipo[];
   concorrenti: Concorrente[];
+  testaATesta: TestaATesta[];
   righe: RigaDomanda[];
+  termini: Termine[];
   fonti: Fonte[];
   descrizioneAI: string;
+  descrizioniPerMotore: DescrizioneMotore[];
   errori: ErroreScheda[];
   azioni: Azione[];
+  metodo: Metodo;
   /** Solo abbonamento: punteggi degli ultimi mesi, dal più vecchio. */
   andamento?: { mese: string; punteggio: number }[];
 }

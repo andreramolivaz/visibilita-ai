@@ -1,23 +1,69 @@
 {
   "id": "dentista",
   "nome": "Dentista, medico, fisioterapista",
-  "categorieGoogle": ["Dentista", "Studio dentistico", "Fisioterapista", "Medico", "Poliambulatorio", "Nutrizionista"],
+  "categorieGoogle": [
+    "Dentista",
+    "Studio dentistico",
+    "Fisioterapista",
+    "Medico",
+    "Poliambulatorio",
+    "Nutrizionista"
+  ],
   "domande": {
-    "generica": ["Miglior {categoria} a {citta}", "{categoria} consigliato a {citta}"],
+    "generica": [
+      "Miglior {categoria} a {citta}",
+      "{categoria} consigliato a {citta}",
+      "{categoria} migliore a {citta} secondo le recensioni",
+      "{categoria} in {zona} a {citta}"
+    ],
     "bisogno": [
       "{categoria} urgente a {citta}",
       "{categoria} convenzionato a {citta}",
-      "{categoria} che riceve il sabato a {citta}"
+      "{categoria} che riceve il sabato a {citta}",
+      "{categoria} per bambini a {citta}",
+      "{categoria} economico a {citta}",
+      "{categoria} che riceve la sera a {citta}",
+      "{categoria} con pagamento a rate a {citta}",
+      "{categoria} con prima visita gratuita a {citta}"
     ],
-    "specialita": ["{categoria} per {specialita} a {citta}", "{specialita} a {citta} prezzi"],
+    "specialita": [
+      "{categoria} per {specialita} a {citta}",
+      "{specialita} a {citta} prezzi"
+    ],
     "nome": "Com'è {nome} a {citta}?"
   },
-  "fonti": ["MioDottore", "Google Maps", "Sito ufficiale", "Dottori.it", "Ordine professionale"],
-  "metriche": ["presenza per prestazione", "urgenze e orari", "titoli e convenzioni corretti"],
+  "fonti": [
+    "MioDottore",
+    "Google Maps",
+    "Sito ufficiale",
+    "Dottori.it",
+    "Ordine professionale"
+  ],
+  "metriche": [
+    "presenza per prestazione",
+    "urgenze e orari",
+    "titoli e convenzioni corretti"
+  ],
   "azioni": [
-    { "codice": "miodottore", "titolo": "Apri il profilo MioDottore", "quando": "fonte MioDottore assente" },
-    { "codice": "pagina-prestazione", "titolo": "Una pagina per ogni prestazione sul sito", "quando": "invisibile sulle domande per prestazione" },
-    { "codice": "prenotazione", "titolo": "Attiva la prenotazione online", "quando": "prenotazione online non citata" },
-    { "codice": "titoli", "titolo": "Correggi titoli e convenzioni sulle schede", "quando": "l'AI riporta dati sbagliati" }
+    {
+      "codice": "miodottore",
+      "titolo": "Apri il profilo MioDottore",
+      "quando": "fonte MioDottore assente"
+    },
+    {
+      "codice": "pagina-prestazione",
+      "titolo": "Una pagina per ogni prestazione sul sito",
+      "quando": "invisibile sulle domande per prestazione"
+    },
+    {
+      "codice": "prenotazione",
+      "titolo": "Attiva la prenotazione online",
+      "quando": "prenotazione online non citata"
+    },
+    {
+      "codice": "titoli",
+      "titolo": "Correggi titoli e convenzioni sulle schede",
+      "quando": "l'AI riporta dati sbagliati"
+    }
   ]
 }

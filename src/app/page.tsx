@@ -13,7 +13,7 @@ const PASSI = [
   },
   {
     titolo: "Interroghiamo i motori come farebbe un cliente",
-    testo: "Cinque domande vere, nella tua città, su sei assistenti AI. Ogni domanda due volte, perché le risposte cambiano.",
+    testo: "Otto domande vere, nella tua città, su sei assistenti AI. Ogni domanda due volte, perché le risposte cambiano.",
   },
   {
     titolo: "Ricevi punteggio, concorrenti e tre azioni",
@@ -153,8 +153,9 @@ export default function Landing() {
           <div className="max-w-2xl">
             <h2 className="text-2xl font-bold sm:text-3xl">Un punteggio, un confronto, tre azioni</h2>
             <p className="mt-3 text-muted">
-              Questo è un report vero, con i nomi cambiati. Niente quaranta metriche: ogni numero con
-              il suo campione, ogni consiglio legato a un dato.
+              Questo è un report vero, con i nomi cambiati. Punteggio, dove ti trovano e dove no, chi
+              ti passa davanti, le parole e le fonti che usano, cosa dicono di te, tre azioni. Ogni
+              numero con il suo campione.
             </p>
           </div>
           <div className="mt-8 bg-bg">
@@ -171,13 +172,13 @@ export default function Landing() {
               <h2 className="text-2xl font-bold sm:text-3xl">Si può fare a mano. Non ogni mese.</h2>
               <p className="mt-3 text-muted">
                 Aprire ChatGPT e chiedere «miglior pizzeria a Bergamo» lo fai in un minuto. Farlo su sei
-                assistenti, con dieci domande, tre volte ciascuna, segnando la posizione e le fonti,
-                è una giornata. E il mese dopo è già tutto diverso.
+                assistenti, con quindici domande, tre volte ciascuna, segnando posizione, concorrenti
+                e fonti, è una giornata. E il mese dopo è già tutto diverso.
               </p>
             </div>
             <dl className="grid grid-cols-2 gap-x-6 gap-y-7 sm:grid-cols-4 lg:grid-cols-2">
               {[
-                ["180", "risposte raccolte ogni mese nel piano Base"],
+                ["270", "risposte lette ogni mese nel piano Base"],
                 ["6", "assistenti AI, interrogati con la tua città"],
                 ["1º–5º", "la posizione in cui compari, non solo se compari"],
                 ["8", "fonti controllate: dove l'AI prende le informazioni"],

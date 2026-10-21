@@ -33,14 +33,14 @@ export function Scansione() {
   const id = params.get("id") ?? "";
 
   const domande = useMemo<Domanda[]>(() => {
-    if (typeof window === "undefined") return DOMANDE_ESEMPIO.slice(0, 5);
+    if (typeof window === "undefined") return DOMANDE_ESEMPIO.slice(0, 8);
     try {
       const salvato = sessionStorage.getItem(id);
       if (salvato) return JSON.parse(salvato).domande as Domanda[];
     } catch {
       /* niente */
     }
-    return DOMANDE_ESEMPIO.slice(0, 5);
+    return DOMANDE_ESEMPIO.slice(0, 8);
   }, [id]);
 
   const motori = motoriAttivi("mvp");
@@ -61,8 +61,8 @@ export function Scansione() {
       const t = setTimeout(() => router.push("/report/esempio?nuovo=1"), 700);
       return () => clearTimeout(t);
     }
-    // 40–90 s in totale: ~1 s a passo con 60 passi.
-    const t = setTimeout(() => setI((x) => x + 1), 700 + Math.random() * 600);
+    // 60–90 s in totale: ~0,8 s a passo con 96 passi.
+    const t = setTimeout(() => setI((x) => x + 1), 550 + Math.random() * 500);
     return () => clearTimeout(t);
   }, [i, passi.length, router]);
 
