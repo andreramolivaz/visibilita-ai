@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet, Font, Svg, Rect, Circle } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Font, Svg, Rect, Circle, Path } from "@react-pdf/renderer";
 import type { Report, TipoDomanda, Verdetto } from "@/lib/types";
 import { ENGINES } from "@/lib/engines";
 import { distribuzionePosizioni } from "@/components/report/Posizioni";
@@ -110,12 +110,14 @@ function posizioneMedia(celle: { posizione: number | null; volte?: number; frequ
 function Marchio({ nome }: { nome: string }) {
   return (
     <View style={s.marchio}>
-      <Svg width={14} height={14} viewBox="0 0 64 64">
-        <Rect x={0} y={0} width={64} height={64} rx={14} ry={14} fill={C.accent} />
-        <Rect x={14} y={36} width={36} height={7} rx={3.5} ry={3.5} fill="#ffffff" opacity={0.45} />
-        <Rect x={14} y={25} width={24} height={7} rx={3.5} ry={3.5} fill="#ffffff" opacity={0.7} />
-        <Rect x={14} y={14} width={14} height={7} rx={3.5} ry={3.5} fill="#ffffff" />
-        <Circle cx={46} cy={17.5} r={4} fill="#ffffff" />
+      <Svg width={15} height={15} viewBox="0 0 64 64">
+        <Path d="M14 6h36a10 10 0 0 1 10 10v26a10 10 0 0 1-10 10H40l-8 9-8-9H14A10 10 0 0 1 4 42V16A10 10 0 0 1 14 6z" fill={C.accent} />
+        <Circle cx={17} cy={19} r={3} fill="#ffffff" opacity={0.4} />
+        <Rect x={24} y={16.5} width={18} height={5} rx={2.5} ry={2.5} fill="#ffffff" opacity={0.4} />
+        <Circle cx={17} cy={29} r={3.5} fill="#9fe8c6" />
+        <Rect x={24} y={26} width={26} height={6} rx={3} ry={3} fill="#ffffff" />
+        <Circle cx={17} cy={39} r={3} fill="#ffffff" opacity={0.4} />
+        <Rect x={24} y={36.5} width={14} height={5} rx={2.5} ry={2.5} fill="#ffffff" opacity={0.4} />
       </Svg>
       <Text style={s.marchioTesto}>{nome}</Text>
     </View>
@@ -265,6 +267,8 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
   const durata = Math.max(0, Math.round((new Date(r.metodo.fine).getTime() - new Date(r.metodo.inizio).getTime()) / 1000));
   const indiceTuo = r.concorrenti.findIndex((c) => c.seiTu);
   const testa = (nome: string) => r.testaATesta.find((t) => t.nome === nome);
+  const guadagno = r.azioni.reduce((acc, a) => acc + (a.impattoStimato ?? 0), 0);
+  const potenziale = guadagno > 0 ? Math.min(100, r.punteggio + guadagno) : null;
 
   const sezioni = [
     "1. Sintesi dei risultati",
@@ -344,6 +348,29 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
               </View>
             </View>
             <Scala punteggio={r.punteggio} />
+            {r.contesto && (
+              <Text style={[s.p, { marginTop: 6, fontSize: 8.5 }]}>
+                Contesto: su {r.contesto.attivitaAnalizzate} {r.contesto.categoria} analizzate a {r.contesto.citta} la mediana è {r.contesto.mediana}; questo punteggio è più alto del {r.contesto.percentile}% di loro.
+              </Text>
+            )}
+            {potenziale !== null && (
+              <View style={{ marginTop: 6 }}>
+                <View style={[s.riga, { justifyContent: "space-between", marginBottom: 2 }]}>
+                  <Text style={{ fontSize: 8.5, fontFamily: "Helvetica-Bold" }}>Stima con le azioni della sezione 7</Text>
+                  <Text style={{ fontSize: 8.5 }}>
+                    {r.punteggio} → <Text style={{ fontFamily: "Helvetica-Bold", color: C.accent }}>{potenziale}</Text>
+                  </Text>
+                </View>
+                <Segmenti
+                  totale={100}
+                  parti={[
+                    { v: r.punteggio, colore: C.ink, testo: String(r.punteggio) },
+                    ...r.azioni.filter((a) => (a.impattoStimato ?? 0) > 0).map((a, i) => ({ v: a.impattoStimato ?? 0, colore: ["#0a4537", C.accent, "#3f7f6b"][i % 3], testo: `+${a.impattoStimato}` })),
+                    { v: Math.max(0, 100 - potenziale), colore: C.soft },
+                  ]}
+                />
+              </View>
+            )}
             <Text style={[s.nota, { marginTop: 5 }]}>
               Punteggio = media, pesata per quota d&apos;uso di ogni assistente, del peso della posizione in cui compari (1° = 1,00 · 2° = 0,85 · 3° = 0,70 · 4° = 0,55 · 5° = 0,40 · assente = 0). Dettagli in Allegato A.
             </Text>
@@ -367,17 +394,13 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           <>
             <Text style={s.h3}>1.2 Distribuzione delle posizioni quando compari</Text>
             <Segmenti totale={distTot} parti={([1, 2, 3, 4, 5] as const).map((p) => ({ v: dist[p], colore: POS[p], testo: `${p}°`, chiaro: p >= 4 }))} />
-            <View style={{ marginTop: 4 }}>
-              <Tabella
-                colonne={[
-                  { testo: "Posizione", larghezza: 1 },
-                  { testo: "Risposte", larghezza: 1, num: true },
-                  { testo: "Quota", larghezza: 1, num: true },
-                  { testo: "Peso nel punteggio", larghezza: 1.4, num: true },
-                ]}
-                righe={([1, 2, 3, 4, 5] as const).map((p) => [`${p}° posto`, String(dist[p]), pct(dist[p], distTot), n2(PESO_POSIZIONE[p - 1])])}
-              />
-            </View>
+            <Text style={[s.nota, { marginTop: 3 }]}>
+              {([1, 2, 3, 4, 5] as const)
+                .filter((p) => dist[p] > 0)
+                .map((p) => `${p}° posto: ${dist[p]} risposte (${pct(dist[p], distTot)}, peso ${n2(PESO_POSIZIONE[p - 1])})`)
+                .join(" · ")}
+              . Totale {distTot} risposte in cui compari.
+            </Text>
           </>
         )}
 
@@ -453,26 +476,16 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           «Solo lui»: domande, su {r.domande}, in cui il concorrente compare e questa attività no; «Entrambi» e «Solo tu» a specchio. I concorrenti seguiti nel confronto diretto sono i tre più citati.
         </Text>
 
-        <Text style={s.h3}>3.1 Confronto diretto, in domande</Text>
-        {r.testaATesta.map((t) => (
-          <View key={t.nome} style={{ marginBottom: 5 }}>
-            <View style={[s.riga, { justifyContent: "space-between", marginBottom: 2 }]}>
-              <Text style={s.td}>{t.nome}</Text>
-              <Text style={s.nota}>
-                solo lui {t.loroSenzaTe} · entrambi {t.entrambi} · solo tu {t.tuSenzaLoro} · nessuno dei due {r.domande - t.loroSenzaTe - t.entrambi - t.tuSenzaLoro}
-              </Text>
-            </View>
-            <Segmenti
-              totale={r.domande}
-              parti={[
-                { v: t.loroSenzaTe, colore: C.grey, testo: String(t.loroSenzaTe), chiaro: true },
-                { v: t.entrambi, colore: C.entrambi, testo: String(t.entrambi) },
-                { v: t.tuSenzaLoro, colore: C.accent, testo: String(t.tuSenzaLoro) },
-                { v: r.domande - t.loroSenzaTe - t.entrambi - t.tuSenzaLoro, colore: C.soft },
-              ]}
+        {r.citaChi.length > 0 && (
+          <>
+            <Text style={s.h3}>3.1 Chi cita chi: domande (su {r.domande}) in cui ogni assistente cita l&apos;attività</Text>
+            <Tabella
+              colonne={[{ testo: "Attività", larghezza: 2 }, ...r.motori.map((m) => ({ testo: nomeMotore(m), larghezza: 0.8, num: true }))]}
+              evidenzia={r.citaChi.findIndex((c) => c.seiTu)}
+              righe={r.citaChi.map((c) => [c.seiTu ? `${c.nome} (questa attività)` : c.nome, ...r.motori.map((m) => String(c.perMotore[m] ?? 0))])}
             />
-          </View>
-        ))}
+          </>
+        )}
         <Pie r={r} />
       </Page>
 
@@ -543,12 +556,13 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
             <Text style={[s.h3, { marginTop: 0 }]}>5.1 Fonti citate dagli assistenti</Text>
             <Tabella
               colonne={[
-                { testo: "Fonte", larghezza: 1.6 },
+                { testo: "Fonte", larghezza: 1.5 },
                 { testo: "Citazioni", larghezza: 0.8, num: true },
-                { testo: "Quota", larghezza: 0.7, num: true },
-                { testo: "Presenza", larghezza: 0.9, num: true },
+                { testo: "Quota", larghezza: 0.6, num: true },
+                { testo: "Presenza", larghezza: 0.8, num: true },
+                { testo: "Concorrenti presenti (su 5)", larghezza: 1.1, num: true },
               ]}
-              righe={r.fonti.map((f) => [f.nome, String(f.citazioni), pct(f.citazioni, totale), f.ciSei ? "Sì" : "No"])}
+              righe={r.fonti.map((f) => [f.nome, String(f.citazioni), pct(f.citazioni, totale), f.ciSei ? "Sì" : "No", f.concorrentiPresenti !== undefined ? String(f.concorrentiPresenti) : "–"])}
             />
             <Text style={[s.nota, { marginTop: 4 }]}>Presenza: l&apos;attività ha una scheda o una pagina su quella fonte. Dove è «No», gli assistenti non possono trovarla lì.</Text>
           </View>
@@ -565,11 +579,11 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
                   colonne={[
                     { testo: "Termine", larghezza: 1.8 },
                     { testo: "Occorrenze", larghezza: 0.9, num: true },
-                    { testo: "Nelle tue fonti", larghezza: 1, num: true },
+                    { testo: "Nelle tue recensioni", larghezza: 1.1, num: true },
                   ]}
-                  righe={r.termini.map((t) => [t.termine, String(t.volte), t.ceLHai ? "Sì" : "No"])}
+                  righe={r.termini.map((t) => [t.termine, String(t.volte), t.volteTue !== undefined ? String(t.volteTue) : t.ceLHai ? "Sì" : "No"])}
                 />
-                <Text style={[s.nota, { marginTop: 4 }]}>Occorrenze nelle {totale} risposte. «Nelle tue fonti»: il termine compare nelle recensioni Google o sul sito dell&apos;attività.</Text>
+                <Text style={[s.nota, { marginTop: 4 }]}>Occorrenze nelle {totale} risposte, e quante volte il termine compare nelle recensioni Google dell&apos;attività.</Text>
               </>
             )}
           </View>
@@ -609,10 +623,11 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
             { testo: "Azione", larghezza: 2 },
             { testo: "Dato di riferimento", larghezza: 2.6 },
             { testo: "Impatto atteso", larghezza: 0.8 },
+            { testo: "Punti stimati", larghezza: 0.7, num: true },
           ]}
-          righe={r.azioni.map((a, i) => [String(i + 1), a.titolo, a.dato, maiuscola(a.impatto)])}
+          righe={r.azioni.map((a, i) => [String(i + 1), a.titolo, a.dato, maiuscola(a.impatto), a.impattoStimato !== undefined ? `+${a.impattoStimato}` : "–"])}
         />
-        <Text style={[s.nota, { marginTop: 4 }]}>Le azioni sono scelte tra quelle previste per la categoria dell&apos;attività e ordinate per impatto atteso sul punteggio. La verifica avviene alla scansione successiva.</Text>
+        <Text style={[s.nota, { marginTop: 4 }]}>Le azioni sono scelte tra quelle previste per la categoria dell&apos;attività e ordinate per impatto atteso. I punti stimati sono una stima dai dati di questo report{potenziale !== null ? ` (punteggio stimato dopo le azioni: ${potenziale})` : ""}; la verifica avviene alla scansione successiva.</Text>
 
         <Text style={[s.h2, { marginTop: 0 }]} break>
           Allegato A. Metodo e limiti

@@ -10,6 +10,7 @@ import type {
   RisultatoTipo,
   TipoDomanda,
   Piano,
+  CitaChi,
 } from "./types";
 import { motoriAttivi } from "./engines";
 import { punteggio as calcolaPunteggio, verdetto as calcolaVerdetto } from "./score";
@@ -90,12 +91,15 @@ const RISULTATI: Cella[][] = [
 
 const TIPI: TipoDomanda[] = ["generica", "bisogno", "specialita", "nome"];
 
-/** Nomi dei concorrenti e quota di citazioni rispetto al totale (il resto si calcola). */
+/**
+ * Nomi dei concorrenti, quota di citazioni rispetto al totale e profilo per
+ * assistente (quanto ogni motore li cita rispetto alla media: 1 = nella media).
+ */
 const CONCORRENTI = [
-  { nome: "Pizzeria Fratelli Rossi", quota: 0.75 },
-  { nome: "Al Forno Antico", quota: 0.61 },
-  { nome: "La Margherita", quota: 0.45 },
-  { nome: "Trattoria del Borgo", quota: 0.16 },
+  { nome: "Pizzeria Fratelli Rossi", quota: 0.75, profilo: [1.2, 1.1, 1.25, 0.9, 0.8, 1.0] },
+  { nome: "Al Forno Antico", quota: 0.61, profilo: [1.1, 1.0, 1.1, 1.0, 0.9, 0.7] },
+  { nome: "La Margherita", quota: 0.45, profilo: [0.9, 1.1, 0.8, 1.2, 1.2, 0.6] },
+  { nome: "Trattoria del Borgo", quota: 0.16, profilo: [0.8, 1.2, 0.5, 1.3, 1.4, 0.4] },
 ];
 
 /**
@@ -163,6 +167,23 @@ function costruisci(opzioni: {
     ...CONCORRENTI.slice(3).map((c) => ({ nome: c.nome, citazioni: Math.round(c.quota * totaleRisposte), totale: totaleRisposte })),
   ];
 
+  // Chi cita chi: domande (su N) in cui ogni assistente cita ciascuna attività.
+  const citaChi: CitaChi[] = [
+    ...CONCORRENTI.slice(0, 3).map((c) => ({
+      nome: c.nome,
+      perMotore: Object.fromEntries(MOTORI.map((m, j) => [m, Math.min(domande.length, Math.round(c.quota * c.profilo[j] * domande.length))])),
+    })),
+    {
+      nome: ATTIVITA_ESEMPIO.nome,
+      seiTu: true,
+      perMotore: Object.fromEntries(MOTORI.map((m, j) => [m, risultati.filter((celle) => celle[j][1] > 0).length])),
+    },
+    ...CONCORRENTI.slice(3).map((c) => ({
+      nome: c.nome,
+      perMotore: Object.fromEntries(MOTORI.map((m, j) => [m, Math.min(domande.length, Math.round(c.quota * c.profilo[j] * domande.length))])),
+    })),
+  ];
+
   // Testa a testa: entrambi + solo tu = domande in cui compari.
   const senzaDiTe = domande.length - domandeInCuiCompari;
   const testaATesta = [
@@ -185,16 +206,24 @@ function costruisci(opzioni: {
     perTipo,
     concorrenti,
     testaATesta,
+    citaChi,
+    contesto: {
+      categoria: "pizzerie",
+      citta: ATTIVITA_ESEMPIO.citta,
+      attivitaAnalizzate: 42,
+      mediana: 21,
+      percentile: punteggio >= 21 ? 55 : 38,
+    },
     righe,
     fonti: [
-      { nome: "TheFork", citazioni: Math.round(totaleRisposte * 0.41), ciSei: false },
-      { nome: "TripAdvisor", citazioni: Math.round(totaleRisposte * 0.35), ciSei: true },
-      { nome: "Google Maps", citazioni: Math.round(totaleRisposte * 0.32), ciSei: true },
-      { nome: "L'Eco di Bergamo", citazioni: Math.round(totaleRisposte * 0.11), ciSei: false },
-      { nome: "Gambero Rosso", citazioni: Math.round(totaleRisposte * 0.09), ciSei: false },
-      { nome: "Sito ufficiale", citazioni: Math.round(totaleRisposte * 0.07), ciSei: true },
-      { nome: "Michelin", citazioni: Math.round(totaleRisposte * 0.04), ciSei: false },
-      { nome: "Instagram", citazioni: Math.round(totaleRisposte * 0.03), ciSei: false },
+      { nome: "TheFork", citazioni: Math.round(totaleRisposte * 0.41), ciSei: false, concorrentiPresenti: 4 },
+      { nome: "TripAdvisor", citazioni: Math.round(totaleRisposte * 0.35), ciSei: true, concorrentiPresenti: 5 },
+      { nome: "Google Maps", citazioni: Math.round(totaleRisposte * 0.32), ciSei: true, concorrentiPresenti: 5 },
+      { nome: "L'Eco di Bergamo", citazioni: Math.round(totaleRisposte * 0.11), ciSei: false, concorrentiPresenti: 2 },
+      { nome: "Gambero Rosso", citazioni: Math.round(totaleRisposte * 0.09), ciSei: false, concorrentiPresenti: 2 },
+      { nome: "Sito ufficiale", citazioni: Math.round(totaleRisposte * 0.07), ciSei: true, concorrentiPresenti: 5 },
+      { nome: "Michelin", citazioni: Math.round(totaleRisposte * 0.04), ciSei: false, concorrentiPresenti: 1 },
+      { nome: "Instagram", citazioni: Math.round(totaleRisposte * 0.03), ciSei: false, concorrentiPresenti: 3 },
     ],
     tueCitazioni,
     totaleRisposte,
@@ -211,14 +240,14 @@ export const REPORT_ESEMPIO: Report = {
   ...BASE,
   sintesi: `Compari in ${TUE_CITAZIONI} risposte su ${TOTALE_RISPOSTE} (${PCT}%), in ${DOMANDE_IN_CUI_COMPARI} domande su ${DOMANDE_ESEMPIO.length}. Ti citano quasi solo quando la domanda riguarda il forno a legna o la pizza napoletana: sulle domande generiche compari poco, su quelle per bisogno (asporto, delivery, pranzo, domenica) quasi mai. Gemini e Perplexity sono i motori che ti conoscono meglio; ChatGPT e Google AI, i più usati, quasi non ti nominano. Pizzeria Fratelli Rossi compare in ${TESTA_A_TESTA[0].loroSenzaTe} domande dove tu non ci sei. La fonte più citata dai motori è TheFork, dove non hai una scheda: è la prima cosa da sistemare.`,
   termini: [
-    { termine: "forno a legna", volte: 61, ceLHai: true },
-    { termine: "impasto a lunga lievitazione", volte: 38, ceLHai: false },
-    { termine: "in centro", volte: 34, ceLHai: true },
-    { termine: "pizza napoletana", volte: 29, ceLHai: true },
-    { termine: "prenotazione consigliata", volte: 22, ceLHai: false },
-    { termine: "ingredienti DOP", volte: 17, ceLHai: false },
-    { termine: "dehors", volte: 14, ceLHai: true },
-    { termine: "senza glutine", volte: 9, ceLHai: false },
+    { termine: "forno a legna", volte: 61, ceLHai: true, volteTue: 3 },
+    { termine: "impasto a lunga lievitazione", volte: 38, ceLHai: false, volteTue: 0 },
+    { termine: "in centro", volte: 34, ceLHai: true, volteTue: 27 },
+    { termine: "pizza napoletana", volte: 29, ceLHai: true, volteTue: 11 },
+    { termine: "prenotazione consigliata", volte: 22, ceLHai: false, volteTue: 0 },
+    { termine: "ingredienti DOP", volte: 17, ceLHai: false, volteTue: 0 },
+    { termine: "dehors", volte: 14, ceLHai: true, volteTue: 6 },
+    { termine: "senza glutine", volte: 9, ceLHai: false, volteTue: 0 },
   ],
   descrizioneAI:
     "Pizzeria in centro a Bergamo con forno a legna e impasto napoletano, apprezzata per il rapporto qualità-prezzo. Gemini la descrive come «bar pizzeria»; ChatGPT e Grok riportano la chiusura il lunedì.",
@@ -240,16 +269,19 @@ export const REPORT_ESEMPIO: Report = {
       titolo: "Apri la scheda su TheFork",
       dato: `È la fonte più citata (${BASE.fonti[0].citazioni} risposte su ${TOTALE_RISPOSTE}): 4 concorrenti su 5 ci sono, tu no.`,
       impatto: "alto",
+      impattoStimato: 9,
     },
     {
       titolo: "Correggi la categoria su Google e gli orari del lunedì",
       dato: `Gemini ti descrive come «bar pizzeria» e due motori su sei ti danno chiuso il lunedì: i dati sbagliati ti escludono dalle domande per bisogno, dove oggi compari ${BISOGNO.comparse} volte su ${BISOGNO.totale}.`,
       impatto: "alto",
+      impattoStimato: 6,
     },
     {
       titolo: "Metti «impasto a lunga lievitazione» e «senza glutine» nel menu sul sito e chiedi recensioni che li citino",
       dato: "Sono termini che i motori usano 38 e 9 volte quando consigliano, e non compaiono mai nelle tue recensioni né sul sito.",
       impatto: "medio",
+      impattoStimato: 4,
     },
   ],
   metodo: {

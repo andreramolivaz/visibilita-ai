@@ -46,11 +46,16 @@ src/
 
 ## Il report
 
-Sezioni, nell'ordine: intestazione con il campione (domande × assistenti × ripetizioni) · punteggio con scala a fasce e distribuzione delle posizioni · "In breve" (sintesi scritta dai dati) · per assistente · per tipo di domanda · chi consigliano al posto tuo + testa a testa · mappa domanda × assistente (heatmap, un solo colore: più scuro = posizione migliore) · le parole che usano · da dove prendono le informazioni · cosa dice ogni assistente di te + errori · tre azioni · come è stato fatto.
+Sezioni, nell'ordine: intestazione con il campione e un indice delle sezioni · punteggio con scala a fasce, mediana della categoria come riferimento, distribuzione delle posizioni · "In breve" (sintesi scritta dai dati) e punteggio stimato dopo le azioni · per assistente · per tipo di domanda · chi consigliano al posto tuo + testa a testa + "chi cita chi" (attività × assistente) · mappa domanda × assistente (heatmap, un solo colore: più scuro = posizione migliore) · le parole che usano (con quante volte nelle tue recensioni) · da dove prendono le informazioni (con quanti concorrenti ci sono) · cosa dice ogni assistente di te + errori · tre azioni con "dove puoi arrivare" (punti stimati per azione) · come è stato fatto.
+Contesto (`contesto`: attività analizzate, mediana, percentile) e punti stimati per azione oggi sono nel mock; in produzione arrivano dal database e dal modello dei consigli.
 Grafici ammessi: barre orizzontali, barre a segmenti, mappa a celle, una linea per l'andamento. Niente torte, radar, gauge.
-Il PDF è un rapporto tecnico: marchio e identificativo documento (`VAI-AAAAMMGG-ID`) in testata, sezioni numerate, tabelle, indice, allegati con metodo, pesi, limiti ed elenco domande. In white-label il nome dell'agenzia sostituisce il marchio (`logo` in `ReportPdf`).
+Il PDF è un rapporto tecnico a 5 pagine: marchio e identificativo documento (`VAI-AAAAMMGG-ID`) in testata, sezioni numerate, tabelle, indice, contesto e stima, chi cita chi, allegati con metodo, pesi, limiti ed elenco domande. In white-label il nome dell'agenzia sostituisce il marchio (`logo` in `ReportPdf`).
 Test gratuito: 8 domande × 2 ripetizioni, senza "In breve", "Le parole che usano" e PDF; al loro posto "Nel piano Base trovi anche".
 Domande per piano: 8 nel test gratuito, 15 nel Base, 30 nel Pro e Agenzia (`src/lib/prezzi.ts`).
+
+## Marchio
+
+Una risposta di un assistente (la bolla con l'elenco) la cui coda è un segnaposto: il locale che compare nella risposta. La riga accesa con il punto è "tu". Componente `Simbolo` in `src/components/Marchio.tsx`, favicon in `src/app/icon.svg`, versione vettoriale nel PDF, anteprima social generata in `src/app/opengraph-image.tsx`.
 
 ## Regole di prodotto (dalla roadmap)
 

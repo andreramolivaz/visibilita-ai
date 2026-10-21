@@ -12,7 +12,7 @@ export function Header() {
   return (
     <header className="no-print sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <Marchio />
+        <Marchio size={26} />
         <nav className="hidden items-center gap-6 text-[15px] text-muted md:flex" aria-label="Principale">
           {VOCI.map((v) => (
             <Link key={v.href} href={v.href} className="hover:text-ink">

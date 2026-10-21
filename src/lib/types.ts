@@ -141,6 +141,8 @@ export interface Fonte {
   nome: Portale | string;
   citazioni: number;
   ciSei: boolean;
+  /** Quanti dei 5 concorrenti più citati hanno una scheda qui. */
+  concorrentiPresenti?: number;
 }
 
 export interface ErroreScheda {
@@ -153,6 +155,8 @@ export interface Azione {
   titolo: string;
   dato: string;
   impatto: "alto" | "medio" | "basso";
+  /** Punti di punteggio stimati se fatta. */
+  impattoStimato?: number;
   fatta?: boolean;
 }
 
@@ -183,6 +187,26 @@ export interface Termine {
   volte: number;
   /** Compare nelle tue recensioni o sul tuo sito. */
   ceLHai: boolean;
+  /** Quante volte compare nelle tue recensioni Google. */
+  volteTue?: number;
+}
+
+/** Chi cita chi: per ogni attività, in quante domande ogni assistente la cita. */
+export interface CitaChi {
+  nome: string;
+  seiTu?: boolean;
+  perMotore: Partial<Record<EngineId, number>>;
+}
+
+/** Contesto: come stanno le altre attività della stessa categoria e città. */
+export interface Contesto {
+  categoria: string;
+  citta: string;
+  attivitaAnalizzate: number;
+  /** Punteggio mediano delle attività analizzate. */
+  mediana: number;
+  /** Percentuale di attività con punteggio più basso del tuo. */
+  percentile: number;
 }
 
 export interface DescrizioneMotore {
@@ -217,6 +241,8 @@ export interface Report {
   perTipo: RisultatoTipo[];
   concorrenti: Concorrente[];
   testaATesta: TestaATesta[];
+  citaChi: CitaChi[];
+  contesto?: Contesto;
   righe: RigaDomanda[];
   termini: Termine[];
   fonti: Fonte[];

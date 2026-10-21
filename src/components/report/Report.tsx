@@ -7,6 +7,8 @@ import { CopiaLink } from "./CopiaLink";
 import { Heatmap } from "./Heatmap";
 import { TestaATesta } from "./TestaATesta";
 import { Posizioni } from "./Posizioni";
+import { Potenziale } from "./Potenziale";
+import { CitaChi } from "./CitaChi";
 
 const dataIt = (iso: string) =>
   new Date(iso.length === 10 ? iso + "T12:00:00" : iso).toLocaleDateString("it-IT", {
@@ -61,7 +63,7 @@ function Blocco({
   id?: string;
 }) {
   return (
-    <section id={id} className="py-7 sm:py-9">
+    <section id={id} className="scroll-mt-20 py-7 sm:py-9">
       <h2 className="text-xl font-semibold sm:text-2xl">{titolo}</h2>
       {sotto && <p className="mt-1 max-w-prose text-[15px] text-muted">{sotto}</p>}
       <div className="mt-4">{children}</div>
@@ -100,6 +102,8 @@ function NelBase({ compatto = false }: { compatto?: boolean }) {
 export function Report({ report, abbonato = false }: { report: ReportT; abbonato?: boolean }) {
   const r = report;
   const gratuito = r.piano === "gratuito";
+  const guadagno = r.azioni.reduce((acc, a) => acc + (a.impattoStimato ?? 0), 0);
+  const potenziale = guadagno > 0 ? Math.min(100, r.punteggio + guadagno) : null;
   const totaleRisposte = r.domande * r.motori.length * r.ripetizioni;
   const tue = r.concorrenti.find((c) => c.seiTu);
   const col = coloreVerdetto(r.verdetto);
@@ -140,10 +144,26 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             </div>
           ))}
         </dl>
+        <nav className="no-print mt-6 -mb-1 flex gap-2 overflow-x-auto text-sm" aria-label="Sezioni del report">
+          {[
+            ["#punteggio", "Punteggio"],
+            ["#assistenti", "Assistenti"],
+            ["#concorrenti", "Concorrenti"],
+            ["#mappa", "Mappa"],
+            ["#fonti", "Fonti"],
+            ["#dicono", "Cosa dicono"],
+            ["#azioni", "Azioni"],
+            ["#metodo", "Metodo"],
+          ].map(([href, testo]) => (
+            <a key={href} href={href} className="shrink-0 rounded-full border border-line px-3 py-1 text-muted hover:border-ink hover:text-ink">
+              {testo}
+            </a>
+          ))}
+        </nav>
       </header>
 
       {/* In breve + punteggio */}
-      <section className="py-7 sm:py-9">
+      <section id="punteggio" className="scroll-mt-20 py-7 sm:py-9">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
           <div>
             <div className="flex items-end gap-4">
@@ -153,10 +173,21 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
                 <span className="text-sm text-muted">{spiegazioneVerdetto(r.verdetto)}</span>
               </span>
             </div>
-            <ScalaPunteggio punteggio={r.punteggio} />
-            <p className="mt-4 text-sm text-muted">
-              Su 100: quante volte compari nelle {totaleRisposte} risposte, pesato per la posizione (1º
-              posto vale 1, 5º vale 0,4) e per quanti italiani usano ogni assistente.
+            <ScalaPunteggio
+              punteggio={r.punteggio}
+              riferimento={r.contesto ? { valore: r.contesto.mediana, etichetta: `mediana ${r.contesto.categoria} a ${r.contesto.citta}` } : undefined}
+            />
+            {r.contesto && (
+              <p className="mt-3 text-sm">
+                <span className="tabular">
+                  Su {r.contesto.attivitaAnalizzate} {r.contesto.categoria} analizzate a {r.contesto.citta}, la mediana è {r.contesto.mediana}: il tuo
+                  punteggio è più alto del {r.contesto.percentile}% di loro.
+                </span>
+              </p>
+            )}
+            <p className="mt-2 text-sm text-muted">
+              Su 100: quante volte compari nelle {totaleRisposte} risposte, pesato per la posizione (1º posto vale 1, 5º vale 0,4)
+              e per quanti italiani usano ogni assistente.
             </p>
             <Posizioni righe={r.righe} />
             {abbonato && r.andamento && <Andamento punti={r.andamento} />}
@@ -168,14 +199,22 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
           ) : (
             <div>
               <h2 className="text-xl font-semibold sm:text-2xl">In breve</h2>
-              <p className="mt-3 text-[17px] leading-relaxed">{r.sintesi}</p>
+              <p className="mt-3 border-l-[3px] border-accent pl-4 text-[17px] leading-relaxed">{r.sintesi}</p>
+              {potenziale !== null && (
+                <p className="mt-4 text-sm text-muted">
+                  Con le tre azioni in fondo al report il punteggio stimato è <span className="tabular font-semibold text-ink">{potenziale}</span>.{" "}
+                  <a href="#azioni" className="font-semibold text-accent underline underline-offset-2">
+                    Vai alle azioni
+                  </a>
+                </p>
+              )}
             </div>
           )}
         </div>
       </section>
 
       {/* Per motore + per tipo */}
-      <section className="py-7 sm:py-9">
+      <section id="assistenti" className="scroll-mt-20 py-7 sm:py-9">
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
           <div>
             <h2 className="text-xl font-semibold sm:text-2xl">Per assistente</h2>
@@ -209,20 +248,18 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
                   valore={t.comparse}
                   massimo={t.totale}
                   testo={`${t.comparse} su ${t.totale}`}
-                  sotto={`${t.domande} ${t.domande === 1 ? "domanda" : "domande"}`}
+                  sotto={`${t.domande} ${t.domande === 1 ? "domanda" : "domande"} · ${NOME_TIPO[t.tipo].esempio}`}
                   accento
                 />
               ))}
             </div>
-            <p className="mt-3 text-sm text-muted">
-              Esempi: {r.perTipo.map((t) => NOME_TIPO[t.tipo].esempio).join(", ")}.
-            </p>
           </div>
         </div>
       </section>
 
       {/* Concorrenti */}
       <Blocco
+        id="concorrenti"
         titolo="Chi consigliano al posto tuo"
         sotto={`I cinque nomi più citati nelle ${totaleRisposte} risposte, e il confronto diretto domanda per domanda.`}
       >
@@ -245,10 +282,18 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             <TestaATesta righe={r.testaATesta} domande={r.domande} />
           </div>
         </div>
+        {r.citaChi.length > 0 && (
+          <div className="mt-8">
+            <h3 className="font-semibold">Chi cita chi</h3>
+            <p className="mb-3 mt-1 text-sm text-muted">Quale assistente conosce quale attività: dove un concorrente è forte e tu no, è lì che si gioca.</p>
+            <CitaChi righe={r.citaChi} motori={r.motori} domande={r.domande} />
+          </div>
+        )}
       </Blocco>
 
       {/* Domanda per domanda */}
       <Blocco
+        id="mappa"
         titolo="Dove ti trovano, domanda per domanda"
         sotto="Una cella per ogni domanda e assistente: più è scura, più in alto ti mettono. Passa il mouse o tocca una cella per il dettaglio."
       >
@@ -256,7 +301,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
       </Blocco>
 
       {/* Parole + fonti */}
-      <section className="py-7 sm:py-9">
+      <section id="fonti" className="scroll-mt-20 py-7 sm:py-9">
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
           {gratuito ? (
             <div>
@@ -284,12 +329,13 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
                   valore={t.volte}
                   massimo={r.termini[0]?.volte ?? 1}
                   testo={`${t.volte}`}
+                  sotto={t.volteTue !== undefined ? `nelle tue recensioni: ${t.volteTue}` : undefined}
                   accento={t.ceLHai}
                   stato={t.ceLHai ? { testo: "ce l'hai", tono: "accento" } : { testo: "manca", tono: "errore" }}
                 />
               ))}
             </div>
-            <p className="mt-3 text-xs text-muted">Volte in cui il termine compare nelle risposte. In verde i termini che hai già; in grigio quelli che mancano.</p>
+            <p className="mt-3 text-xs text-muted">Volte in cui il termine compare nelle {totaleRisposte} risposte, e quante nelle tue recensioni Google. In verde i termini che hai già.</p>
           </div>
           )}
           <div>
@@ -305,18 +351,20 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
                   valore={f.citazioni}
                   massimo={r.fonti[0]?.citazioni ?? 1}
                   testo={`${f.citazioni}`}
+                  sotto={f.concorrentiPresenti !== undefined ? `concorrenti presenti: ${f.concorrentiPresenti} su 5` : undefined}
                   accento={f.ciSei}
                   stato={f.ciSei ? { testo: "ci sei", tono: "accento" } : { testo: "non ci sei", tono: "errore" }}
                 />
               ))}
             </div>
-            <p className="mt-3 text-xs text-muted">Volte in cui la fonte è citata nelle risposte. In verde dove hai una scheda; in grigio dove manchi.</p>
+            <p className="mt-3 text-xs text-muted">Volte in cui la fonte è citata nelle {totaleRisposte} risposte, e quanti dei 5 concorrenti più citati ci sono. In verde dove hai una scheda.</p>
           </div>
         </div>
       </section>
 
       {/* Cosa dicono di te */}
       <Blocco
+        id="dicono"
         titolo="Cosa dicono di te"
         sotto="La descrizione che ogni assistente dà della tua attività quando gli chiedi di te, e gli errori nei dati."
       >
@@ -343,7 +391,12 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
       </Blocco>
 
       {/* Tre azioni */}
-      <Blocco titolo="Tre azioni, in ordine di impatto" sotto="Ognuna nasce da un dato di questo report. Fatte queste, il mese prossimo si misura la differenza.">
+      <Blocco id="azioni" titolo="Tre azioni, in ordine di impatto" sotto="Ognuna nasce da un dato di questo report. Fatte queste, il mese prossimo si misura la differenza.">
+        {potenziale !== null && (
+          <div className="mb-5">
+            <Potenziale punteggio={r.punteggio} azioni={r.azioni} />
+          </div>
+        )}
         <ol className="space-y-3">
           {r.azioni.map((a, i) => (
             <li key={i}>
@@ -355,8 +408,9 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
                   <div>
                     <p className="text-[17px] font-semibold">{a.titolo}</p>
                     <p className="mt-1 text-[15px] text-muted">{a.dato}</p>
-                    <p className="mt-2">
+                    <p className="mt-2 flex flex-wrap gap-2">
                       <Etichetta tono={a.impatto === "alto" ? "accento" : "neutro"}>impatto {a.impatto}</Etichetta>
+                      {a.impattoStimato !== undefined && <Etichetta tono="neutro">+{a.impattoStimato} punti stimati</Etichetta>}
                     </p>
                   </div>
                 </div>
@@ -367,7 +421,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
       </Blocco>
 
       {/* Metodo */}
-      <Blocco titolo="Come è stato fatto">
+      <Blocco id="metodo" titolo="Come è stato fatto">
         <dl className="grid gap-x-8 gap-y-3 text-[15px] sm:grid-cols-2">
           <div>
             <dt className="text-xs text-muted">Scansione</dt>
