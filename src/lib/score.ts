@@ -14,7 +14,7 @@ export function pesoPosizione(p: Posizione): number {
  * Per ogni motore: media del peso-posizione sulle sue risposte.
  * Il totale è la media pesata per quota d'uso dei motori interrogati,
  * rinormalizzata sui soli motori attivi, così il punteggio resta 0–100
- * anche con tre motori su otto.
+ * anche con sei motori su otto.
  */
 export function punteggio(risposte: Risposta[], motori: EngineId[]): number {
   let somma = 0;

@@ -1,8 +1,8 @@
 # Visibilità AI
 
-Un servizio self-service in italiano che dice a un'attività locale se ChatGPT, Gemini e Google AI la consigliano o consigliano i concorrenti, e cosa fare per cambiare le cose.
+Un servizio self-service in italiano che dice a un'attività locale se ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok la consigliano o consigliano i concorrenti, e cosa fare per cambiare le cose.
 
-**Promessa:** in 60 secondi sai se ti consigliano, chi ti passa davanti e le tre cose da sistemare. Il test gratuito aggancia, l'abbonamento da 9 € al mese paga.
+**Promessa:** in 60 secondi sai se ti consigliano, chi ti passa davanti e le tre cose da sistemare. Il test gratuito aggancia, l'abbonamento da 29 € al mese paga.
 
 **Cosa non è:** non una suite SEO, non una dashboard con 40 metriche. Un punteggio, un confronto, tre azioni.
 

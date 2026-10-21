@@ -2,7 +2,8 @@ import Link from "next/link";
 import { CercaAttivita } from "@/components/CercaAttivita";
 import { RispostaChat } from "@/components/landing/RispostaChat";
 import { AnteprimaReport } from "@/components/landing/AnteprimaReport";
-import { Bottone } from "@/components/ui";
+import { Barra, Bottone } from "@/components/ui";
+import { elencoMotori, motoriAttivi, motoriInArrivo } from "@/lib/engines";
 import { PIANI, SISTEMAZIONE, euro } from "@/lib/prezzi";
 
 const PASSI = [
@@ -12,7 +13,7 @@ const PASSI = [
   },
   {
     titolo: "Interroghiamo i motori come farebbe un cliente",
-    testo: "Cinque domande vere, nella tua città, su ChatGPT, Gemini e Google AI. Ogni domanda due volte, perché le risposte cambiano.",
+    testo: "Cinque domande vere, nella tua città, su sei assistenti AI. Ogni domanda due volte, perché le risposte cambiano.",
   },
   {
     titolo: "Ricevi punteggio, concorrenti e tre azioni",
@@ -63,8 +64,8 @@ const FAQ = [
     r: "Sì, dall'area personale, in un clic. L'abbonamento mensile si ferma a fine mese, quello annuale a fine anno.",
   },
   {
-    d: "Siete legati a OpenAI o a Google?",
-    r: "No. Interroghiamo i motori attraverso le loro interfacce ufficiali, come farebbe qualsiasi cliente, e non siamo affiliati a nessuno di loro.",
+    d: "Quali assistenti interrogate?",
+    r: "ChatGPT, Gemini, Google AI (le risposte AI dentro Google), Claude, Perplexity e Grok, tutti attraverso le loro interfacce ufficiali. Nel punteggio ogni assistente pesa per quanti italiani lo usano: essere invisibile su ChatGPT costa più punti che su Grok. Copilot e Meta AI arrivano appena sarà possibile leggerli in modo affidabile. Non siamo affiliati a nessuno di loro.",
   },
 ];
 
@@ -77,8 +78,8 @@ export default function Landing() {
           <div className="max-w-xl">
             <h1 className="display">Quando un cliente chiede a ChatGPT, fa il tuo nome?</h1>
             <p className="mt-5 text-lg text-muted sm:text-xl">
-              In 60 secondi sai se ChatGPT, Gemini e Google AI consigliano la tua attività o i tuoi
-              concorrenti, e le tre cose da sistemare.
+              In 60 secondi sai se ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok consigliano
+              la tua attività o i tuoi concorrenti, e le tre cose da sistemare.
             </p>
             <div className="mt-7">
               <CercaAttivita grande id="test" />
@@ -111,6 +112,41 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Motori */}
+      <section className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+            <div>
+              <h2 className="text-2xl font-bold sm:text-3xl">Sei assistenti, pesati per quanti italiani li usano</h2>
+              <p className="mt-3 text-muted">
+                Non tutti contano uguale. Nel punteggio ogni assistente pesa per la sua quota d&apos;uso
+                in Italia: essere invisibile su ChatGPT costa più punti che su Grok. Le quote si
+                aggiornano ogni trimestre.
+              </p>
+              <p className="mt-3 text-sm text-muted">
+                In arrivo: {elencoMotori(motoriInArrivo())}, appena sarà possibile leggerli in modo affidabile.
+              </p>
+            </div>
+            <div>
+              {motoriAttivi().map((m) => (
+                <Barra
+                  key={m.id}
+                  etichetta={m.nome}
+                  valore={m.utentiMln}
+                  massimo={Math.max(...motoriAttivi().map((x) => x.utentiMln))}
+                  testo={`${m.utentiMln.toLocaleString("it-IT")} mln di italiani`}
+                  accento
+                />
+              ))}
+              <p className="mt-3 text-xs text-faint">
+                Utenti mensili in Italia, luglio 2026. Fonte: Osservatorio Cosenza su dati Audicom; per
+                Google AI, Sensemakers su dati Comscore (persone esposte alle risposte AI su Google).
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Cosa ricevi */}
       <section className="border-t border-line bg-soft/60">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
@@ -134,15 +170,15 @@ export default function Landing() {
             <div>
               <h2 className="text-2xl font-bold sm:text-3xl">Si può fare a mano. Non ogni mese.</h2>
               <p className="mt-3 text-muted">
-                Aprire ChatGPT e chiedere «miglior pizzeria a Bergamo» lo fai in un minuto. Farlo su tre
-                motori, con dieci domande, tre volte ciascuna, segnando la posizione e le fonti, sono
-                due ore. E il mese dopo è già tutto diverso.
+                Aprire ChatGPT e chiedere «miglior pizzeria a Bergamo» lo fai in un minuto. Farlo su sei
+                assistenti, con dieci domande, tre volte ciascuna, segnando la posizione e le fonti,
+                è una giornata. E il mese dopo è già tutto diverso.
               </p>
             </div>
             <dl className="grid grid-cols-2 gap-x-6 gap-y-7 sm:grid-cols-4 lg:grid-cols-2">
               {[
-                ["90", "risposte raccolte ogni mese nel piano Base"],
-                ["3", "motori, interrogati con la tua città"],
+                ["180", "risposte raccolte ogni mese nel piano Base"],
+                ["6", "assistenti AI, interrogati con la tua città"],
                 ["1º–5º", "la posizione in cui compari, non solo se compari"],
                 ["8", "fonti controllate: dove l'AI prende le informazioni"],
               ].map(([n, t]) => (

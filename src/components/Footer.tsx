@@ -36,7 +36,7 @@ export function Footer() {
           <div>
             <Marchio />
             <p className="mt-3 max-w-xs text-sm text-muted">
-              Ti dice se ChatGPT, Gemini e Google AI consigliano te o i tuoi concorrenti, e cosa fare
+              Ti dice se ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok consigliano te o i tuoi concorrenti, e cosa fare
               per cambiare le cose.
             </p>
           </div>
@@ -56,7 +56,7 @@ export function Footer() {
           ))}
         </div>
         <p className="mt-10 max-w-2xl text-xs leading-relaxed text-faint">
-          Funziona con ChatGPT, Gemini e Google AI. Non siamo affiliati a OpenAI, Google o Anthropic;
+          Funziona con ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok. Non siamo affiliati a OpenAI, Google, Anthropic, Perplexity o xAI;
           i marchi appartengono ai rispettivi proprietari. Le risposte dei motori cambiano nel tempo:
           mostriamo sempre quante volte compari su quante risposte. Usiamo solo dati pubblici della
           tua attività e la tua email.

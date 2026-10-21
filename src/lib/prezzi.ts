@@ -28,7 +28,7 @@ export const PIANI: Piano[] = [
     annuale: 290,
     include: [
       "1 attività",
-      "10 domande su 3 motori, 3 ripetizioni ciascuna",
+      "10 domande su 6 motori, 3 ripetizioni ciascuna",
       "Scansione ogni mese",
       "Email mensile con punteggio e variazione",
       "Storico dei report",
@@ -44,7 +44,7 @@ export const PIANI: Piano[] = [
     annuale: 590,
     include: [
       "1 attività",
-      "20 domande su tutti i motori attivi",
+      "20 domande su 6 motori, 3 ripetizioni ciascuna",
       "Scansione ogni settimana",
       "5 concorrenti seguiti, avviso se ne entra uno nuovo",
       "Azioni spuntate e verificate il mese dopo",
@@ -79,7 +79,7 @@ export const SISTEMAZIONE = {
 
 export const TEST_GRATUITO = {
   domande: 5,
-  motori: 3,
+  motori: 6,
   ripetizioni: 2,
   ogniGiorni: 30,
 };

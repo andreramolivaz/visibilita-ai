@@ -14,7 +14,7 @@ export default function Privacy() {
           pubblici: li leggiamo da Google, dal tuo sito e dai portali di categoria.
         </p>
         <p>
-          <strong>Cosa ne facciamo.</strong> Interroghiamo ChatGPT, Gemini e Google AI con domande
+          <strong>Cosa ne facciamo.</strong> Interroghiamo ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok con domande
           sulla tua categoria e città e ti mostriamo le risposte. Niente profilazione, niente
           pubblicità, nessuna cessione a terzi.
         </p>

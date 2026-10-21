@@ -4,6 +4,9 @@ import type { Engine, EngineId, Phase } from "./types";
  * Motori AI, in ordine di quota d'uso in Italia (Osservatorio Cosenza su
  * dati Audicom, luglio 2026). In produzione questa tabella vive nel
  * database e si aggiorna ogni trimestre senza rilascio.
+ *
+ * Fase "mvp" = attivo adesso: tutti i motori con un'API ufficiale di ricerca.
+ * Copilot e Meta AI non ce l'hanno: si leggono con uno scraper, dopo.
  */
 export const ENGINES: Engine[] = [
   {
@@ -43,7 +46,7 @@ export const ENGINES: Engine[] = [
     nome: "Claude",
     utentiMln: 1.8,
     peso: 0.07,
-    fase: "v2",
+    fase: "mvp",
     come: "API Anthropic, ricerca web con posizione",
   },
   {
@@ -59,7 +62,7 @@ export const ENGINES: Engine[] = [
     nome: "Perplexity",
     utentiMln: 1.0,
     peso: 0.04,
-    fase: "v2",
+    fase: "mvp",
     come: "Agent API, tool web_search",
   },
   {
@@ -67,7 +70,7 @@ export const ENGINES: Engine[] = [
     nome: "Grok",
     utentiMln: 0.5,
     peso: 0.01,
-    fase: "v3",
+    fase: "mvp",
     come: "xAI API, tool web_search",
   },
 ];
@@ -84,4 +87,17 @@ export function engine(id: EngineId): Engine {
 export function motoriAttivi(fase: Phase = "mvp"): Engine[] {
   const max = ORDINE.indexOf(fase);
   return ENGINES.filter((e) => ORDINE.indexOf(e.fase) <= max);
+}
+
+/** Motori non ancora interrogabili (senza API ufficiale). */
+export function motoriInArrivo(fase: Phase = "mvp"): Engine[] {
+  const max = ORDINE.indexOf(fase);
+  return ENGINES.filter((e) => ORDINE.indexOf(e.fase) > max);
+}
+
+/** "ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok" */
+export function elencoMotori(motori: Engine[] = motoriAttivi()): string {
+  const nomi = motori.map((m) => m.nome);
+  if (nomi.length <= 1) return nomi.join("");
+  return `${nomi.slice(0, -1).join(", ")} e ${nomi[nomi.length - 1]}`;
 }

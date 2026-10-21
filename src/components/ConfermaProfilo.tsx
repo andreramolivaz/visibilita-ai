@@ -4,9 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Domanda, ProfiloAttivita, TipoDomanda } from "@/lib/types";
 import { Bottone, Etichetta, Scheda } from "@/components/ui";
+import { motoriAttivi } from "@/lib/engines";
+import { TEST_GRATUITO } from "@/lib/prezzi";
 
-const MOTORI = 3;
-const RIPETIZIONI = 2;
+const MOTORI = motoriAttivi().length;
+const RIPETIZIONI = TEST_GRATUITO.ripetizioni;
 
 /** Nella conferma mostriamo il tipo di domanda, non il testo: il testo è nel report. */
 const TIPO: Record<TipoDomanda, { titolo: string; descrizione: (a: ProfiloAttivita, n: number) => string }> = {
@@ -154,7 +156,7 @@ export function ConfermaProfilo({
         <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4">
           {[
             [`${domande.length * MOTORI * RIPETIZIONI}`, "risposte raccolte"],
-            [`${MOTORI}`, "motori, con la tua città"],
+            [`${MOTORI}`, "motori AI, interrogati con la tua città"],
             [`${RIPETIZIONI}×`, "ogni domanda, perché le risposte cambiano"],
             ["1º–5º", "la posizione in cui compari"],
           ].map(([n, t]) => (

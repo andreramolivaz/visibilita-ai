@@ -18,7 +18,7 @@ function etichetta(d: Domanda) {
   return d.modificabile ? `«${d.testo}»` : TIPO[d.tipo];
 }
 
-const RIPETIZIONI_GRATIS = 2;
+const RIPETIZIONI_GRATIS = 2; // come TEST_GRATUITO.ripetizioni
 
 /**
  * Avanzamento in diretta: "Chiedo a ChatGPT: miglior pizzeria a Bergamo… 3 di 30".
@@ -61,8 +61,8 @@ export function Scansione() {
       const t = setTimeout(() => router.push("/report/esempio?nuovo=1"), 700);
       return () => clearTimeout(t);
     }
-    // 40–90 s in totale: ~1,5–2 s a passo con 30 passi.
-    const t = setTimeout(() => setI((x) => x + 1), 1200 + Math.random() * 800);
+    // 40–90 s in totale: ~1 s a passo con 60 passi.
+    const t = setTimeout(() => setI((x) => x + 1), 700 + Math.random() * 600);
     return () => clearTimeout(t);
   }, [i, passi.length, router]);
 

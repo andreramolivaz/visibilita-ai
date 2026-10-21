@@ -31,15 +31,15 @@ const s = StyleSheet.create({
   riga: { flexDirection: "row", alignItems: "center" },
   punteggio: { fontSize: 56, fontFamily: "Helvetica-Bold", letterSpacing: -2, lineHeight: 1.05 },
   verdetto: { fontSize: 16, fontFamily: "Helvetica-Bold", lineHeight: 1.2, marginBottom: 2 },
-  barraRiga: { marginBottom: 5 },
+  barraRiga: { marginBottom: 4 },
   barraTesto: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
   barraSfondo: { height: 5, backgroundColor: C.soft, borderRadius: 3 },
   barra: { height: 5, borderRadius: 3 },
   tabella: { marginTop: 2 },
   tr: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: C.line, paddingVertical: 4 },
   th: { fontSize: 8.5, color: C.muted, fontFamily: "Helvetica-Bold" },
-  tdDomanda: { flex: 2.6 },
-  td: { flex: 1 },
+  tdDomanda: { flex: 2.4, paddingRight: 6 },
+  td: { flex: 1, fontSize: 8.5 },
   azione: { flexDirection: "row", marginBottom: 7 },
   numero: { width: 16, height: 16, borderRadius: 8, backgroundColor: C.accent, color: "#fff", fontSize: 9, fontFamily: "Helvetica-Bold", textAlign: "center", lineHeight: 1, paddingTop: 3.5, marginRight: 8 },
   etichetta: { fontSize: 8, fontFamily: "Helvetica-Bold", paddingHorizontal: 5, paddingVertical: 2, borderRadius: 3 },
@@ -168,23 +168,6 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
             </View>
           </View>
         ))}
-        <Text style={s.h2}>Da dove prendono le informazioni</Text>
-        <View style={{ flexDirection: "row", gap: 24 }}>
-          {[r.fonti.slice(0, Math.ceil(r.fonti.length / 2)), r.fonti.slice(Math.ceil(r.fonti.length / 2))].map((colonna, i) => (
-            <View key={i} style={{ flex: 1 }}>
-              {colonna.map((f) => (
-                <View key={f.nome} style={[s.tr, { justifyContent: "space-between", alignItems: "center" }]}>
-                  <Text>
-                    {f.nome} <Text style={{ color: C.muted }}>{f.citazioni}</Text>
-                  </Text>
-                  <Text style={[s.etichetta, f.ciSei ? { backgroundColor: C.accentSoft, color: C.accent } : { backgroundColor: C.dangerSoft, color: C.danger }]}>
-                    {f.ciSei ? "ci sei" : "non ci sei"}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          ))}
-        </View>
         <Pie r={r} />
       </Page>
 
@@ -205,7 +188,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
               {riga.celle.map((c) => (
                 <Text key={c.motore} style={s.td}>
                   {c.posizione === null ? <Text style={{ color: C.faint }}>–</Text> : <Text style={{ fontFamily: "Helvetica-Bold", color: C.accent }}>{c.posizione}°</Text>}
-                  <Text style={{ color: C.muted }}>  {c.frequenza}</Text>
+                  <Text style={{ color: C.muted }}> {c.frequenza}</Text>
                 </Text>
               ))}
             </View>
@@ -214,6 +197,23 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
         <Text style={[s.piccolo, { marginTop: 4 }]}>Posizione in cui compari e quante volte su {r.ripetizioni} ripetizioni. – = mai.</Text>
 
 
+        <Text style={s.h2}>Da dove prendono le informazioni</Text>
+        <View style={{ flexDirection: "row", gap: 24 }}>
+          {[r.fonti.slice(0, Math.ceil(r.fonti.length / 2)), r.fonti.slice(Math.ceil(r.fonti.length / 2))].map((colonna, i) => (
+            <View key={i} style={{ flex: 1 }}>
+              {colonna.map((f) => (
+                <View key={f.nome} style={[s.tr, { justifyContent: "space-between", alignItems: "center" }]}>
+                  <Text>
+                    {f.nome} <Text style={{ color: C.muted }}>{f.citazioni}</Text>
+                  </Text>
+                  <Text style={[s.etichetta, f.ciSei ? { backgroundColor: C.accentSoft, color: C.accent } : { backgroundColor: C.dangerSoft, color: C.danger }]}>
+                    {f.ciSei ? "ci sei" : "non ci sei"}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ))}
+        </View>
         <Text style={s.h2}>Cosa dicono di te</Text>
         <Text style={{ backgroundColor: C.soft, padding: 8, borderRadius: 4 }}>{r.descrizioneAI}</Text>
         {r.errori.map((e, i) => (
@@ -225,7 +225,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
 
         <Text style={[s.piccolo, { marginTop: 18 }]}>
           Le risposte dei motori cambiano nel tempo: ogni numero riporta quante volte compari su quante risposte. Funziona con
-          ChatGPT, Gemini e Google AI; non siamo affiliati a OpenAI, Google o Anthropic.
+          ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok; non siamo affiliati a OpenAI, Google, Anthropic, Perplexity o xAI.
         </Text>
         <Pie r={r} />
       </Page>

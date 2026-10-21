@@ -18,14 +18,14 @@ export const metadata: Metadata = {
     template: "%s · Visibilità AI",
   },
   description:
-    "In 60 secondi scopri se ChatGPT, Gemini e Google AI consigliano la tua attività, chi ti passa davanti e le tre cose da sistemare. Test gratuito, senza registrazione.",
+    "In 60 secondi scopri se ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok consigliano la tua attività, chi ti passa davanti e le tre cose da sistemare. Test gratuito, senza registrazione.",
   openGraph: {
     type: "website",
     locale: "it_IT",
     siteName: "Visibilità AI",
     title: "ChatGPT consiglia te o i tuoi concorrenti?",
     description:
-      "In 60 secondi scopri se ChatGPT, Gemini e Google AI consigliano la tua attività, chi ti passa davanti e le tre cose da sistemare.",
+      "In 60 secondi scopri se ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok consigliano la tua attività, chi ti passa davanti e le tre cose da sistemare.",
   },
 };
 

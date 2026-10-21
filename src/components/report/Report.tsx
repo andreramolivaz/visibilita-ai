@@ -120,7 +120,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
       {/* 5. Domanda per domanda */}
       <Sezione titolo="Domanda per domanda">
         {/* Telefono: schede */}
-        <ul className="space-y-3 sm:hidden">
+        <ul className="space-y-3 md:hidden">
           {r.righe.map((riga) => (
             <li key={riga.domanda.id}>
               <Scheda>
@@ -145,12 +145,12 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
           ))}
         </ul>
         {/* Schermo largo: tabella */}
-        <table className="hidden w-full text-sm sm:table">
+        <table className="hidden w-full text-sm md:table">
           <thead>
             <tr className="text-left text-xs text-muted">
               <th className="pb-2 font-medium">Domanda</th>
               {r.motori.map((m) => (
-                <th key={m} className="pb-2 font-medium">
+                <th key={m} className="pb-2 pr-3 font-medium">
                   {engine(m).nome}
                 </th>
               ))}
@@ -159,15 +159,15 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
           <tbody>
             {r.righe.map((riga) => (
               <tr key={riga.domanda.id} className="border-t border-line">
-                <td className="py-2 pr-3">{riga.domanda.testo}</td>
+                <td className="py-2 pr-4">{riga.domanda.testo}</td>
                 {riga.celle.map((c) => (
-                  <td key={c.motore} className="tabular py-2 pr-3">
+                  <td key={c.motore} className="tabular whitespace-nowrap py-2 pr-3">
                     {c.posizione === null ? (
                       <span className="text-muted">✕</span>
                     ) : (
                       <span className="font-semibold text-accent">{posizioneTesto(c.posizione)}</span>
                     )}
-                    <span className="ml-1.5 text-xs text-muted">{c.frequenza}</span>
+                    <span className="ml-1 text-xs text-muted">{c.frequenza}</span>
                   </td>
                 ))}
               </tr>
