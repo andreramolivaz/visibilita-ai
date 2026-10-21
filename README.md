@@ -73,6 +73,13 @@ Da «nome, città» (o link di Google Maps) a profilo e domande, con dati veri:
 
 Senza `GOOGLE_PLACES_API_KEY` il profilo è quello di esempio con il nome digitato. Cache in memoria (7 giorni scheda e suggerimenti, 3 il sito); in produzione va nel database. Costi Places: Text Search con recensioni e attributi è nello SKU «Enterprise + Atmosphere» (circa 40 $ per 1.000 richieste), Nearby «Pro» (circa 35 $ per 1.000); con la cache, una richiesta di ciascuno per attività.
 
+## La scansione (`src/lib/motori/`, `src/lib/scansione/`, `src/lib/analisi/`)
+
+- **Assistenti** (`motori/`): un adattatore per ciascuno, stessa interfaccia (`interroga(domanda, città, regione, coordinate)` → testo, URL citate o consultate, modello, canale, orari). ChatGPT: Responses API con `web_search` e `user_location`; Gemini: grounding Google Search + Google Maps con `latLng`; Google AI: AI Mode e AI Overviews letti dalla pagina dei risultati con DataForSEO (località italiana); Claude: Messages API con `web_search` e `user_location`; Perplexity: Sonar con `user_location`; Grok: Responses API con `web_search`. Unica istruzione di sistema: «Rispondi in italiano». Un assistente è attivo solo con la sua chiave; con zero chiavi la scansione è una dimostrazione.
+- **Coda** (`scansione/`): una cella per domanda × assistente × ripetizione, con data di esecuzione (test gratuito: tutto subito; abbonamento: una ripetizione al giorno per tre giorni). `avanza()` esegue un lotto di celle scadute (un assistente alla volta per assistente, assistenti in parallelo, entro un tempo massimo), salva ogni cella e, se restano celle, si richiama (`/api/scansioni/[id]/avanza`, protetta da `CODA_SEGRETO`); a fine celle costruisce il report. Il passaggio giornaliero (`/api/cron/scansioni`, Vercel Cron alle 06:00 UTC, `CRON_SECRET`) riprende le celle dei giorni successivi. Deposito in memoria senza Supabase, tabelle `scansioni`, `celle`, `report`, `test_gratuiti` con Supabase. Limiti: un test gratuito per scheda Google ogni 30 giorni, `MAX_TEST_GRATUITI_AL_GIORNO`.
+- **Analisi** (`analisi/`): riconoscimento a regole dichiarate (nucleo del nome senza parole generiche, intero e vicino; telefono o indirizzo; nomi in elenco estratti da voci numerate, puntate e grassetti; concorrenti vicini dalla scheda come nomi canonici), posizione = ordine di prima comparsa tra i nomi riconosciuti (oltre il quinto non conta); fonti dalle URL (portali con nome, sito dell'attività come «Sito ufficiale», altrimenti dominio); termini ricorrenti nelle risposte spontanee confrontati con le recensioni; descrizioni dalla domanda sul nome con tono (segnalato solo se critico) ed errori (telefono diverso, giorno di chiusura che da te è aperto); tre azioni a regole con punti stimati (fonte più citata in cui non ci sei, dati sbagliati, sito povero, termini mancanti, domande per bisogno deboli, inglese). `costruisciReport()` applica le stesse formule del report di esempio ai dati veri.
+- **Pagina di scansione**: con i motori segue la coda (stato ogni 3 secondi) e apre il report quando è pronto; senza, mostra la dimostrazione e apre il report di esempio.
+
 ## Le domande e i settori
 
 Sei tipi di domanda, dallo studio dei prompt reali (Semrush 2025–26, Otterly, Citations.press, BrightLocal): generica, per bisogno, per specialità, per requisito, di confronto, sul nome; più l'inglese per chi esporta o riceve stranieri. I modelli sono scritti per 36 categorie in ordine di numerosità (ISTAT-ASIA 2023 via Eurostat), da «Negozi al dettaglio» (532 mila imprese) a «Musei» (1.282), in `src/data/profiles/`; ogni profilo ha anche fonti attese, metriche e azioni ammesse. Lo studio completo («Visibilità AI per tutte le attività italiane: settori, domande reali, fonti, metriche e metodo di raccolta») è in `docs/studio-settori-domande.md`; `docs/genera-profili.mjs` riscrive i profili da un'unica tabella (`node docs/genera-profili.mjs src/data/profiles`, poi rigenerare `index.ts`).
@@ -92,9 +99,9 @@ Una risposta di un assistente (la bolla con l'elenco) la cui coda è un segnapos
 
 ## Prossimi passi
 
-1. **Profilo attività**: fatto (`src/lib/profilo/`); manca la verifica della presenza sui portali di categoria e il salvataggio nel database.
-2. **Scansione**: coda con un worker per motore (OpenAI Responses, Gemini grounding, DataForSEO), ripetizioni in giorni diversi, cache 7 giorni.
-3. **Analisi risposte**: riconoscimento dell'attività e dei concorrenti (nome + indirizzo + telefono, alias), estrazione fonti.
-4. **Consigli**: prompt Claude con JSON in ingresso e in uscita, azioni solo dal profilo della categoria.
+1. **Profilo attività**: fatto (`src/lib/profilo/`); manca la verifica della presenza sui portali di categoria.
+2. **Scansione**: fatta (`src/lib/scansione/`, `src/lib/motori/`); da provare con le chiavi vere e da misurare (tempi, errori per assistente, costo per scansione); cache delle risposte 7 giorni ancora da fare.
+3. **Analisi risposte**: fatta a regole (`src/lib/analisi/`); da misurare la precisione del riconoscimento su un campione a mano (Allegato A del metodo) e da aggiungere gli alias del nome.
+4. **Consigli**: oggi a regole; un passaggio con Claude può riscrivere il «dato» delle azioni e il tono delle descrizioni, con JSON in ingresso e in uscita e azioni solo dal profilo della categoria.
 5. **Abbonamento**: Stripe Checkout, link magico via Resend, area personale minima.
 6. **Database**: Supabase; tabella motori/pesi e profili di categoria caricati da `src/data`.

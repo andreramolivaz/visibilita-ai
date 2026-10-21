@@ -1,19 +1,13 @@
 import { createElement, type ReactElement } from "react";
 import { renderToBuffer, type DocumentProps } from "@react-pdf/renderer";
 import { ReportPdf } from "@/components/pdf/ReportPdf";
-import { REPORT_ESEMPIO, REPORT_GRATUITO } from "@/lib/mock-report";
+import { caricaReport } from "@/lib/report/carica";
 
-
-// TODO: caricare il report dal database e, per le agenzie, il logo white-label.
-function caricaReport(id: string) {
-  if (id === "esempio") return REPORT_ESEMPIO;
-  if (id === "gratuito" || id.startsWith("scan-")) return { ...REPORT_GRATUITO, id };
-  return null;
-}
+// TODO: per le agenzie, il logo white-label.
 
 export async function GET(_req: Request, ctx: RouteContext<"/report/[id]/pdf">) {
   const { id } = await ctx.params;
-  const report = caricaReport(id);
+  const report = await caricaReport(id);
   if (!report) return new Response("Report non trovato", { status: 404 });
   if (report.piano === "gratuito") {
     return new Response("Il PDF del report è nel piano Base. Attivalo dalla pagina del report.", {

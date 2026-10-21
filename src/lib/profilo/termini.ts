@@ -26,6 +26,7 @@ const STOPWORD = new Set(
   bravi brave migliore migliori peggio peggiore tutto niente nulla altro altri altra altre stesso stessa
   the and of to in is it for with on at by this that you we our your their from or as be are was were
   euro km minuti ore ora
+  recensioni recensione citato citati citata spesso spesso consigliano consigliata consigliate ecco alcune alcuni
   menu home contatti contattaci prenota prenotazioni scopri leggi privacy cookie policy news blog galleria foto
   chi siamo dove orari mappa seguici iscriviti newsletter copyright via tel email info pagina sito web
   servizi prodotti azienda carta listino`
@@ -86,6 +87,7 @@ export function estraiTermini(testi: string[], escludi: string[] = [], opzioni: 
   const voci = [...conteggio.entries()].filter(([, v]) => v >= minimo).sort((a, b) => b[1] - a[1] || b[0].length - a[0].length);
   const SOGLIA = 0.6;
   const scelti: TermineRicorrente[] = [];
+  const pieni = (t: string) => t.split(" ").filter((x) => !STOPWORD.has(x));
   for (const [termine, volte] of voci) {
     const contenuto = scelti.find((s) => s.termine.includes(termine) && s.volte >= volte * SOGLIA);
     if (contenuto) continue;
@@ -94,6 +96,9 @@ export function estraiTermini(testi: string[], escludi: string[] = [], opzioni: 
       contiene.termine = termine;
       continue;
     }
+    // Due frasi che condividono due parole piene sono la stessa cosa detta a pezzi: resta la prima (più frequente o più lunga).
+    const mie = pieni(termine);
+    if (scelti.some((s) => pieni(s.termine).filter((x) => mie.includes(x)).length >= 2)) continue;
     scelti.push({ termine, volte });
   }
   return scelti.slice(0, massimo);

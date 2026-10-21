@@ -13,6 +13,10 @@ export const config = {
   get places() {
     return Boolean(process.env.GOOGLE_PLACES_API_KEY);
   },
+  /** Quanti assistenti hanno una chiave: 0 = scansione dimostrativa. */
+  get motori() {
+    return ["OPENAI_API_KEY", "GEMINI_API_KEY", "ANTHROPIC_API_KEY", "PERPLEXITY_API_KEY", "XAI_API_KEY"].filter((k) => process.env[k]).length + (process.env.DATAFORSEO_LOGIN && process.env.DATAFORSEO_PASSWORD ? 1 : 0);
+  },
   /** Varianti delle domande e, poi, consigli: modello linguistico Anthropic. */
   get claude() {
     return Boolean(process.env.ANTHROPIC_API_KEY);

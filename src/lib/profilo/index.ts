@@ -23,6 +23,8 @@ export interface ProfiloCostruito {
   attivita: ProfiloAttivita;
   domande: Domanda[];
   segnali: SegnaliProfilo;
+  /** I testi delle recensioni, per contare i termini «nelle tue recensioni» nel report. */
+  recensioni: string[];
 }
 
 const SEGNALI_ESEMPIO: SegnaliProfilo = {
@@ -95,7 +97,7 @@ function esempio(query: string, n: number): ProfiloCostruito {
     { nome: attivita.nome, categoria: attivita.categoriaGoogle, citta: attivita.citta, zona: attivita.zona, provincia: attivita.provincia, regione: attivita.regione, specialita, requisiti, origini, concorrente: s.concorrenti[0]?.nome },
     n,
   );
-  return { attivita: { ...attivita, specialita }, domande: conEsplora(conOrigine(domande)), segnali: s };
+  return { attivita: { ...attivita, specialita }, domande: conEsplora(conOrigine(domande)), segnali: s, recensioni: [] };
 }
 
 export async function costruisciProfilo(query: string, n: number): Promise<ProfiloCostruito> {
@@ -125,5 +127,5 @@ export async function costruisciProfilo(query: string, n: number): Promise<Profi
   );
   domande = conOrigine(domande);
   domande = await variantiClaude(domande, { nome: attivita.nome, categoria: attivita.categoriaGoogle, citta: attivita.citta, provincia: attivita.provincia, b2b: cat.b2b });
-  return { attivita, domande: conEsplora(domande), segnali };
+  return { attivita, domande: conEsplora(domande), segnali, recensioni: testiRecensioni(posto) };
 }

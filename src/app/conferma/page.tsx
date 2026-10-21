@@ -26,6 +26,6 @@ export default function Conferma({ searchParams }: PageProps<"/conferma">) {
 async function Profilo({ searchParams }: { searchParams: PageProps<"/conferma">["searchParams"] }) {
   const { q } = await searchParams;
   const testo = typeof q === "string" ? q : "";
-  const { attivita, domande, segnali } = await costruisciProfilo(testo, TEST_GRATUITO.domande);
-  return <ConfermaProfilo attivita={attivita} domande={domande} segnali={segnali} />;
+  const { attivita, domande, segnali, recensioni } = await costruisciProfilo(testo, TEST_GRATUITO.domande);
+  return <ConfermaProfilo attivita={attivita} domande={domande} segnali={segnali} recensioni={recensioni} />;
 }

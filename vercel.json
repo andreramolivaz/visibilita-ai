@@ -1,0 +1,7 @@
+{
+  "crons": [{ "path": "/api/cron/scansioni", "schedule": "0 6 * * *" }],
+  "functions": {
+    "src/app/api/scansioni/[id]/avanza/route.ts": { "maxDuration": 300 },
+    "src/app/api/cron/scansioni/route.ts": { "maxDuration": 60 }
+  }
+}

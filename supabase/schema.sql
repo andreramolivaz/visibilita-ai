@@ -79,9 +79,34 @@ create table if not exists test_gratuiti (
   nome text not null,
   citta text not null,
   ip_hash text,
+  scansione_id text,
   creato_il timestamptz not null default now()
 );
 create index if not exists test_gratuiti_giorno_idx on test_gratuiti (creato_il);
+create index if not exists test_gratuiti_place_idx on test_gratuiti (google_place_id, creato_il desc);
+
+-- La coda: una scansione e le sue celle (domanda × assistente × ripetizione).
+-- `dati` è la Scansione senza le celle (profilo, domande, segnali, recensioni).
+create table if not exists scansioni (
+  id text primary key,
+  stato text not null check (stato in ('in corso', 'in attesa', 'completata')),
+  email text,
+  dati jsonb not null,
+  creata_il timestamptz not null default now(),
+  aggiornata_il timestamptz not null default now()
+);
+create table if not exists celle (
+  scansione_id text not null references scansioni (id) on delete cascade,
+  domanda_id text not null,
+  motore text not null,
+  ripetizione int not null,
+  esegui_dopo timestamptz not null,
+  stato text not null check (stato in ('da fare', 'fatta', 'errore')),
+  risposta jsonb,                               -- RispostaGrezza: modello, canale, orari, testo, fonti
+  analisi jsonb,                                -- AnalisiCella: posizione, citati, fonti
+  primary key (scansione_id, domanda_id, motore, ripetizione)
+);
+create index if not exists celle_da_fare_idx on celle (stato, esegui_dopo);
 
 -- Sicurezza a livello di riga: ognuno vede solo le proprie righe (per email).
 alter table abbonamenti enable row level security;

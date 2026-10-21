@@ -54,15 +54,19 @@ export function ConfermaProfilo({
   attivita,
   domande: iniziali,
   segnali,
+  recensioni = [],
 }: {
   attivita: ProfiloAttivita;
   domande: Domanda[];
   segnali: SegnaliProfilo;
+  recensioni?: string[];
 }) {
   const router = useRouter();
   const [domande, setDomande] = useState(iniziali);
   const [modifica, setModifica] = useState<string | null>(null);
   const [telefono, setTelefono] = useState("");
+  const [avvio, setAvvio] = useState<"fermo" | "invio" | "errore">("fermo");
+  const [errore, setErrore] = useState("");
 
   /** La domanda che i clienti fanno al telefono diventa una delle domande del test. */
   function usaTelefono() {
@@ -75,14 +79,28 @@ export function ConfermaProfilo({
     });
   }
 
-  function avvia() {
-    // TODO: POST /api/scansioni con profilo e domande; qui si simula.
-    const id = `scan-${Date.now().toString(36)}`;
-    sessionStorage.setItem(
-      id,
-      JSON.stringify({ attivita, domande }),
-    );
-    router.push(`/scansione?id=${id}`);
+  /** Crea la scansione: con i motori configurati parte davvero, altrimenti è una dimostrazione. */
+  async function avvia() {
+    setAvvio("invio");
+    setErrore("");
+    try {
+      const r = await fetch("/api/scansioni", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ attivita, domande, segnali, recensioni }),
+      });
+      const dati = (await r.json()) as { id?: string; simulata?: boolean; giaFatto?: boolean; errore?: string };
+      if (!r.ok || !dati.id) throw new Error(dati.errore ?? "Non siamo riusciti ad avviare il test.");
+      if (dati.giaFatto) {
+        router.push(`/report/${dati.id}`);
+        return;
+      }
+      sessionStorage.setItem(dati.id, JSON.stringify({ attivita, domande, simulata: Boolean(dati.simulata) }));
+      router.push(`/scansione?id=${dati.id}`);
+    } catch (e) {
+      setAvvio("errore");
+      setErrore(e instanceof Error ? e.message : "Non siamo riusciti ad avviare il test.");
+    }
   }
 
   const voci: [string, string | undefined][] = [
@@ -291,11 +309,18 @@ export function ConfermaProfilo({
       </Scheda>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Bottone onClick={avvia}>Avvia il test</Bottone>
+        <Bottone onClick={avvia} disabled={avvio === "invio"}>
+          {avvio === "invio" ? "Avvio il test…" : "Avvia il test"}
+        </Bottone>
         <Bottone href="/" secondario>
           Non sono io
         </Bottone>
       </div>
+      {avvio === "errore" && (
+        <p className="text-sm text-danger" role="alert">
+          {errore}
+        </p>
+      )}
       <p className="text-xs text-muted">
         Usiamo solo dati pubblici della tua attività. Un test gratuito per attività ogni 30 giorni.
       </p>
