@@ -2,30 +2,14 @@ import Link from "next/link";
 import { CercaAttivita } from "@/components/CercaAttivita";
 import { ChatSimulata } from "@/components/landing/ChatSimulata";
 import { AnteprimaReport } from "@/components/landing/AnteprimaReport";
-import { Barra, Bottone } from "@/components/ui";
-import { elencoMotori, motoriAttivi, motoriInArrivo } from "@/lib/engines";
+import { Passi } from "@/components/landing/Passi";
+import { StrisciaMotori } from "@/components/landing/StrisciaMotori";
+import { Categorie } from "@/components/landing/Categorie";
+import { Bottone } from "@/components/ui";
 import { Pipeline } from "@/components/metodo/Pipeline";
 import { GLOSSARIO } from "@/lib/glossario";
 import { PIANI, SISTEMAZIONE, euro } from "@/lib/prezzi";
-import { profiliPerNumerosita } from "@/lib/profiles";
-
-const PASSI = [
-  {
-    titolo: "Scrivi il nome della tua attività",
-    testo: "Troviamo noi categoria, specialità, orari e portali da Google e dal tuo sito. Tu confermi con un tocco.",
-  },
-  {
-    titolo: "Interroghiamo i motori come farebbe un cliente",
-    testo: "Otto domande vere, nella tua città, su sei assistenti AI. Ogni domanda due volte, perché le risposte cambiano.",
-  },
-  {
-    titolo: "Ricevi punteggio, concorrenti e tre azioni",
-    testo: "In 60 secondi: quanto sei visibile, chi citano al posto tuo, da dove prendono le informazioni e cosa sistemare per primo.",
-  },
-];
-
-/** «532 mila», «1.282». */
-const migliaia = (n: number) => (n >= 10000 ? `${Math.round(n / 1000)} mila` : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."));
+import { RIFERIMENTI } from "@/lib/riferimenti";
 
 const FAQ = [
   {
@@ -46,7 +30,7 @@ const FAQ = [
   },
   {
     d: "Come faccio a fidarmi dei numeri?",
-    r: "Ogni numero ha il suo campione («51 su 270») e, dove è una quota, l'intervallo di confidenza. Le domande sono ripetute, la posizione è dichiarata, i pesi degli assistenti vengono da dati pubblici e si aggiornano ogni trimestre. In fondo a ogni report c'è la guida alla lettura, e nella pagina Metodo tutto il percorso dei dati.",
+    r: "Ogni numero ha il suo campione («51 su 270») e, dove è una quota, l'intervallo di confidenza. Le domande sono ripetute, la posizione è dichiarata, i pesi degli assistenti vengono da dati pubblici e si aggiornano ogni trimestre. In fondo a ogni report ci sono le definizioni, e nella pagina Metodo tutto il percorso dei dati.",
   },
   {
     d: "Posso disdire quando voglio?",
@@ -58,226 +42,168 @@ const FAQ = [
   },
 ];
 
+/** I tre riferimenti esterni da mettere in evidenza nella banda del metodo. */
+const RIFERIMENTI_HOME = RIFERIMENTI.slice(0, 3);
+
 export default function Landing() {
   return (
     <>
       {/* Hero */}
-      <section className="mx-auto max-w-6xl px-4 pt-12 pb-10 sm:px-6 sm:pt-20 sm:pb-16">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-          <div className="max-w-xl">
-            <h1 className="display">Quando un cliente chiede a ChatGPT, fa il tuo nome?</h1>
-            <p className="mt-5 text-lg text-muted sm:text-xl">
-              In 60 secondi sai se ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok consigliano
-              la tua attività o i tuoi concorrenti, e le tre cose da sistemare.
-            </p>
-            <div className="mt-7">
-              <CercaAttivita grande id="test" />
+      <section className="relative overflow-hidden">
+        <div className="relative mx-auto max-w-6xl px-4 pt-12 pb-14 sm:px-6 sm:pt-20 sm:pb-20 lg:pt-24">
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-14">
+            <div className="min-w-0 max-w-xl">
+              <h1 className="display">Quando un cliente chiede a ChatGPT, fa il tuo nome?</h1>
+              <p className="mt-5 max-w-lg text-lg text-muted sm:text-xl">
+                In 60 secondi sai se ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok consigliano te o i tuoi concorrenti, e le tre cose da sistemare.
+              </p>
+              <div className="mt-8">
+                <CercaAttivita grande id="test" />
+              </div>
+              <p className="mt-3 text-sm text-muted">Gratis, senza registrazione. Ristoranti e studi medici come carpenterie e logistica: le domande cambiano con il mestiere.</p>
             </div>
-            <p className="mt-3 text-sm text-muted">
-              Gratis, senza registrazione. Per ristoranti e dentisti come per carpenterie e logistica: le domande cambiano con il mestiere.
-            </p>
+            <div className="flex min-w-0 justify-center pt-4 lg:justify-end">
+              <ChatSimulata />
+            </div>
           </div>
-          <div className="flex justify-center lg:justify-end">
-            <ChatSimulata />
-          </div>
+        </div>
+      </section>
+
+      {/* Sei assistenti */}
+      <section className="border-y border-line bg-soft/50">
+        <div className="mx-auto max-w-6xl px-4 py-9 sm:px-6 sm:py-10">
+          <StrisciaMotori />
         </div>
       </section>
 
       {/* Come funziona */}
-      <section id="come-funziona" className="border-t border-line">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-          <h2 className="text-2xl font-bold sm:text-3xl">Come funziona</h2>
-          <ol className="mt-8 grid gap-8 sm:grid-cols-3 sm:gap-6">
-            {PASSI.map((p, i) => (
-              <li key={p.titolo} className="flex gap-4 sm:block">
-                <span className="tabular flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ink text-sm font-bold sm:mb-4">
-                  {i + 1}
-                </span>
-                <span>
-                  <h3 className="font-semibold">{p.titolo}</h3>
-                  <p className="mt-1.5 text-[15px] text-muted">{p.testo}</p>
-                </span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* Motori */}
-      <section className="border-t border-line">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-            <div>
-              <h2 className="text-2xl font-bold sm:text-3xl">Sei assistenti, pesati per quanti italiani li usano</h2>
-              <p className="mt-3 text-muted">
-                Non tutti contano uguale. Nel punteggio ogni assistente pesa per la sua quota d&apos;uso
-                in Italia: essere invisibile su ChatGPT costa più punti che su Grok. Le quote si
-                aggiornano ogni trimestre.
-              </p>
-              <p className="mt-3 text-sm text-muted">
-                In arrivo: {elencoMotori(motoriInArrivo())}, appena sarà possibile leggerli in modo affidabile.
-              </p>
-            </div>
-            <div>
-              {motoriAttivi().map((m) => (
-                <Barra
-                  key={m.id}
-                  etichetta={m.nome}
-                  valore={m.utentiMln}
-                  massimo={Math.max(...motoriAttivi().map((x) => x.utentiMln))}
-                  testo={`${m.utentiMln.toLocaleString("it-IT")} mln di italiani`}
-                  accento
-                />
-              ))}
-              <p className="mt-3 text-xs text-faint">
-                Utenti mensili in Italia, luglio 2026. Fonte: Osservatorio Cosenza su dati Audicom; per
-                Google AI, Sensemakers su dati Comscore (persone esposte alle risposte AI su Google).
-              </p>
-            </div>
+      <section id="come-funziona">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
+          <div className="max-w-2xl">
+            <h2 className="text-3xl font-bold sm:text-4xl">Come funziona</h2>
+            <p className="mt-3 text-lg text-muted">Un minuto per te, qualche minuto per noi. Niente da configurare.</p>
+          </div>
+          <div className="mt-10">
+            <Passi />
           </div>
         </div>
       </section>
 
-      {/* Cosa ricevi */}
-      <section className="border-t border-line bg-soft/60">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-          <div className="max-w-2xl">
-            <h2 className="text-2xl font-bold sm:text-3xl">Un punteggio, un confronto, tre azioni</h2>
-            <p className="mt-3 text-muted">
-              Questo è un report vero, con i nomi cambiati. Punteggio, dove ti trovano e dove no, chi
-              ti passa davanti, le parole e le fonti che usano, cosa dicono di te, tre azioni. Ogni
-              numero con il suo campione.
+      {/* Il report */}
+      <section className="border-t border-line bg-soft/50">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
+          <div className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:gap-16">
+            <div>
+              <h2 className="text-3xl font-bold sm:text-4xl">Si può fare a mano. Non ogni mese.</h2>
+            </div>
+            <p className="text-lg text-muted">
+              Aprire ChatGPT e chiedere <span className="domanda text-ink">miglior pizzeria a Bergamo</span> lo fai in un minuto. Farlo su sei assistenti, con quindici
+              domande, tre volte ciascuna in giorni diversi, segnando posizione, concorrenti e fonti, è una giornata. E il mese dopo è già tutto diverso. Questo è un
+              report vero, con i nomi cambiati.
             </p>
           </div>
-          <div className="mt-8 bg-bg">
+          <div className="mt-10">
             <AnteprimaReport />
           </div>
         </div>
       </section>
 
-      {/* Perché non a mano */}
-      <section className="border-t border-line">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+      {/* Metodo */}
+      <section id="metodo" className="bg-ink text-white">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
             <div>
-              <h2 className="text-2xl font-bold sm:text-3xl">Si può fare a mano. Non ogni mese.</h2>
-              <p className="mt-3 text-muted">
-                Aprire ChatGPT e chiedere «miglior pizzeria a Bergamo» lo fai in un minuto. Farlo su sei
-                assistenti, con quindici domande, tre volte ciascuna, segnando posizione, concorrenti
-                e fonti, è una giornata. E il mese dopo è già tutto diverso.
+              <h2 className="text-3xl font-bold sm:text-4xl">Come raccogliamo i dati</h2>
+              <p className="mt-4 text-white/75">
+                Ogni numero del report si ricava dalla mappa domanda × assistente, e ogni metrica ha la sua definizione: cos&apos;è, come si calcola, come si legge.
+                Le {GLOSSARIO.length} voci sono nelle note tecniche di ogni report. Nessuna previsione e nessuna stima senza campione.
               </p>
-            </div>
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-7 sm:grid-cols-4 lg:grid-cols-2">
-              {[
-                ["270", "risposte lette ogni mese nel piano Base"],
-                ["6", "assistenti AI, interrogati con la tua città"],
-                ["1º–5º", "la posizione in cui compari, non solo se compari"],
-                ["8", "fonti controllate: dove l'AI prende le informazioni"],
-              ].map(([n, t]) => (
-                <div key={t}>
-                  <dt className="tabular text-4xl font-bold tracking-tight sm:text-5xl">{n}</dt>
-                  <dd className="mt-1 max-w-[18ch] text-[15px] text-muted">{t}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-      </section>
-
-      {/* Come raccogliamo i dati */}
-      <section id="metodo" className="border-t border-line bg-ink text-white">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-            <div>
-              <h2 className="text-2xl font-bold sm:text-3xl">Come raccogliamo i dati</h2>
-              <p className="mt-3 text-white/75">
-                Ogni numero del report si ricava dalla mappa domanda × assistente, e ogni metrica ha la sua definizione: cos&apos;è, come si
-                calcola, come si legge. Le {GLOSSARIO.length} voci sono nelle note tecniche di ogni report. Nessuna previsione e nessuna
-                stima senza campione.
-              </p>
-              <p className="mt-4">
+              <p className="mt-5">
                 <Link href="/metodo" className="font-semibold text-[#9fe8c6] underline underline-offset-2">
                   Leggi il metodo per intero
                 </Link>
               </p>
             </div>
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3">
+            <dl className="divide-y divide-white/15 border-y border-white/15">
               {[
-                ["2–3×", "ogni domanda, in giorni diversi, perché le risposte cambiano"],
-                ["95%", "intervallo di confidenza dichiarato sulle quote"],
-                ["6", "tipi di domanda, dallo studio dei prompt reali"],
-                ["90 gg", "finestra della mediana di categoria"],
-                ["50", "domande confrontate ogni trimestre con le app vere"],
-                ["0", "previsioni: mostriamo l'andamento, non il futuro"],
+                ["Ogni domanda 2–3 volte", "in giorni diversi, perché le risposte cambiano più tra un giorno e l'altro che tra un minuto e l'altro"],
+                ["Intervallo al 95%", "dichiarato su ogni quota: due scansioni sono diverse solo se gli intervalli non si sovrappongono"],
+                ["Sei tipi di domanda", "dallo studio dei prompt reali: generiche, per bisogno, per specialità, per requisito, di confronto, sul nome"],
+                ["Riconoscimento a regole", "nome, indirizzo e telefono nel testo; la posizione è l'ordine in cui compari, dichiarato"],
+                ["Controllo trimestrale", "50 domande confrontate con le app vere, e i pesi degli assistenti aggiornati con le quote d'uso"],
+                ["Zero previsioni", "mostriamo l'andamento, non il futuro"],
               ].map(([n, t]) => (
-                <div key={t}>
-                  <dt className="tabular text-3xl font-bold tracking-tight text-[#9fe8c6]">{n}</dt>
-                  <dd className="mt-1 text-sm text-white/70">{t}</dd>
+                <div key={n} className="grid gap-1 py-3.5 sm:grid-cols-[13rem_1fr] sm:gap-6">
+                  <dt className="font-semibold text-[#9fe8c6]">{n}</dt>
+                  <dd className="text-[15px] text-white/70">{t}</dd>
                 </div>
               ))}
             </dl>
           </div>
-          <div className="mt-10 rounded-2xl bg-bg p-4 text-ink sm:p-6">
-            <Pipeline />
+          <div className="mt-12">
+            <Pipeline scuro />
+          </div>
+          <div className="mt-10 border-t border-white/15 pt-8">
+            <p className="text-sm text-white/55">Perché uno zero è la norma, non un difetto della misura: i riferimenti esterni, nel report e nel metodo.</p>
+            <ul className="mt-4 grid gap-6 sm:grid-cols-3">
+              {RIFERIMENTI_HOME.map((r) => (
+                <li key={r.fonte} className="text-[15px]">
+                  <p>{r.dato.split(";")[0].replace(/\.$/, "")}.</p>
+                  <p className="mt-1 text-[13px] text-white/55">
+                    {r.fonte}, {r.anno} · {r.campione}
+                  </p>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
       {/* Per chi */}
       <section className="border-t border-line">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
+          <div className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:gap-16">
+            <h2 className="text-3xl font-bold sm:text-4xl">Per qualsiasi attività che i clienti cercano, dal bar alla carpenteria</h2>
             <div>
-              <h2 className="text-2xl font-bold sm:text-3xl">Per qualsiasi attività che i clienti cercano, dal bar alla carpenteria</h2>
-              <p className="mt-3 text-muted">
-                Trentasei categorie con domande, fonti e azioni proprie, dalla più numerosa alla più piccola: un ristorante si gioca su
-                piatti e orari, un dentista sulle prestazioni, una carpenteria su lavorazioni, certificazioni, provincia e domande in inglese.
-                Per i mestieri non previsti il profilo lo costruiamo dal tuo sito e dalla tua scheda Google.
+              <p className="text-lg text-muted">
+                Trentasei categorie con domande, fonti e azioni proprie: un ristorante si gioca su piatti e orari, un dentista sulle prestazioni, una carpenteria su
+                lavorazioni, certificazioni, provincia e domande in inglese. Per i mestieri non previsti il profilo lo costruiamo dal tuo sito e dalla tua scheda
+                Google.
               </p>
-              <p className="mt-3 text-xs text-faint">Imprese attive per categoria: ISTAT, registro ASIA 2023 (via Eurostat).</p>
+              <p className="mt-3 text-[13px] text-faint">Imprese attive per categoria: ISTAT, registro ASIA 2023 (via Eurostat).</p>
             </div>
-            <ul className="flex flex-wrap gap-1.5">
-              {profiliPerNumerosita().map((p) => (
-                <li key={p.id} className="rounded-full border border-line px-3 py-1 text-[14px]">
-                  {p.nome} <span className="tabular text-[13px] text-faint">{migliaia(p.imprese)}</span>
-                </li>
-              ))}
-              <li className="rounded-full border border-dashed border-line px-3 py-1 text-[14px] text-muted">
-                e qualsiasi altro mestiere
-              </li>
-            </ul>
+          </div>
+          <div className="mt-10">
+            <Categorie />
           </div>
         </div>
       </section>
 
       {/* Prezzi */}
-      <section id="prezzi" className="border-t border-line bg-soft/60">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+      <section id="prezzi" className="border-t border-line bg-soft/50">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
-              <h2 className="text-2xl font-bold sm:text-3xl">Il test è gratis. Il mese dopo costa meno di un coperto al giorno.</h2>
+              <h2 className="text-3xl font-bold sm:text-4xl">Il test è gratis. Il mese dopo costa meno di un coperto al giorno.</h2>
               <p className="mt-3 text-muted">Prezzi al mese, IVA esclusa. Con l&apos;annuale due mesi sono gratis.</p>
             </div>
             <Link href="/prezzi" className="font-semibold text-accent underline underline-offset-2">
               Tutti i dettagli dei piani
             </Link>
           </div>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
             {PIANI.map((p) => (
-              <div
-                key={p.id}
-                className={`flex flex-col rounded-2xl border bg-bg p-6 ${p.evidenza ? "border-accent ring-1 ring-accent" : "border-line"}`}
-              >
+              <div key={p.id} className={`flex flex-col rounded-2xl p-6 ${p.evidenza ? "bg-ink text-white" : "border border-line bg-bg"}`}>
                 <h3 className="text-lg font-semibold">{p.nome}</h3>
-                <p className="mt-1 min-h-10 text-sm text-muted">{p.perChi}</p>
+                <p className={`mt-1 min-h-10 text-sm ${p.evidenza ? "text-white/70" : "text-muted"}`}>{p.perChi}</p>
                 <p className="mt-4">
                   <span className="tabular text-4xl font-bold tracking-tight">{euro(p.mensile)}</span>
-                  <span className="ml-1.5 text-sm text-muted">al mese</span>
+                  <span className={`ml-1.5 text-sm ${p.evidenza ? "text-white/70" : "text-muted"}`}>al mese</span>
                 </p>
-                <ul className="mt-4 space-y-1.5 text-[15px] text-muted">
+                <ul className={`mt-4 space-y-1.5 text-[15px] ${p.evidenza ? "text-white/80" : "text-muted"}`}>
                   {p.include.slice(0, 4).map((i) => (
                     <li key={i} className="flex gap-2">
-                      <span className="text-accent" aria-hidden="true">
+                      <span className={p.evidenza ? "text-[#9fe8c6]" : "text-accent"} aria-hidden="true">
                         ✓
                       </span>
                       {i}
@@ -285,7 +211,7 @@ export default function Landing() {
                   ))}
                 </ul>
                 <div className="mt-auto pt-6">
-                  <Bottone href={`/prezzi#${p.id}`} secondario={!p.evidenza} className="w-full sm:w-full">
+                  <Bottone href={`/prezzi#${p.id}`} secondario={!p.evidenza} className={`w-full sm:w-full ${p.evidenza ? "!bg-[#9fe8c6] !text-ink hover:!bg-[#b8f0d6]" : ""}`}>
                     Scegli {p.nome}
                   </Bottone>
                 </div>
@@ -300,9 +226,9 @@ export default function Landing() {
 
       {/* FAQ */}
       <section id="domande" className="border-t border-line">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-            <h2 className="text-2xl font-bold sm:text-3xl">Domande frequenti</h2>
+            <h2 className="text-3xl font-bold sm:text-4xl">Domande frequenti</h2>
             <div className="divide-y divide-line border-y border-line">
               {FAQ.map((f) => (
                 <details key={f.d} className="group py-4">
@@ -324,8 +250,9 @@ export default function Landing() {
       <section className="border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-bold sm:text-3xl">Scopri cosa dicono di te. Ci vuole un minuto.</h2>
-            <div className="mt-6 text-left">
+            <p className="domanda text-2xl text-muted sm:text-3xl">Cosa mi consigli qui vicino, aperto adesso?</p>
+            <h2 className="mt-2 text-3xl font-bold sm:text-4xl">Scopri se fanno il tuo nome. Ci vuole un minuto.</h2>
+            <div className="mt-7 text-left">
               <CercaAttivita />
             </div>
           </div>

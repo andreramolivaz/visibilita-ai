@@ -40,44 +40,40 @@ export function Prezzi({ pagamentiAttivi }: { pagamentiAttivi: boolean }) {
             <section
               key={p.id}
               id={p.id}
-              className={`flex flex-col rounded-2xl border p-6 sm:p-7 ${
-                p.evidenza ? "border-accent ring-1 ring-accent" : "border-line"
-              }`}
+              className={`flex flex-col rounded-2xl p-6 sm:p-7 ${p.evidenza ? "bg-ink text-white" : "border border-line"}`}
             >
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">{p.nome}</h2>
-                {p.evidenza && (
-                  <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-ink">
-                    Il più scelto
-                  </span>
-                )}
+                {p.evidenza && <span className="rounded-full bg-[#9fe8c6] px-2.5 py-0.5 text-xs font-semibold text-ink">Il più scelto</span>}
               </div>
-              <p className="mt-1 text-sm text-muted">{p.perChi}</p>
+              <p className={`mt-1 text-sm ${p.evidenza ? "text-white/70" : "text-muted"}`}>{p.perChi}</p>
               <p className="mt-5">
                 <span className="tabular text-5xl font-bold tracking-tight">{euro(importo)}</span>
-                <span className="ml-2 text-sm text-muted">{periodo === "annuale" ? "all'anno" : "al mese"}</span>
+                <span className={`ml-2 text-sm ${p.evidenza ? "text-white/70" : "text-muted"}`}>{periodo === "annuale" ? "all'anno" : "al mese"}</span>
               </p>
-              {periodo === "annuale" ? (
-                <p className="tabular mt-1 text-sm text-muted">
-                  Come {euro(Math.round(p.annuale / 12))} al mese. Risparmi {euro(p.mensile * 12 - p.annuale)}.
-                </p>
-              ) : (
-                <p className="tabular mt-1 text-sm text-muted">Oppure {euro(p.annuale)} all&apos;anno.</p>
-              )}
-              <ul className="mt-6 flex-1 space-y-2 text-[15px]">
+              <p className={`tabular mt-1 text-sm ${p.evidenza ? "text-white/70" : "text-muted"}`}>
+                {periodo === "annuale" ? (
+                  <>
+                    Come {euro(Math.round(p.annuale / 12))} al mese. Risparmi {euro(p.mensile * 12 - p.annuale)}.
+                  </>
+                ) : (
+                  <>Oppure {euro(p.annuale)} all&apos;anno.</>
+                )}
+              </p>
+              <ul className={`mt-6 flex-1 space-y-2 text-[15px] ${p.evidenza ? "text-white/85" : ""}`}>
                 {p.include.map((i) => (
                   <li key={i} className="flex gap-2.5">
-                    <span className="mt-0.5 text-accent" aria-hidden="true">
+                    <span className={`mt-0.5 ${p.evidenza ? "text-[#9fe8c6]" : "text-accent"}`} aria-hidden="true">
                       ✓
                     </span>
                     <span>{i}</span>
                   </li>
                 ))}
               </ul>
-              <Checkout piano={p.id} periodo={periodo} secondario={!p.evidenza} attivo={pagamentiAttivi} className="mt-7">
+              <Checkout piano={p.id} periodo={periodo} secondario={!p.evidenza} suScuro={p.evidenza} attivo={pagamentiAttivi} className="mt-7">
                 Attiva {p.nome}
               </Checkout>
-              <p className="mt-2 text-center text-xs text-faint">Parti dal test gratuito, poi scegli il piano dal report.</p>
+              <p className={`mt-2 text-center text-xs ${p.evidenza ? "text-white/50" : "text-faint"}`}>Parti dal test gratuito, poi scegli il piano dal report.</p>
             </section>
           );
         })}

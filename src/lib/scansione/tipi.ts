@@ -1,4 +1,4 @@
-import type { Domanda, EngineId, Piano, Posizione, ProfiloAttivita, SegnaliProfilo } from "../types";
+import type { Domanda, EngineId, Piano, Posizione, ProfiloAttivita, SegnaliProfilo, TipoDomanda } from "../types";
 import type { RispostaGrezza } from "../motori/tipi";
 
 /** Cosa abbiamo letto in una risposta: la tua posizione, chi è citato, da quali fonti. */
@@ -49,6 +49,22 @@ export interface Scansione {
   reportId?: string;
 }
 
+/** Una domanda, come la vede la pagina di scansione: il tipo, e il testo solo se l'ha scritta il titolare. */
+export interface DomandaInScansione {
+  id: string;
+  tipo: TipoDomanda;
+  testo?: string;
+}
+
+/** Una casella della griglia domanda × assistente: quante ripetizioni sono fatte, quante in errore. */
+export interface CasellaAvanzamento {
+  domandaId: string;
+  motore: EngineId;
+  fatte: number;
+  errori: number;
+  totale: number;
+}
+
 /** Avanzamento, per la pagina di scansione. */
 export interface Avanzamento {
   id: string;
@@ -61,4 +77,8 @@ export interface Avanzamento {
   corrente?: { motore: EngineId; domandaId: string };
   reportId?: string;
   simulata: boolean;
+  domande: DomandaInScansione[];
+  motori: EngineId[];
+  ripetizioni: number;
+  griglia: CasellaAvanzamento[];
 }

@@ -17,6 +17,7 @@ export function Checkout({
   secondario,
   className = "",
   attivo,
+  suScuro = false,
 }: {
   piano: PianoId;
   periodo: Periodo;
@@ -27,6 +28,8 @@ export function Checkout({
   className?: string;
   /** Pagamenti configurati sul server. */
   attivo: boolean;
+  /** Dentro una scheda scura: bottone menta, errore chiaro. */
+  suScuro?: boolean;
 }) {
   const [stato, setStato] = useState<"fermo" | "apro" | "errore">("fermo");
   const [messaggio, setMessaggio] = useState("");
@@ -55,11 +58,17 @@ export function Checkout({
 
   return (
     <div className={className}>
-      <Bottone type="button" onClick={apri} disabled={stato === "apro"} secondario={secondario} className="w-full sm:w-full">
+      <Bottone
+        type="button"
+        onClick={apri}
+        disabled={stato === "apro"}
+        secondario={secondario}
+        className={`w-full sm:w-full ${suScuro ? "!bg-[#9fe8c6] !text-ink hover:!bg-[#b8f0d6]" : ""}`}
+      >
         {stato === "apro" ? "Apro il pagamento…" : children}
       </Bottone>
       {stato === "errore" && (
-        <p className="mt-2 text-sm text-danger" role="alert">
+        <p className={`mt-2 text-sm ${suScuro ? "text-[#ffb4ad]" : "text-danger"}`} role="alert">
           {messaggio}
         </p>
       )}

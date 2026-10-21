@@ -1,0 +1,122 @@
+import { ATTIVITA_ESEMPIO, REPORT_ESEMPIO } from "@/lib/mock-report";
+import { ScalaPunteggio } from "@/components/report/ScalaPunteggio";
+import { Etichetta } from "@/components/ui";
+
+/**
+ * Come funziona, in tre passi. Sopra ogni passo c'è un pezzo vero
+ * dell'interfaccia, non un'icona: la scheda trovata, le domande che faremo,
+ * il punteggio che arriva.
+ */
+
+function Riquadro({ children }: { children: React.ReactNode }) {
+  return <div className="min-h-[172px] overflow-hidden rounded-xl border border-line bg-bg p-4 text-[13px] leading-snug md:h-[176px]">{children}</div>;
+}
+
+function MiniScheda() {
+  const a = ATTIVITA_ESEMPIO;
+  return (
+    <Riquadro>
+      <p className="text-[11px] text-faint">Trovata su Google</p>
+      <p className="mt-0.5 text-[15px] font-semibold">
+        {a.nome}, {a.citta}
+      </p>
+      <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-muted">
+        <dt className="text-faint">Categoria</dt>
+        <dd className="text-ink">{a.categoriaGoogle}</dd>
+        <dt className="text-faint">Specialità</dt>
+        <dd className="text-ink">{a.specialita.slice(0, 2).join(", ")}</dd>
+        <dt className="text-faint">Orari</dt>
+        <dd className="text-ink">{a.orari}</dd>
+      </dl>
+      <div className="mt-2.5 flex flex-wrap gap-1">
+        {a.portaliPresenti.map((p) => (
+          <Etichetta key={p} tono="accento">
+            {p}
+          </Etichetta>
+        ))}
+        {a.portaliAssenti.map((p) => (
+          <Etichetta key={p} tono="errore">
+            {p}: assente
+          </Etichetta>
+        ))}
+      </div>
+    </Riquadro>
+  );
+}
+
+const DOMANDE = [
+  ["Pizzeria aperta la domenica a Bergamo", "per bisogno"],
+  ["Pizzeria con forno a legna a Bergamo", "per specialità"],
+  ["Meglio Da Gino o Fratelli Rossi a Bergamo?", "di confronto"],
+];
+
+function MiniDomande() {
+  return (
+    <Riquadro>
+      <p className="text-[11px] text-faint">Tre delle otto domande</p>
+      <ul className="mt-1.5 space-y-1.5">
+        {DOMANDE.map(([d, t]) => (
+          <li key={d} className="flex items-baseline justify-between gap-3">
+            <span className="domanda text-[16px] leading-tight">{d}</span>
+            <span className="shrink-0 text-[11px] text-faint">{t}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="tabular mt-3 border-t border-line pt-2 text-[12px] text-muted">× 6 assistenti × 2 volte = 96 risposte</p>
+    </Riquadro>
+  );
+}
+
+function MiniPunteggio() {
+  const r = REPORT_ESEMPIO;
+  return (
+    <Riquadro>
+      <p className="text-[11px] text-faint">Il report</p>
+      <div className="mt-0.5 flex items-baseline gap-2.5">
+        <span className="tabular text-[40px] font-bold leading-none tracking-tight text-warn">{r.punteggio}</span>
+        <span className="text-[15px] font-semibold text-warn">{r.verdetto}</span>
+      </div>
+      <ScalaPunteggio punteggio={r.punteggio} compatta />
+      <p className="mt-2.5 line-clamp-2 text-[12.5px] text-muted">
+        Davanti a te: <span className="text-ink">{r.concorrenti[0].nome}</span>. Prima azione: <span className="text-ink">{r.azioni[0].titolo}</span>.
+      </p>
+    </Riquadro>
+  );
+}
+
+const PASSI = [
+  {
+    titolo: "Scrivi il nome della tua attività",
+    testo: "Troviamo noi categoria, specialità, orari e portali dalla scheda Google e dal tuo sito. Tu confermi con un tocco.",
+    figura: <MiniScheda />,
+  },
+  {
+    titolo: "Facciamo le domande che fanno i tuoi clienti",
+    testo: "Otto domande, nella tua città, a sei assistenti AI. Ogni domanda due volte, perché le risposte cambiano.",
+    figura: <MiniDomande />,
+  },
+  {
+    titolo: "Leggi dove sei, chi ti passa davanti, cosa fare",
+    testo: "Punteggio con il suo campione, i concorrenti citati al posto tuo, le fonti da cui gli assistenti prendono le informazioni e tre azioni in ordine di impatto.",
+    figura: <MiniPunteggio />,
+  },
+];
+
+export function Passi() {
+  return (
+    <ol className="grid gap-8 md:grid-cols-3 md:gap-6">
+      {PASSI.map((p, i) => (
+        <li key={p.titolo}>
+          {p.figura}
+          <div className="mt-4 flex gap-3">
+            <span className="tabular flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ink text-[13px] font-bold text-white">{i + 1}</span>
+            <div>
+              <h3 className="text-[17px] font-semibold leading-snug">{p.titolo}</h3>
+              <p className="mt-1.5 text-[15px] text-muted">{p.testo}</p>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}

@@ -72,6 +72,16 @@ export function avanzamentoDi(s: Scansione): Avanzamento {
   const daFare = s.celle.filter((c) => c.stato === "da fare");
   const future = daFare.filter((c) => c.eseguiDopo > ora);
   const prossima = future.map((c) => c.eseguiDopo).sort()[0];
+  // La griglia domanda × assistente, con le ripetizioni sommate.
+  const caselle = new Map<string, Avanzamento["griglia"][number]>();
+  for (const c of s.celle) {
+    const k = `${c.domandaId}|${c.motore}`;
+    const v = caselle.get(k) ?? { domandaId: c.domandaId, motore: c.motore, fatte: 0, errori: 0, totale: 0 };
+    v.totale++;
+    if (c.stato === "fatta") v.fatte++;
+    if (c.stato === "errore") v.errori++;
+    caselle.set(k, v);
+  }
   return {
     id: s.id,
     stato: s.stato,
@@ -82,6 +92,10 @@ export function avanzamentoDi(s: Scansione): Avanzamento {
     corrente: daFare[0] ? { motore: daFare[0].motore, domandaId: daFare[0].domandaId } : undefined,
     reportId: s.reportId,
     simulata: Boolean(s.simulata),
+    domande: s.domande.map((d) => ({ id: d.id, tipo: d.tipo, testo: d.modificabile ? d.testo : undefined })),
+    motori: s.motori,
+    ripetizioni: s.ripetizioni,
+    griglia: [...caselle.values()],
   };
 }
 

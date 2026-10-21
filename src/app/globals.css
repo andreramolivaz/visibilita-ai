@@ -38,6 +38,7 @@
   --color-warn: var(--warn);
   --color-warn-soft: var(--warn-soft);
   --font-sans: var(--font-instrument), system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
 }
 
 html {
@@ -74,6 +75,24 @@ h3 {
   text-wrap: balance;
 }
 
+/* I titoli di sezione: leggermente condensati (asse wdth di Instrument Sans). */
+h1,
+h2 {
+  font-stretch: 94%;
+}
+
+/*
+ * Le domande che la gente scrive davvero: in corsivo serif, ovunque sul sito.
+ * È la voce del cliente; i dati e le risposte restano in sans.
+ */
+.domanda {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  font-stretch: 100%;
+}
+
 p {
   text-wrap: pretty;
 }
@@ -105,10 +124,26 @@ p {
 
 /* Titolo della landing: grande e stretto, senza accenti colorati. */
 .display {
-  font-size: clamp(2.1rem, 1.3rem + 3.6vw, 3.6rem);
-  line-height: 1.02;
+  font-size: clamp(2.3rem, 1.4rem + 3.8vw, 3.9rem);
+  line-height: 1;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
+  font-stretch: 90%;
+}
+
+/* La cella della scansione: si accende quando la risposta arriva. */
+@keyframes accendi {
+  from {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.cella-accesa {
+  animation: accendi 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @media print {

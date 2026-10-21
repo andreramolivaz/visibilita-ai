@@ -87,9 +87,17 @@ function conEsplora(domande: Domanda[]): Domanda[] {
   return domande.map((d) => (ultime.has(d.id) ? { ...d, esplora: true } : d));
 }
 
+/** «pizzeria da gino bergamo» → «Pizzeria Da Gino Bergamo»: nel profilo di esempio il nome è quello scritto. */
+const maiuscole = (s: string) =>
+  s
+    .trim()
+    .split(/\s+/)
+    .map((p) => (p.length > 1 && p === p.toLowerCase() ? p[0].toUpperCase() + p.slice(1) : p))
+    .join(" ");
+
 function esempio(query: string, n: number): ProfiloCostruito {
   const [nome, citta] = query.split(",").map((s) => s.trim());
-  const attivita: ProfiloAttivita = { ...ATTIVITA_ESEMPIO, nome: nome || ATTIVITA_ESEMPIO.nome, citta: citta || ATTIVITA_ESEMPIO.citta };
+  const attivita: ProfiloAttivita = { ...ATTIVITA_ESEMPIO, nome: nome ? maiuscole(nome) : ATTIVITA_ESEMPIO.nome, citta: citta ? maiuscole(citta) : ATTIVITA_ESEMPIO.citta };
   const s = SEGNALI_ESEMPIO;
   const { specialita, requisiti, origini } = segnaposto(s, attivita.servizi);
   const domande = generaDomande(

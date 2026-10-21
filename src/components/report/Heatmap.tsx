@@ -37,7 +37,7 @@ export function Heatmap({ righe, motori, ripetizioni }: { righe: RigaDomanda[]; 
       <ol className="space-y-2 md:space-y-1">
         {righe.map((riga) => (
           <li key={riga.domanda.id} className="md:grid md:grid-cols-[minmax(0,1.6fr)_repeat(6,minmax(0,1fr))] md:items-center md:gap-1">
-            <span className="mb-1 block text-[15px] md:mb-0 md:pr-3 md:text-sm">{riga.domanda.testo}</span>
+            <span className="domanda mb-1 block text-[17px] leading-tight md:mb-0 md:pr-3 md:text-[16px]">{riga.domanda.testo}</span>
             <div className="grid grid-cols-6 gap-1 md:contents">
               {riga.celle.map((c) => {
                 const volte = c.volte ?? Number(c.frequenza.split(" ")[0]);

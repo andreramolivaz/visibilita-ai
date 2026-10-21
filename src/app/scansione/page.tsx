@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Sto chiedendo ai motori…" };
 
 export default function PaginaScansione() {
   return (
-    <Pagina>
+    <Pagina className="!max-w-3xl">
       <Suspense fallback={null}>
         <Scansione />
       </Suspense>

@@ -264,12 +264,12 @@ export function ConfermaProfilo({
                   onKeyDown={(e) => {
                     if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                   }}
-                  className="flex-1 border-b border-accent bg-transparent outline-none"
+                  className="domanda flex-1 border-b border-accent bg-transparent text-[17px] outline-none"
                 />
               ) : (
                 <span className="flex-1">
-                  <span className="block text-xs text-muted">La tua domanda</span>
-                  {d.testo}
+                  <span className="block text-xs text-muted">{d.origine === "titolare" ? "La tua domanda" : "La domanda che puoi cambiare"}</span>
+                  <span className="domanda text-[17px]">{d.testo}</span>
                 </span>
               )}
               {d.modificabile && modifica !== d.id && (
