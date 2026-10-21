@@ -63,21 +63,31 @@ interface Variabili {
   categoria: string;
   citta: string;
   zona?: string;
+  provincia?: string;
+  regione?: string;
   specialita?: string[];
   requisito?: string;
-  regione?: string;
+  requisiti?: string[];
 }
 
-function riempi(template: string, v: Variabili, specialita?: string): string {
+function riempi(template: string, v: Variabili, specialita?: string, requisito?: string): string {
   const testo = template
     .replaceAll("{nome}", v.nome)
     .replaceAll("{categoria}", v.categoria.toLowerCase())
     .replaceAll("{citta}", v.citta)
     .replaceAll("{zona}", v.zona ?? "centro")
+    .replaceAll("{provincia}", v.provincia ?? v.citta)
+    .replaceAll("{regione}", v.regione ?? v.provincia ?? v.citta)
     .replaceAll("{specialita}", specialita ?? v.specialita?.[0] ?? "")
-    .replaceAll("{requisito}", v.requisito ?? "")
-    .replaceAll("{regione}", v.regione ?? "");
-  return testo.charAt(0).toUpperCase() + testo.slice(1);
+    .replaceAll("{requisito}", requisito ?? v.requisito ?? v.requisiti?.[0] ?? "");
+  return (testo.charAt(0).toUpperCase() + testo.slice(1)).replace(/\s{2,}/g, " ").trim();
+}
+
+/** Un template con un segnaposto vuoto non va usato. */
+function valido(testo: string, template: string, v: Variabili): boolean {
+  if (template.includes("{specialita}") && !v.specialita?.length) return false;
+  if (template.includes("{requisito}") && !v.requisito && !v.requisiti?.length) return false;
+  return testo.length > 0;
 }
 
 /**
@@ -92,11 +102,12 @@ export function generaDomande(p: ProfiloCategoria, v: Variabili, n: number): Dom
   };
 
   // Alterna generica → bisogno → specialità finché c'è posto.
-  const generiche = p.domande.generica.map((t) => riempi(t, v));
-  const bisogni = p.domande.bisogno.map((t) => riempi(t, v));
-  const spec = (v.specialita?.length ? v.specialita : [""]).flatMap((s) =>
-    p.domande.specialita.map((t) => riempi(t, v, s)),
-  );
+  const generiche = p.domande.generica.map((t) => riempi(t, v)).filter((x, i) => valido(x, p.domande.generica[i], v));
+  const bisogni = p.domande.bisogno
+    .flatMap((t) => (t.includes("{requisito}") ? (v.requisiti?.length ? v.requisiti : [v.requisito ?? ""]).map((r) => [t, riempi(t, v, undefined, r)] as const) : [[t, riempi(t, v)] as const]))
+    .filter(([t, x]) => valido(x, t, v))
+    .map(([, x]) => x);
+  const spec = (v.specialita?.length ? v.specialita : []).flatMap((s) => p.domande.specialita.map((t) => riempi(t, v, s)));
 
   let i = 0;
   while (out.length < n - 1 && i < Math.max(generiche.length, bisogni.length, spec.length)) {

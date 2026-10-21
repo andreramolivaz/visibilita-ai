@@ -73,6 +73,9 @@ export interface ProfiloAttivita {
   nome: string;
   citta: string;
   zona?: string;
+  /** Per le attività B2B le domande si fanno per provincia e regione. */
+  provincia?: string;
+  regione?: string;
   indirizzo: string;
   telefono?: string;
   sito?: string;
