@@ -156,7 +156,7 @@ export function Scansione() {
             {domande.map((d) => (
               <tr key={d.id}>
                 <td className="pr-3 align-middle">
-                  {d.testo ? <span className="domanda text-[16px] text-ink">{d.testo}</span> : <span className="text-muted">{TIPO[d.tipo]}</span>}
+                  {d.testo ? <span className="font-medium text-[14px] text-ink">{d.testo}</span> : <span className="text-muted">{TIPO[d.tipo]}</span>}
                 </td>
                 {motori.map((m) => {
                   const c = caselle.get(`${d.id}|${m}`);
@@ -202,7 +202,7 @@ export function Scansione() {
             ) : corrente ? (
               <>
                 Chiedo a <span className="font-semibold text-ink">{engine(corrente.motore).nome}</span>:{" "}
-                {domandaCorrente?.testo ? <span className="domanda text-[15px] text-ink">{domandaCorrente.testo}</span> : (domandaCorrente ? TIPO[domandaCorrente.tipo].toLowerCase() : "")}
+                {domandaCorrente?.testo ? <span className="font-medium text-ink">{domandaCorrente.testo}</span> : (domandaCorrente ? TIPO[domandaCorrente.tipo].toLowerCase() : "")}
               </>
             ) : (
               "Preparo le domande"

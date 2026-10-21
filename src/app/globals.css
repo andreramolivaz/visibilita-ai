@@ -38,7 +38,6 @@
   --color-warn: var(--warn);
   --color-warn-soft: var(--warn-soft);
   --font-sans: var(--font-instrument), system-ui, sans-serif;
-  --font-serif: var(--font-instrument-serif), Georgia, serif;
 }
 
 html {
@@ -79,18 +78,6 @@ h3 {
 h1,
 h2 {
   font-stretch: 94%;
-}
-
-/*
- * Le domande che la gente scrive davvero: in corsivo serif, ovunque sul sito.
- * È la voce del cliente; i dati e le risposte restano in sans.
- */
-.domanda {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: 0;
-  font-stretch: 100%;
 }
 
 p {

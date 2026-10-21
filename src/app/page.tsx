@@ -97,7 +97,7 @@ export default function Landing() {
               <h2 className="text-3xl font-bold sm:text-4xl">Si può fare a mano. Non ogni mese.</h2>
             </div>
             <p className="text-lg text-muted">
-              Aprire ChatGPT e chiedere <span className="domanda text-ink">miglior pizzeria a Bergamo</span> lo fai in un minuto. Farlo su sei assistenti, con quindici
+              Aprire ChatGPT e chiedere «miglior pizzeria a Bergamo» lo fai in un minuto. Farlo su sei assistenti, con quindici
               domande, tre volte ciascuna in giorni diversi, segnando posizione, concorrenti e fonti, è una giornata. E il mese dopo è già tutto diverso. Questo è un
               report vero, con i nomi cambiati.
             </p>
@@ -250,8 +250,7 @@ export default function Landing() {
       <section className="border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="domanda text-2xl text-muted sm:text-3xl">Cosa mi consigli qui vicino, aperto adesso?</p>
-            <h2 className="mt-2 text-3xl font-bold sm:text-4xl">Scopri se fanno il tuo nome. Ci vuole un minuto.</h2>
+            <h2 className="text-3xl font-bold sm:text-4xl">Scopri se fanno il tuo nome. Ci vuole un minuto.</h2>
             <div className="mt-7 text-left">
               <CercaAttivita />
             </div>

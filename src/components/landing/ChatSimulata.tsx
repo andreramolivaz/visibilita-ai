@@ -15,8 +15,9 @@ const leggiMovimento = () => window.matchMedia(QUERY_MOVIMENTO).matches;
 const leggiMovimentoServer = () => false;
 
 /**
- * La hero: una chat simulata. Scrive la domanda come la scriverebbe un cliente,
- * l'assistente risponde con tre nomi, e l'attività che cerchiamo non c'è.
+ * La hero: una chat simulata come in un'app di messaggi. Il cliente «sta
+ * scrivendo» (i tre puntini), la domanda arriva intera, l'assistente pensa e
+ * risponde con tre nomi, e l'attività che cerchiamo non c'è.
  * Tre scenari a rotazione (ristorante, dentista, carpenteria) su tre assistenti
  * diversi: le domande cambiano con il mestiere, il problema è lo stesso.
  * Con "riduci movimento" attivo mostra solo lo stato finale.
@@ -69,10 +70,22 @@ const SCENARI: {
 
 type Fase = "scrivo" | "penso" | "rispondo" | "verdetto" | "pausa";
 
+/** I tre puntini di «sta scrivendo», come nelle app di messaggi. */
+function StaScrivendo({ aDestra = false, etichetta }: { aDestra?: boolean; etichetta: string }) {
+  return (
+    <div className={`flex ${aDestra ? "justify-end" : "justify-start"}`} aria-label={etichetta}>
+      <span className={`inline-flex items-center gap-1 rounded-2xl px-3.5 py-2.5 ${aDestra ? "rounded-br-md bg-soft" : "rounded-bl-md bg-soft/70"}`}>
+        {[0, 1, 2].map((k) => (
+          <span key={k} className="h-2 w-2 animate-bounce rounded-full bg-faint" style={{ animationDelay: `${k * 150}ms` }} />
+        ))}
+      </span>
+    </div>
+  );
+}
+
 export function ChatSimulata() {
   const [i, setI] = useState(0);
   const [fase, setFase] = useState<Fase>("scrivo");
-  const [caratteri, setCaratteri] = useState(0);
   const [righe, setRighe] = useState(0);
   const ridotto = useSyncExternalStore(sottoscriviMovimento, leggiMovimento, leggiMovimentoServer);
   const scena = SCENARI[i];
@@ -95,10 +108,9 @@ export function ChatSimulata() {
       timer.current = window.setTimeout(fn, ms);
     };
     if (fase === "scrivo") {
-      if (caratteri < scena.domanda.length) dopo(26 + Math.random() * 36, () => setCaratteri((c) => c + 1));
-      else dopo(500, () => setFase("penso"));
+      dopo(1500, () => setFase("penso"));
     } else if (fase === "penso") {
-      dopo(1100, () => setFase("rispondo"));
+      dopo(1300, () => setFase("rispondo"));
     } else if (fase === "rispondo") {
       if (righe < scena.nomi.length + 1) dopo(righe === 0 ? 350 : 650, () => setRighe((r) => r + 1));
       else dopo(700, () => setFase("verdetto"));
@@ -107,7 +119,6 @@ export function ChatSimulata() {
     } else {
       dopo(300, () => {
         setI((x) => (x + 1) % SCENARI.length);
-        setCaratteri(0);
         setRighe(0);
         setFase("scrivo");
       });
@@ -115,10 +126,10 @@ export function ChatSimulata() {
     return () => {
       if (timer.current) window.clearTimeout(timer.current);
     };
-  }, [fase, caratteri, righe, scena, ridotto]);
+  }, [fase, righe, scena, ridotto]);
 
   const finale = ridotto;
-  const testoDomanda = finale ? scena.domanda : scena.domanda.slice(0, caratteri);
+  const mostraDomanda = finale || fase !== "scrivo";
   const mostraRisposta = finale || fase === "rispondo" || fase === "verdetto" || fase === "pausa";
   const righeVisibili = finale ? scena.nomi.length + 1 : righe;
   const mostraVerdetto = finale || fase === "verdetto" || fase === "pausa";
@@ -149,19 +160,14 @@ export function ChatSimulata() {
           })}
         </div>
         <div className="min-h-[316px] space-y-3.5 px-4 py-4 text-[15px] leading-relaxed sm:min-h-[332px] sm:px-5 sm:py-5">
-          <div className="flex justify-end">
-            <p className="domanda max-w-[88%] rounded-2xl rounded-br-md bg-soft px-4 py-2 text-[19px] leading-snug text-ink sm:text-[21px]">
-              {testoDomanda}
-              {!finale && fase === "scrivo" && <span className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-0.5 animate-pulse bg-ink" aria-hidden="true" />}
-            </p>
-          </div>
-          {!finale && fase === "penso" && (
-            <div className="flex items-center gap-1 pl-1" aria-label="l'assistente sta scrivendo">
-              {[0, 1, 2].map((k) => (
-                <span key={k} className="h-1.5 w-1.5 animate-bounce rounded-full bg-faint" style={{ animationDelay: `${k * 150}ms` }} />
-              ))}
+          {mostraDomanda ? (
+            <div className="flex justify-end">
+              <p className="max-w-[88%] rounded-2xl rounded-br-md bg-soft px-4 py-2.5 text-[15px] leading-snug text-ink sm:text-[16px]">{scena.domanda}</p>
             </div>
+          ) : (
+            <StaScrivendo aDestra etichetta="il cliente sta scrivendo" />
           )}
+          {!finale && fase === "penso" && <StaScrivendo etichetta="l'assistente sta scrivendo" />}
           {mostraRisposta && (
             <div className="text-ink">
               {righeVisibili >= 1 && <p>{scena.intro}</p>}

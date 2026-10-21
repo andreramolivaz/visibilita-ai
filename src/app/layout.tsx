@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Sans, Instrument_Serif } from "next/font/google";
+import { Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -9,15 +9,6 @@ const instrument = Instrument_Sans({
   subsets: ["latin", "latin-ext"],
   display: "swap",
   axes: ["wdth"],
-});
-
-/** Solo il corsivo: è la voce del cliente, per le domande scritte davvero. */
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin", "latin-ext"],
-  weight: "400",
-  style: ["italic"],
-  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -46,7 +37,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="it" className={`${instrument.variable} ${instrumentSerif.variable} h-full`}>
+    <html lang="it" className={`${instrument.variable} h-full`}>
       <body className="flex min-h-full flex-col">
         <Header />
         <main className="flex-1">{children}</main>

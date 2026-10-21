@@ -57,7 +57,7 @@ function MiniDomande() {
       <ul className="mt-1.5 space-y-1.5">
         {DOMANDE.map(([d, t]) => (
           <li key={d} className="flex items-baseline justify-between gap-3">
-            <span className="domanda text-[16px] leading-tight">{d}</span>
+            <span className="text-[13.5px] font-medium leading-tight">{d}</span>
             <span className="shrink-0 text-[11px] text-faint">{t}</span>
           </li>
         ))}
