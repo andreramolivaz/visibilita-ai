@@ -4,6 +4,19 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { motoriAttivi } from "@/lib/engines";
 import { DOMANDE_ESEMPIO } from "@/lib/mock-report";
+import type { Domanda, TipoDomanda } from "@/lib/types";
+
+const TIPO: Record<TipoDomanda, string> = {
+  generica: "domanda generica",
+  bisogno: "domanda per bisogno",
+  specialita: "domanda per specialità",
+  nome: "domanda sul tuo nome",
+};
+
+/** In scansione si legge solo la domanda scelta dal titolare; le altre per tipo. */
+function etichetta(d: Domanda) {
+  return d.modificabile ? `«${d.testo}»` : TIPO[d.tipo];
+}
 
 const RIPETIZIONI_GRATIS = 2;
 
@@ -19,15 +32,15 @@ export function Scansione() {
   const params = useSearchParams();
   const id = params.get("id") ?? "";
 
-  const domande = useMemo(() => {
-    if (typeof window === "undefined") return DOMANDE_ESEMPIO.slice(0, 5).map((d) => d.testo);
+  const domande = useMemo<Domanda[]>(() => {
+    if (typeof window === "undefined") return DOMANDE_ESEMPIO.slice(0, 5);
     try {
       const salvato = sessionStorage.getItem(id);
-      if (salvato) return JSON.parse(salvato).domande as string[];
+      if (salvato) return JSON.parse(salvato).domande as Domanda[];
     } catch {
       /* niente */
     }
-    return DOMANDE_ESEMPIO.slice(0, 5).map((d) => d.testo);
+    return DOMANDE_ESEMPIO.slice(0, 5);
   }, [id]);
 
   const motori = motoriAttivi("mvp");
@@ -35,7 +48,7 @@ export function Scansione() {
     const out: { motore: string; domanda: string }[] = [];
     for (const m of motori) {
       for (const d of domande) {
-        for (let r = 0; r < RIPETIZIONI_GRATIS; r++) out.push({ motore: m.nome, domanda: d });
+        for (let r = 0; r < RIPETIZIONI_GRATIS; r++) out.push({ motore: m.nome, domanda: etichetta(d) });
       }
     }
     return out;
@@ -74,7 +87,7 @@ export function Scansione() {
         {i < passi.length ? (
           <p className="text-lg">
             Chiedo a <span className="font-semibold">{corrente.motore}</span>:{" "}
-            <span className="text-muted">«{corrente.domanda}»</span>
+            <span className="text-muted">{corrente.domanda}</span>
           </p>
         ) : (
           <p className="text-lg font-semibold text-accent">Fatto. Preparo il report…</p>

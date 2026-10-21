@@ -45,7 +45,7 @@ export function ConfermaProfilo({
     const id = `scan-${Date.now().toString(36)}`;
     sessionStorage.setItem(
       id,
-      JSON.stringify({ attivita, domande: domande.map((d) => d.testo) }),
+      JSON.stringify({ attivita, domande }),
     );
     router.push(`/scansione?id=${id}`);
   }
