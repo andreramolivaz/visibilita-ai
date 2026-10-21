@@ -9,6 +9,9 @@ import { TestaATesta } from "./TestaATesta";
 import { Posizioni } from "./Posizioni";
 import { Potenziale } from "./Potenziale";
 import { CitaChi } from "./CitaChi";
+import { Statistiche } from "./Statistiche";
+import { Guida } from "./Guida";
+import { punteggioPerMotore } from "@/lib/stats";
 
 const dataIt = (iso: string) =>
   new Date(iso.length === 10 ? iso + "T12:00:00" : iso).toLocaleDateString("it-IT", {
@@ -102,6 +105,7 @@ function NelBase({ compatto = false }: { compatto?: boolean }) {
 export function Report({ report, abbonato = false }: { report: ReportT; abbonato?: boolean }) {
   const r = report;
   const gratuito = r.piano === "gratuito";
+  const parziali = punteggioPerMotore(r.righe, r.ripetizioni);
   const guadagno = r.azioni.reduce((acc, a) => acc + (a.impattoStimato ?? 0), 0);
   const potenziale = guadagno > 0 ? Math.min(100, r.punteggio + guadagno) : null;
   const totaleRisposte = r.domande * r.motori.length * r.ripetizioni;
@@ -147,12 +151,14 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
         <nav className="no-print mt-6 -mb-1 flex gap-2 overflow-x-auto text-sm" aria-label="Sezioni del report">
           {[
             ["#punteggio", "Punteggio"],
+            ["#statistiche", "Numeri chiave"],
             ["#assistenti", "Assistenti"],
             ["#concorrenti", "Concorrenti"],
             ["#mappa", "Mappa"],
             ["#fonti", "Fonti"],
             ["#dicono", "Cosa dicono"],
             ["#azioni", "Azioni"],
+            ["#guida", "Guida alla lettura"],
             ["#metodo", "Metodo"],
           ].map(([href, testo]) => (
             <a key={href} href={href} className="shrink-0 rounded-full border border-line px-3 py-1 text-muted hover:border-ink hover:text-ink">
@@ -213,13 +219,15 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
         </div>
       </section>
 
+      <Statistiche report={r} />
+
       {/* Per motore + per tipo */}
       <section id="assistenti" className="scroll-mt-20 py-7 sm:py-9">
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
           <div>
             <h2 className="text-xl font-semibold sm:text-2xl">Per assistente</h2>
             <p className="mt-1 text-[15px] text-muted">
-              Domande in cui compari almeno una volta, su {r.domande}. In ordine di quanti italiani lo usano.
+              Domande in cui compari almeno una volta, su {r.domande}, e punteggio parziale (0–100) di ogni assistente. In ordine di quanti italiani lo usano.
             </p>
             <div className="mt-4">
               {r.perMotore.map((m) => (
@@ -229,7 +237,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
                   valore={m.comparse}
                   massimo={m.totale}
                   testo={`${m.comparse} su ${m.totale}`}
-                  sotto={`${engine(m.motore).utentiMln.toLocaleString("it-IT")} mln`}
+                  sotto={`${engine(m.motore).utentiMln.toLocaleString("it-IT")} mln · punteggio ${parziali[m.motore] ?? 0}`}
                   accento
                 />
               ))}
@@ -419,6 +427,8 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
           ))}
         </ol>
       </Blocco>
+
+      <Guida />
 
       {/* Metodo */}
       <Blocco id="metodo" titolo="Come è stato fatto">

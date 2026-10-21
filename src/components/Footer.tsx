@@ -9,6 +9,7 @@ const COLONNE = [
       { href: "/report/esempio", testo: "Report di esempio" },
       { href: "/prezzi", testo: "Prezzi" },
       { href: "/#domande", testo: "Domande frequenti" },
+      { href: "/metodo", testo: "Metodo: come raccogliamo i dati" },
     ],
   },
   {
@@ -22,6 +23,7 @@ const COLONNE = [
     titolo: "Account",
     voci: [
       { href: "/accedi", testo: "Accedi" },
+      { href: "/area/demo", testo: "Area personale di esempio" },
       { href: "/privacy", testo: "Privacy" },
       { href: "mailto:ciao@visibilita-ai.it", testo: "Scrivici" },
     ],

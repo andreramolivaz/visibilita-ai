@@ -8,10 +8,9 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function proxy(req: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const protetta = req.nextUrl.pathname.startsWith("/area") && !req.nextUrl.pathname.startsWith("/area/demo");
   if (!url || !key) {
-    if (req.nextUrl.pathname.startsWith("/area")) {
-      return NextResponse.redirect(new URL("/accedi", req.url));
-    }
+    if (protetta) return NextResponse.redirect(new URL("/accedi", req.url));
     return NextResponse.next();
   }
 
@@ -31,7 +30,7 @@ export async function proxy(req: NextRequest) {
     data: { user },
   } = await sb.auth.getUser();
 
-  if (!user && req.nextUrl.pathname.startsWith("/area")) {
+  if (!user && protetta) {
     return NextResponse.redirect(new URL("/accedi", req.url));
   }
   return risposta;

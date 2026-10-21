@@ -2,6 +2,8 @@ import { Document, Page, Text, View, StyleSheet, Font, Svg, Rect, Circle, Path }
 import type { Report, TipoDomanda, Verdetto } from "@/lib/types";
 import { ENGINES } from "@/lib/engines";
 import { distribuzionePosizioni } from "@/components/report/Posizioni";
+import { coerenzaDati, concentrazione, copertura, percentuale, punteggioPerMotore, stabilita, tassoCitazione } from "@/lib/stats";
+import { GLOSSARIO } from "@/lib/glossario";
 
 /**
  * Il report in PDF: un rapporto tecnico. Intestazione con il marchio e
@@ -47,8 +49,8 @@ const s = StyleSheet.create({
   pie: { position: "absolute", bottom: 22, left: 40, right: 40, flexDirection: "row", justifyContent: "space-between", borderTopWidth: 0.5, borderTopColor: C.line, paddingTop: 5, fontSize: 7, color: C.faint },
   h1: { fontSize: 22, fontFamily: "Helvetica-Bold", letterSpacing: -0.4, lineHeight: 1.15 },
   sopratitolo: { fontSize: 8, color: C.muted, letterSpacing: 0.3, marginBottom: 3 },
-  h2: { fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 16, marginBottom: 6, paddingBottom: 3, borderBottomWidth: 0.75, borderBottomColor: C.ink },
-  h3: { fontSize: 9.5, fontFamily: "Helvetica-Bold", marginTop: 10, marginBottom: 4 },
+  h2: { fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 14, marginBottom: 5, paddingBottom: 3, borderBottomWidth: 0.75, borderBottomColor: C.ink },
+  h3: { fontSize: 9.5, fontFamily: "Helvetica-Bold", marginTop: 8, marginBottom: 3 },
   p: { fontSize: 9, lineHeight: 1.45 },
   nota: { fontSize: 7.5, color: C.muted, lineHeight: 1.35 },
   riga: { flexDirection: "row", alignItems: "center" },
@@ -56,7 +58,7 @@ const s = StyleSheet.create({
   col: { flex: 1 },
   th: { flexDirection: "row", backgroundColor: C.soft, borderBottomWidth: 0.75, borderBottomColor: C.ink, paddingVertical: 3, paddingHorizontal: 4 },
   thTesto: { fontSize: 7.5, fontFamily: "Helvetica-Bold", color: C.ink },
-  tr: { flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: C.lineSoft, paddingVertical: 3, paddingHorizontal: 4, alignItems: "center" },
+  tr: { flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: C.lineSoft, paddingVertical: 2.5, paddingHorizontal: 4, alignItems: "center" },
   td: { fontSize: 8.5 },
   tdNum: { fontSize: 8.5, textAlign: "right" },
   kv: { flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: C.lineSoft, paddingVertical: 2.5 },
@@ -269,6 +271,12 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
   const testa = (nome: string) => r.testaATesta.find((t) => t.nome === nome);
   const guadagno = r.azioni.reduce((acc, a) => acc + (a.impattoStimato ?? 0), 0);
   const potenziale = guadagno > 0 ? Math.min(100, r.punteggio + guadagno) : null;
+  const cit = tassoCitazione(r.righe, r.ripetizioni);
+  const cop = copertura(r.righe);
+  const stab = stabilita(r.righe, r.ripetizioni);
+  const conc = concentrazione(r.concorrenti);
+  const coer = coerenzaDati(r.attivita);
+  const parziali = punteggioPerMotore(r.righe, r.ripetizioni);
 
   const sezioni = [
     "1. Sintesi dei risultati",
@@ -280,6 +288,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
     "7. Azioni consigliate",
     "Allegato A. Metodo e limiti",
     "Allegato B. Elenco delle domande",
+    "Allegato C. Guida alla lettura delle metriche",
   ];
 
   return (
@@ -320,21 +329,6 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
               ]}
             />
           </View>
-        </View>
-
-        <View style={[s.riga, { marginTop: 14, gap: 6 }]}>
-          {[
-            [String(r.punteggio), "Punteggio di visibilità AI (0–100)"],
-            [r.verdetto, "Verdetto"],
-            [`${tueCitazioni} / ${totale}`, "Risposte in cui compari"],
-            [`${domandeInCuiCompari} / ${r.domande}`, "Domande in cui compari"],
-            [posMedia ? `${n1(posMedia)}°` : "–", "Posizione media quando compari"],
-          ].map(([n, t], i) => (
-            <View key={t} style={s.kpi}>
-              <Text style={[s.kpiNumero, i <= 1 ? { color: col } : {}, i === 1 ? { fontSize: 11, marginTop: 4 } : {}]}>{n}</Text>
-              <Text style={s.kpiTesto}>{t}</Text>
-            </View>
-          ))}
         </View>
 
         <Text style={s.h2}>1. Sintesi dei risultati</Text>
@@ -404,12 +398,36 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           </>
         )}
 
+        <Text style={s.h3}>1.3 Numeri chiave</Text>
+        <Tabella
+          colonne={[
+            { testo: "Metrica", larghezza: 1.6 },
+            { testo: "Valore", larghezza: 0.7, num: true },
+            { testo: "Campione", larghezza: 1.2, num: true },
+            { testo: "Nota", larghezza: 2.6 },
+          ]}
+          righe={[
+            ["Risposte in cui compari", percentuale(cit.quota), `${cit.k} / ${cit.n}`, `Intervallo al 95%: ${percentuale(cit.ic.basso)}–${percentuale(cit.ic.alto)}`],
+            ["Domande in cui compari", percentuale(cop.quota), `${cop.k} / ${cop.n}`, `${cop.n - cop.k} domande vuote per tutti gli assistenti`],
+            ["Posizione media quando compari", posMedia ? `${n1(posMedia)}°` : "–", `${tueCitazioni} risposte`, "1° = primo nome dell'elenco"],
+            ["Stabilità delle risposte", percentuale(stab.quota), `${stab.concordi} / ${stab.totale} celle`, `Celle in cui tutte le ${r.ripetizioni} ripetizioni concordano`],
+            ["Concentrazione dei consigli", percentuale(conc.quotaTop3), `${conc.totale} citazioni`, "Quota dei tre nomi più citati"],
+            ["Dati di scheda coerenti", `${coer.coerenti} / ${coer.totale}`, "campi", coer.coerenti === coer.totale ? "Nessuna incoerenza" : r.attivita.incoerenze.join(" ")],
+          ]}
+        />
+
         <Text style={s.h3}>Indice</Text>
-        {sezioni.map((x) => (
-          <Text key={x} style={[s.p, { fontSize: 8.5, lineHeight: 1.5 }]}>
-            {x}
-          </Text>
-        ))}
+        <View style={{ flexDirection: "row", gap: 16 }}>
+          {[sezioni.slice(0, Math.ceil(sezioni.length / 2)), sezioni.slice(Math.ceil(sezioni.length / 2))].map((col, i) => (
+            <View key={i} style={{ flex: 1 }}>
+              {col.map((x) => (
+                <Text key={x} style={[s.p, { fontSize: 8.5, lineHeight: 1.45 }]}>
+                  {x}
+                </Text>
+              ))}
+            </View>
+          ))}
+        </View>
         <Pie r={r} />
       </Page>
 
@@ -426,18 +444,19 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
             { testo: `Domande in cui compari (su ${r.domande})`, larghezza: 1.3, num: true },
             { testo: `Risposte in cui compari (su ${r.domande * r.ripetizioni})`, larghezza: 1.4, num: true },
             { testo: "Posizione media", larghezza: 0.9, num: true },
-            { testo: "", larghezza: 1.3 },
+            { testo: "Punteggio parziale", larghezza: 0.9, num: true },
+            { testo: "", larghezza: 1.1 },
           ]}
           righe={r.perMotore.map((m) => {
             const celle = r.righe.map((x) => x.celle.find((c) => c.motore === m.motore)!);
             const risposte = celle.reduce((acc, c) => acc + volteDi(c), 0);
             const pm = posizioneMedia(celle);
             const e = motore(m.motore);
-            return [nomeMotore(m.motore), e ? n1(e.utentiMln) : "–", e ? pct(e.peso, 1) : "–", String(m.comparse), String(risposte), pm ? `${n1(pm)}°` : "–", <BarraCella key={m.motore} valore={m.comparse} massimo={m.totale} />];
+            return [nomeMotore(m.motore), e ? n1(e.utentiMln) : "–", e ? pct(e.peso, 1) : "–", String(m.comparse), String(risposte), pm ? `${n1(pm)}°` : "–", String(parziali[m.motore] ?? 0), <BarraCella key={m.motore} valore={parziali[m.motore] ?? 0} massimo={100} />];
           })}
         />
         <Text style={[s.nota, { marginTop: 4 }]}>
-          Assistenti in ordine di quota d&apos;uso in Italia; peso rinormalizzato sugli assistenti interrogati. Fonte utenti: Osservatorio Cosenza su dati Audicom, luglio 2026; per Google AI, Sensemakers su dati Comscore.
+          Assistenti in ordine di quota d&apos;uso in Italia; peso rinormalizzato sugli assistenti interrogati. Punteggio parziale: stessa formula del punteggio totale, ristretta alle risposte di quell&apos;assistente. Fonte utenti: Osservatorio Cosenza su dati Audicom, luglio 2026; per Google AI, Sensemakers su dati Comscore.
         </Text>
 
         <Text style={s.h3}>2.2 Per tipo di domanda</Text>
@@ -675,7 +694,38 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           ]}
           righe={r.righe.map((x, i) => [String(i + 1), x.domanda.testo, NOME_TIPO[x.domanda.tipo]])}
         />
-        <Text style={[s.nota, { marginTop: 10 }]}>
+        <Pie r={r} />
+      </Page>
+
+      {/* Allegato C: guida alla lettura */}
+      <Page size="A4" style={s.page}>
+        <Testata r={r} logo={logo} />
+        <Text style={[s.h2, { marginTop: 0 }]}>Allegato C. Guida alla lettura delle metriche</Text>
+        <Text style={[s.nota, { marginBottom: 6 }]}>Per ogni metrica e visual del report: cos&apos;è, come si calcola, come si legge. Nessun numero è stimato a occhio: tutto si ricava dalla mappa domanda × assistente.</Text>
+        {GLOSSARIO.map((v) => (
+          <View key={v.id} style={{ marginBottom: 7, paddingBottom: 6, borderBottomWidth: 0.5, borderBottomColor: C.lineSoft }} wrap={false}>
+            <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold", marginBottom: 2 }}>{v.nome}</Text>
+            <Text style={[s.p, { fontSize: 8.5 }]}>
+              <Text style={{ fontFamily: "Helvetica-Bold", color: C.muted }}>Cos&apos;è. </Text>
+              {v.cosa}
+            </Text>
+            <Text style={[s.p, { fontSize: 8.5 }]}>
+              <Text style={{ fontFamily: "Helvetica-Bold", color: C.muted }}>Come si calcola. </Text>
+              {v.come}
+            </Text>
+            <Text style={[s.p, { fontSize: 8.5 }]}>
+              <Text style={{ fontFamily: "Helvetica-Bold", color: C.muted }}>Come si legge. </Text>
+              {v.lettura}
+            </Text>
+            {v.nonE && (
+              <Text style={[s.p, { fontSize: 8.5 }]}>
+                <Text style={{ fontFamily: "Helvetica-Bold", color: C.muted }}>Cosa non è. </Text>
+                {v.nonE}
+              </Text>
+            )}
+          </View>
+        ))}
+        <Text style={[s.nota, { marginTop: 8 }]}>
           Funziona con ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok; non siamo affiliati a OpenAI, Google, Anthropic, Perplexity o xAI. I marchi citati appartengono ai rispettivi proprietari.
         </Text>
         <Pie r={r} />

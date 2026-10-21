@@ -4,6 +4,7 @@ import { Bottone } from "./ui";
 
 const VOCI = [
   { href: "/report/esempio", testo: "Report di esempio" },
+  { href: "/metodo", testo: "Metodo" },
   { href: "/prezzi", testo: "Prezzi" },
   { href: "/agenzie", testo: "Agenzie" },
 ];

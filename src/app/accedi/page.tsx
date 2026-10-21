@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Pagina, Titolo } from "@/components/ui";
@@ -21,6 +22,13 @@ export default function Accedi() {
       <div className="mt-8">
         <Accesso attivo={config.supabase} />
       </div>
+      <p className="mt-6 text-sm text-muted">
+        Vuoi vedere com&apos;è?{" "}
+        <Link href="/area/demo" className="font-semibold text-accent underline underline-offset-2">
+          Guarda l&apos;area personale di esempio
+        </Link>
+        .
+      </p>
     </Pagina>
   );
 }

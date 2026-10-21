@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { CercaAttivita } from "@/components/CercaAttivita";
-import { RispostaChat } from "@/components/landing/RispostaChat";
+import { ChatSimulata } from "@/components/landing/ChatSimulata";
 import { AnteprimaReport } from "@/components/landing/AnteprimaReport";
 import { Barra, Bottone } from "@/components/ui";
 import { elencoMotori, motoriAttivi, motoriInArrivo } from "@/lib/engines";
+import { Pipeline } from "@/components/metodo/Pipeline";
+import { GLOSSARIO } from "@/lib/glossario";
 import { PIANI, SISTEMAZIONE, euro } from "@/lib/prezzi";
 
 const PASSI = [
@@ -22,24 +24,26 @@ const PASSI = [
 ];
 
 const CATEGORIE = [
-  "Ristoranti e pizzerie",
-  "Bar",
-  "Dentisti",
-  "Fisioterapisti",
-  "Parrucchieri",
-  "Estetiste",
-  "Palestre",
-  "Idraulici",
-  "Elettricisti",
-  "Avvocati",
-  "Commercialisti",
+  "Negozi al dettaglio",
+  "Ristoranti, pizzerie e bar",
+  "Imprese edili e artigiani",
+  "Carpenterie e metalmeccanica",
+  "Avvocati e commercialisti",
+  "Dentisti e studi medici",
+  "Hotel, B&B e agriturismi",
+  "Autofficine e gommisti",
+  "Idraulici ed elettricisti",
+  "Parrucchieri ed estetiste",
   "Agenzie immobiliari",
-  "Hotel e B&B",
-  "Farmacie",
-  "Veterinari",
-  "Ottici",
-  "Negozi",
-  "Centri revisione",
+  "Logistica e trasporti",
+  "Agenzie di comunicazione",
+  "Scuole di lingue e formazione",
+  "Palestre e centri sportivi",
+  "Fisioterapisti e nutrizionisti",
+  "Farmacie e ottici",
+  "Veterinari e toelettature",
+  "Musei e attrazioni",
+  "Aziende agricole e cantine",
 ];
 
 const FAQ = [
@@ -58,6 +62,10 @@ const FAQ = [
   {
     d: "Cosa succede se risulto invisibile?",
     r: "È la situazione più comune: oggi gli assistenti citano una piccola parte delle attività locali. Il report ti dice chi citano al posto tuo, da quali fonti prendono le informazioni e le tre cose da fare, in ordine di impatto. Se preferisci, le facciamo noi.",
+  },
+  {
+    d: "Come faccio a fidarmi dei numeri?",
+    r: "Ogni numero ha il suo campione («51 su 270») e, dove è una quota, l'intervallo di confidenza. Le domande sono ripetute, la posizione è dichiarata, i pesi degli assistenti vengono da dati pubblici e si aggiornano ogni trimestre. In fondo a ogni report c'è la guida alla lettura, e nella pagina Metodo tutto il percorso dei dati.",
   },
   {
     d: "Posso disdire quando voglio?",
@@ -84,10 +92,12 @@ export default function Landing() {
             <div className="mt-7">
               <CercaAttivita grande id="test" />
             </div>
-            <p className="mt-3 text-sm text-muted">Gratis, senza registrazione. Un test per attività ogni 30 giorni.</p>
+            <p className="mt-3 text-sm text-muted">
+              Gratis, senza registrazione. Per ristoranti e dentisti come per carpenterie e logistica: le domande cambiano con il mestiere.
+            </p>
           </div>
           <div className="flex justify-center lg:justify-end">
-            <RispostaChat />
+            <ChatSimulata />
           </div>
         </div>
       </section>
@@ -193,16 +203,54 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Come raccogliamo i dati */}
+      <section id="metodo" className="border-t border-line bg-ink text-white">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+            <div>
+              <h2 className="text-2xl font-bold sm:text-3xl">Come raccogliamo i dati, senza fuffa</h2>
+              <p className="mt-3 text-white/75">
+                Nessuna stima a occhio. Ogni numero del report si ricava dalla mappa domanda × assistente, e ogni metrica ha la sua
+                definizione: cos&apos;è, come si calcola, come si legge. Le {GLOSSARIO.length} voci sono in fondo a ogni report.
+              </p>
+              <p className="mt-4">
+                <Link href="/metodo" className="font-semibold text-[#9fe8c6] underline underline-offset-2">
+                  Leggi il metodo per intero
+                </Link>
+              </p>
+            </div>
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3">
+              {[
+                ["2–3×", "ogni domanda, perché le risposte cambiano"],
+                ["95%", "intervallo di confidenza dichiarato sulle quote"],
+                ["90 gg", "finestra della mediana di categoria"],
+                ["50", "domande confrontate ogni trimestre con le app vere"],
+                ["1º–5º", "posizione contata nell'elenco"],
+                ["0", "numeri stimati a occhio"],
+              ].map(([n, t]) => (
+                <div key={t}>
+                  <dt className="tabular text-3xl font-bold tracking-tight text-[#9fe8c6]">{n}</dt>
+                  <dd className="mt-1 text-sm text-white/70">{t}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          <div className="mt-10 rounded-2xl bg-bg p-4 text-ink sm:p-6">
+            <Pipeline />
+          </div>
+        </div>
+      </section>
+
       {/* Per chi */}
       <section className="border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
             <div>
-              <h2 className="text-2xl font-bold sm:text-3xl">Per chi ha una sede e dei clienti in zona</h2>
+              <h2 className="text-2xl font-bold sm:text-3xl">Per qualsiasi attività che i clienti cercano, dal bar alla carpenteria</h2>
               <p className="mt-3 text-muted">
-                Le domande, le fonti e le azioni cambiano con il mestiere: un ristorante si gioca su
-                piatti e orari, un dentista sulle prestazioni, un idraulico sulla reperibilità. Il
-                report mostra solo quello che serve alla tua categoria.
+                Le domande, le fonti e le azioni cambiano con il mestiere: un ristorante si gioca su piatti e orari, un dentista sulle
+                prestazioni, una carpenteria su lavorazioni, certificazioni e provincia. Il report mostra solo quello che serve alla tua
+                categoria; per i mestieri non previsti, il profilo lo costruiamo dal tuo sito.
               </p>
             </div>
             <ul className="flex flex-wrap gap-2">
