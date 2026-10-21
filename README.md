@@ -92,7 +92,8 @@ Una risposta di un assistente (la bolla con l'elenco) la cui coda è un segnapos
 
 - Italiano del tu, frasi corte, zero inglese nell'interfaccia. "GEO" solo nelle pagine per le agenzie.
 - Un colore d'accento (verde scuro) per "tu"; rosso solo per "Invisibile" e per gli errori di scheda.
-- Un font (Instrument Sans), punteggio a 64 px, testo a 16 px. Solo barre orizzontali e una linea per l'andamento.
+- Un font per tutto (Instrument Sans, titoli leggermente condensati con l'asse `wdth`), punteggio a 64 px, testo a 16 px. Solo barre orizzontali, barre a segmenti, mappe a celle a un colore e una linea per l'andamento.
+- Le domande scritte davvero dai clienti sono in corsivo serif (Instrument Serif, classe `.domanda`): la voce del cliente; i dati e le risposte degli assistenti restano in sans. Vale ovunque sul sito, non nel PDF (Helvetica).
 - Ogni numero con il suo campione ("2 su 3"), mai un sì/no. Ogni consiglio legato a un dato del report.
 - Mai "ChatGPT" o "GPT" nel nome o nel dominio. I marchi solo nel testo ("funziona con ChatGPT, Gemini…").
 - Nessuna registrazione prima del risultato.

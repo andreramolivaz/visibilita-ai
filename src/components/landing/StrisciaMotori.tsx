@@ -13,9 +13,7 @@ export function StrisciaMotori() {
         {motori.map((m) => (
           <div key={m.id}>
             <p className="text-[15px] font-semibold">{m.nome}</p>
-            <p className="tabular text-sm text-muted">
-              {m.utentiMln.toLocaleString("it-IT")} mln <span className="text-faint">di italiani</span>
-            </p>
+            <p className="tabular text-sm text-muted">{m.utentiMln.toLocaleString("it-IT")} mln</p>
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-soft">
               <div className="h-full rounded-full bg-accent" style={{ width: `${(m.utentiMln / max) * 100}%` }} />
             </div>
@@ -24,8 +22,8 @@ export function StrisciaMotori() {
         ))}
       </div>
       <p className="mt-5 max-w-3xl text-[13px] text-faint">
-        Utenti mensili in Italia, luglio 2026 (Osservatorio Cosenza su dati Audicom; per Google AI, Sensemakers su dati Comscore). Nel punteggio ogni assistente pesa per
-        la sua quota d&apos;uso: essere invisibile su ChatGPT costa più punti che su Grok. In arrivo: {elencoMotori(motoriInArrivo())}.
+        Utenti mensili in Italia, luglio 2026 (Osservatorio Cosenza su dati Audicom; per Google AI, Sensemakers su dati Comscore). Nel punteggio ogni assistente pesa
+        per la sua quota d&apos;uso: essere invisibile su ChatGPT costa più punti che su Grok. In arrivo: {elencoMotori(motoriInArrivo())}.
       </p>
     </div>
   );

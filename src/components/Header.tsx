@@ -27,13 +27,16 @@ export function Header() {
             Fai il test gratis
           </Bottone>
         </nav>
-        <nav className="flex items-center gap-4 text-sm text-muted md:hidden" aria-label="Principale">
+        <nav className="flex items-center gap-3.5 text-sm text-muted md:hidden" aria-label="Principale">
           <Link href="/prezzi" className="hover:text-ink">
             Prezzi
           </Link>
           <Link href="/accedi" className="hover:text-ink">
             Accedi
           </Link>
+          <Bottone href="/#test" className="!w-auto !px-3 !py-1.5 !text-[13px]">
+            Test gratis
+          </Bottone>
         </nav>
       </div>
     </header>
