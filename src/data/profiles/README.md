@@ -11,4 +11,4 @@ Ogni profilo decide:
 - **azioni**: le azioni che il report può consigliare, con la condizione che le fa scattare. Il modello non può inventarne altre.
 - **imprese**: imprese attive in Italia, per ordinare la copertura e per la landing.
 
-Si aggiornano senza rilascio: in produzione vengono caricati nel database. `altro.json` è il profilo di partenza per i mestieri non previsti; il generatore `genera-profili.mjs` (nello studio) li riscrive tutti da un'unica tabella.
+Si aggiornano senza rilascio: in produzione vengono caricati nel database. `altro.json` è il profilo di partenza per i mestieri non previsti; il generatore `docs/genera-profili.mjs` li riscrive tutti da un'unica tabella.

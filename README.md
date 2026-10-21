@@ -61,7 +61,7 @@ Domande per piano: 8 nel test gratuito, 15 nel Base, 30 nel Pro e Agenzia (`src/
 
 ## Le domande e i settori
 
-Sei tipi di domanda, dallo studio dei prompt reali (Semrush 2025–26, Otterly, Citations.press, BrightLocal): generica, per bisogno, per specialità, per requisito, di confronto, sul nome; più l'inglese per chi esporta o riceve stranieri. I modelli sono scritti per 36 categorie in ordine di numerosità (ISTAT-ASIA 2023 via Eurostat), da «Negozi al dettaglio» (532 mila imprese) a «Musei» (1.282), in `src/data/profiles/`; ogni profilo ha anche fonti attese, metriche e azioni ammesse. Lo studio completo («Visibilità AI per tutte le attività italiane: settori, domande reali, fonti, metriche e metodo di raccolta») è nel progetto.
+Sei tipi di domanda, dallo studio dei prompt reali (Semrush 2025–26, Otterly, Citations.press, BrightLocal): generica, per bisogno, per specialità, per requisito, di confronto, sul nome; più l'inglese per chi esporta o riceve stranieri. I modelli sono scritti per 36 categorie in ordine di numerosità (ISTAT-ASIA 2023 via Eurostat), da «Negozi al dettaglio» (532 mila imprese) a «Musei» (1.282), in `src/data/profiles/`; ogni profilo ha anche fonti attese, metriche e azioni ammesse. Lo studio completo («Visibilità AI per tutte le attività italiane: settori, domande reali, fonti, metriche e metodo di raccolta») è in `docs/studio-settori-domande.md`; `docs/genera-profili.mjs` riscrive i profili da un'unica tabella (`node docs/genera-profili.mjs src/data/profiles`, poi rigenerare `index.ts`).
 
 ## Marchio
 
