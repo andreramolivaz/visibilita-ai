@@ -17,7 +17,7 @@ export function InvitoAbbonamento({ reportId, pagamentiAttivi }: { reportId: str
   const emailValida = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   return (
-    <section className="no-print mt-10 rounded-2xl border border-accent p-5 sm:p-7">
+    <section id="abbonamento" className="no-print mt-10 scroll-mt-20 rounded-2xl border border-accent p-5 sm:p-7">
       <h2 className="text-xl font-semibold sm:text-2xl">Ricevilo ogni mese</h2>
       <p className="mt-1.5 max-w-prose text-[15px] text-muted">
         Ogni mese una sola email: punteggio, variazione rispetto al mese prima, due azioni e il link

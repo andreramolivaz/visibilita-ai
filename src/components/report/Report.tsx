@@ -69,8 +69,37 @@ function Blocco({
   );
 }
 
+/** Nel test gratuito, al posto di "In breve" e delle parole: cosa arriva con il Base. */
+function NelBase({ compatto = false }: { compatto?: boolean }) {
+  const voci = [
+    "«In breve»: la sintesi scritta dai dati, da leggere in trenta secondi",
+    "Le parole che gli assistenti usano quando consigliano, e quali ti mancano",
+    "15 domande invece di 8, 3 ripetizioni invece di 2",
+    "Scansione ogni mese, andamento del punteggio, PDF da inviare",
+  ];
+  return (
+    <div className={`rounded-2xl border border-accent bg-accent-soft/40 ${compatto ? "p-4" : "p-5 sm:p-6"}`}>
+      <p className="text-xs font-semibold text-accent-ink">Nel piano Base trovi anche</p>
+      <ul className={`mt-2 space-y-1.5 ${compatto ? "text-sm" : "text-[15px]"}`}>
+        {(compatto ? voci.slice(1, 2) : voci).map((v) => (
+          <li key={v} className="flex gap-2">
+            <span className="text-accent" aria-hidden="true">
+              ✓
+            </span>
+            {v}
+          </li>
+        ))}
+      </ul>
+      <a href="#abbonamento" className="mt-3 inline-block text-sm font-semibold text-accent underline underline-offset-2">
+        Attiva il piano Base, 29 € al mese
+      </a>
+    </div>
+  );
+}
+
 export function Report({ report, abbonato = false }: { report: ReportT; abbonato?: boolean }) {
   const r = report;
+  const gratuito = r.piano === "gratuito";
   const totaleRisposte = r.domande * r.motori.length * r.ripetizioni;
   const tue = r.concorrenti.find((c) => c.seiTu);
   const col = coloreVerdetto(r.verdetto);
@@ -90,9 +119,11 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             </p>
           </div>
           <div className="no-print flex gap-2">
-            <Bottone href={`/report/${r.id}/pdf`} secondario className="!w-auto !px-4 !py-2 !text-sm" target="_blank">
-              Scarica il PDF
-            </Bottone>
+            {!gratuito && (
+              <Bottone href={`/report/${r.id}/pdf`} secondario className="!w-auto !px-4 !py-2 !text-sm" target="_blank">
+                Scarica il PDF
+              </Bottone>
+            )}
             <CopiaLink />
           </div>
         </div>
@@ -130,10 +161,16 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             <Posizioni righe={r.righe} />
             {abbonato && r.andamento && <Andamento punti={r.andamento} />}
           </div>
-          <div>
-            <h2 className="text-xl font-semibold sm:text-2xl">In breve</h2>
-            <p className="mt-3 text-[17px] leading-relaxed">{r.sintesi}</p>
-          </div>
+          {gratuito ? (
+            <div className="self-center">
+              <NelBase />
+            </div>
+          ) : (
+            <div>
+              <h2 className="text-xl font-semibold sm:text-2xl">In breve</h2>
+              <p className="mt-3 text-[17px] leading-relaxed">{r.sintesi}</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -221,6 +258,18 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
       {/* Parole + fonti */}
       <section className="py-7 sm:py-9">
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
+          {gratuito ? (
+            <div>
+              <h2 className="text-xl font-semibold sm:text-2xl">Le parole che usano</h2>
+              <p className="mt-1 text-[15px] text-muted">
+                I termini più frequenti quando gli assistenti consigliano nella tua categoria, e se compaiono già
+                nelle tue recensioni o sul tuo sito.
+              </p>
+              <div className="mt-4">
+                <NelBase compatto />
+              </div>
+            </div>
+          ) : (
           <div>
             <h2 className="text-xl font-semibold sm:text-2xl">Le parole che usano</h2>
             <p className="mt-1 text-[15px] text-muted">
@@ -242,6 +291,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             </div>
             <p className="mt-3 text-xs text-muted">Volte in cui il termine compare nelle risposte. In verde i termini che hai già; in grigio quelli che mancano.</p>
           </div>
+          )}
           <div>
             <h2 className="text-xl font-semibold sm:text-2xl">Da dove prendono le informazioni</h2>
             <p className="mt-1 text-[15px] text-muted">

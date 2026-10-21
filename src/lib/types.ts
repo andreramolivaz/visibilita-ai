@@ -202,6 +202,8 @@ export interface Metodo {
 
 export interface Report {
   id: string;
+  /** Piano con cui è stato prodotto: decide cosa mostrare. */
+  piano: Piano;
   attivita: ProfiloAttivita;
   data: string;
   motori: EngineId[];

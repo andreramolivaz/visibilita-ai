@@ -58,7 +58,7 @@ export function Scansione() {
 
   useEffect(() => {
     if (i >= passi.length) {
-      const t = setTimeout(() => router.push("/report/esempio?nuovo=1"), 700);
+      const t = setTimeout(() => router.push(`/report/${id || "gratuito"}?nuovo=1`), 700);
       return () => clearTimeout(t);
     }
     // 60–90 s in totale: ~0,8 s a passo con 96 passi.

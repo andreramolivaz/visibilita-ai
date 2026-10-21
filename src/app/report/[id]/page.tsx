@@ -3,13 +3,14 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Pagina } from "@/components/ui";
 import { Report } from "@/components/report/Report";
-import { REPORT_ESEMPIO } from "@/lib/mock-report";
+import { REPORT_ESEMPIO, REPORT_GRATUITO } from "@/lib/mock-report";
 import { InvitoAbbonamento } from "@/components/InvitoAbbonamento";
 import { config } from "@/lib/config";
 
 // TODO: caricare il report dal database per id (link inviato via email).
 function caricaReport(id: string) {
-  if (id === "esempio" || id.startsWith("scan-")) return REPORT_ESEMPIO;
+  if (id === "esempio") return REPORT_ESEMPIO;
+  if (id === "gratuito" || id.startsWith("scan-")) return { ...REPORT_GRATUITO, id };
   return null;
 }
 
@@ -39,8 +40,9 @@ async function Contenuto({ params, searchParams }: PageProps<"/report/[id]">) {
     <>
       {nuovo && (
         <p className="no-print mb-6 rounded-lg bg-accent-soft px-4 py-3 text-sm text-accent-ink">
-          Il tuo test è pronto. In questa anteprima i dati sono di esempio: la scansione vera arriva
-          con il collegamento ai motori.
+          Il tuo test gratuito è pronto: {report.domande} domande, {report.motori.length} assistenti,{" "}
+          {report.ripetizioni} ripetizioni. In questa anteprima i dati sono di esempio: la scansione
+          vera arriva con il collegamento ai motori.
         </p>
       )}
       <Report report={report} abbonato={abbonato === "1"} />
