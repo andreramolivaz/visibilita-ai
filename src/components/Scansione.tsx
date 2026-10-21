@@ -72,7 +72,7 @@ export function Scansione() {
   return (
     <div className="py-10">
       <p className="text-sm text-muted">Passo 2 di 3</p>
-      <h1 className="mt-1 text-2xl font-bold tracking-tight">Sto chiedendo ai motori…</h1>
+      <h1 className="mt-1 text-3xl font-bold">Sto chiedendo ai motori…</h1>
 
       <div className="mt-8">
         <div className="h-2.5 w-full overflow-hidden rounded-full bg-soft">

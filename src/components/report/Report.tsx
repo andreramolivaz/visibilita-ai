@@ -3,6 +3,8 @@ import { frequenza } from "@/lib/score";
 import type { Report as ReportT, Verdetto } from "@/lib/types";
 import { Barra, Etichetta, Scheda, Sezione } from "@/components/ui";
 import { Andamento } from "./Andamento";
+import { ScalaPunteggio } from "./ScalaPunteggio";
+import { Bottone } from "@/components/ui";
 
 const dataIt = (iso: string) =>
   new Date(iso + "T12:00:00").toLocaleDateString("it-IT", {
@@ -44,11 +46,18 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
     <article>
       {/* 1. Intestazione */}
       <header className="pb-6">
-        <p className="text-sm text-muted">Report di visibilità AI · {dataIt(r.data)}</p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
-          {r.attivita.nome}, {r.attivita.citta}
-        </h1>
-        <p className="mt-2 text-sm text-muted">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm text-muted">Report di visibilità AI, {dataIt(r.data)}</p>
+            <h1 className="mt-1 text-2xl font-bold sm:text-3xl">
+              {r.attivita.nome}, {r.attivita.citta}
+            </h1>
+          </div>
+          <Bottone href={`/report/${r.id}/pdf`} secondario className="no-print !w-auto !px-4 !py-2 !text-sm" target="_blank">
+            Scarica il PDF
+          </Bottone>
+        </div>
+        <p className="mt-3 text-sm text-muted">
           {r.domande} domande × {r.motori.length} motori × {r.ripetizioni} ripetizioni ={" "}
           <span className="tabular">{totaleRisposte}</span> risposte. Motori:{" "}
           {r.motori.map((m) => engine(m).nome).join(", ")}.
@@ -56,7 +65,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
       </header>
 
       {/* 2. Punteggio */}
-      <Sezione numero={2} titolo="Punteggio di visibilità AI">
+      <Sezione titolo="Punteggio di visibilità AI">
         <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
           <div className={`punteggio ${coloreVerdetto(r.verdetto)}`}>{r.punteggio}</div>
           <div className="pb-1">
@@ -64,15 +73,16 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             <div className="text-sm text-muted">{spiegazioneVerdetto(r.verdetto)}</div>
           </div>
         </div>
-        <p className="mt-3 text-sm text-muted">
-          Su 100. Percentuale di risposte in cui compari, pesata per posizione (1º posto vale 1, 5º
-          vale 0,4) e per quanti italiani usano ogni motore.
+        <ScalaPunteggio punteggio={r.punteggio} />
+        <p className="mt-4 text-sm text-muted">
+          Su 100: quante volte compari, pesato per la posizione (1º posto vale 1, 5º vale 0,4) e per
+          quanti italiani usano ogni motore.
         </p>
         {abbonato && r.andamento && <Andamento punti={r.andamento} />}
       </Sezione>
 
       {/* 3. Per motore */}
-      <Sezione numero={3} titolo="Per motore">
+      <Sezione titolo="Per motore">
         {r.perMotore.map((m) => (
           <Barra
             key={m.motore}
@@ -80,6 +90,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             valore={m.comparse}
             massimo={m.totale}
             testo={`${frequenza(m.comparse, m.totale)} domande`}
+            sotto={`${engine(m.motore).utentiMln.toLocaleString("it-IT")} mln di italiani`}
             accento
           />
         ))}
@@ -90,7 +101,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
       </Sezione>
 
       {/* 4. Concorrenti */}
-      <Sezione numero={4} titolo="Chi consigliano al posto tuo">
+      <Sezione titolo="Chi consigliano al posto tuo">
         {r.concorrenti.map((c) => (
           <Barra
             key={c.nome}
@@ -107,7 +118,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
       </Sezione>
 
       {/* 5. Domanda per domanda */}
-      <Sezione numero={5} titolo="Domanda per domanda">
+      <Sezione titolo="Domanda per domanda">
         {/* Telefono: schede */}
         <ul className="space-y-3 sm:hidden">
           {r.righe.map((riga) => (
@@ -169,7 +180,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
       </Sezione>
 
       {/* 6. Fonti */}
-      <Sezione numero={6} titolo="Da dove prendono le informazioni">
+      <Sezione titolo="Da dove prendono le informazioni">
         <ul className="divide-y divide-line">
           {r.fonti.map((f) => (
             <li key={f.nome} className="flex items-center justify-between gap-3 py-2 text-sm">
@@ -189,7 +200,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
       </Sezione>
 
       {/* 7. Cosa dicono di te */}
-      <Sezione numero={7} titolo="Cosa dicono di te">
+      <Sezione titolo="Cosa dicono di te">
         <blockquote className="rounded-xl bg-soft p-4 text-[15px]">{r.descrizioneAI}</blockquote>
         {r.errori.length > 0 ? (
           <ul className="mt-3 space-y-2">
@@ -206,7 +217,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
       </Sezione>
 
       {/* 8. Tre azioni */}
-      <Sezione numero={8} titolo="Tre azioni, in ordine di impatto">
+      <Sezione titolo="Tre azioni, in ordine di impatto">
         <ol className="space-y-3">
           {r.azioni.map((a, i) => (
             <li key={i}>

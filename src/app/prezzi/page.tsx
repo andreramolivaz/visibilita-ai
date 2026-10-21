@@ -1,93 +1,46 @@
 import type { Metadata } from "next";
-import { Bottone, Pagina, Scheda, Titolo } from "@/components/ui";
+import { Pagina, Titolo } from "@/components/ui";
+import { Prezzi } from "@/components/Prezzi";
+import { config } from "@/lib/config";
 
 export const metadata: Metadata = { title: "Prezzi" };
 
-const PIANI = [
-  {
-    nome: "Test gratuito",
-    prezzo: "0 €",
-    periodo: "",
-    include: [
-      "5 domande × 3 motori × 2 ripetizioni",
-      "Un test per attività ogni 30 giorni",
-      "Senza registrazione",
-    ],
-    azione: { testo: "Fai il test", href: "/#test" },
-  },
-  {
-    nome: "Base",
-    prezzo: "9 €",
-    periodo: "al mese + IVA, o 79 €/anno",
-    include: [
-      "1 attività",
-      "10 domande × 3 motori × 3 ripetizioni",
-      "Scansione mensile, email, storico",
-    ],
-    azione: { testo: "Inizia dal test gratuito", href: "/#test" },
-    evidenza: true,
-  },
-  {
-    nome: "Pro",
-    prezzo: "19 €",
-    periodo: "al mese + IVA, o 169 €/anno",
-    include: [
-      "Scansione settimanale",
-      "20 domande × tutti i motori attivi × 2 ripetizioni",
-      "5 concorrenti seguiti, PDF",
-    ],
-    azione: { testo: "Inizia dal test gratuito", href: "/#test" },
-  },
-  {
-    nome: "Agenzia",
-    prezzo: "79 €",
-    periodo: "al mese + IVA",
-    include: [
-      "10 attività con report Pro e scansione mensile",
-      "PDF con il tuo logo, link cliente, CSV",
-      "+6 € per attività in più, +5 € per passare a settimanale",
-    ],
-    azione: { testo: "Per le agenzie", href: "/agenzie" },
-  },
+const CONFRONTO = [
+  ["Otterly", "da 29 $ al mese", "in inglese, per chi fa SEO"],
+  ["BrightLocal", "da 31 $ al mese", "suite per agenzie, decine di metriche"],
+  ["SEOZoom", "da 56 € al mese", "suite SEO completa, non per il titolare"],
 ];
 
-export default function Prezzi() {
+export default function PaginaPrezzi() {
   return (
-    <Pagina>
-      <Titolo>Prezzi</Titolo>
-      <p className="mt-3 text-muted">
-        Semplice, in italiano, per la singola attività. Annuale = due mesi gratis. Nessun piano
-        gratuito permanente: solo il test.
-      </p>
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        {PIANI.map((p) => (
-          <Scheda key={p.nome} className={p.evidenza ? "border-accent" : ""}>
-            <h2 className="font-semibold">{p.nome}</h2>
-            <p className="mt-1">
-              <span className="text-3xl font-bold tracking-tight">{p.prezzo}</span>
-              {p.periodo && <span className="ml-2 text-sm text-muted">{p.periodo}</span>}
-            </p>
-            <ul className="mt-3 space-y-1 text-sm text-muted">
-              {p.include.map((i) => (
-                <li key={i}>✓ {i}</li>
-              ))}
-            </ul>
-            <div className="mt-4">
-              <Bottone href={p.azione.href} secondario={!p.evidenza} className="w-full">
-                {p.azione.testo}
-              </Bottone>
-            </div>
-          </Scheda>
-        ))}
+    <Pagina larga>
+      <div className="max-w-2xl">
+        <Titolo>Un prezzo per attività, non per metrica</Titolo>
+        <p className="mt-4 text-lg text-muted">
+          Ogni mese: quanto sei visibile, chi citano al posto tuo, tre azioni. Niente da configurare,
+          niente da imparare.
+        </p>
+      </div>
+      <div className="mt-10">
+        <Prezzi pagamentiAttivi={config.stripe} />
       </div>
 
-      <Scheda className="mt-6 bg-soft">
-        <h2 className="font-semibold">Sistemazione · 149–299 € una tantum</h2>
-        <p className="mt-1 text-sm text-muted">
-          Le tre azioni del report le facciamo noi: schede sui portali, categorie, descrizioni,
-          foto. Verifica dopo 30 giorni.
+      <section className="mt-16 max-w-2xl">
+        <h2 className="text-xl font-semibold">Perché non una suite SEO</h2>
+        <p className="mt-2 text-muted">
+          Gli strumenti esistenti parlano a chi fa SEO di mestiere. Noi parliamo al titolare, in
+          italiano, con un report che si legge in due minuti sul telefono.
         </p>
-      </Scheda>
+        <ul className="mt-4 divide-y divide-line border-y border-line text-[15px]">
+          {CONFRONTO.map(([nome, prezzo, nota]) => (
+            <li key={nome} className="grid grid-cols-[1fr_auto] gap-x-4 py-3 sm:grid-cols-[160px_160px_1fr]">
+              <span className="font-medium">{nome}</span>
+              <span className="tabular text-muted">{prezzo}</span>
+              <span className="col-span-2 text-sm text-muted sm:col-span-1">{nota}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
     </Pagina>
   );
 }

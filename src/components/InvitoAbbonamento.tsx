@@ -1,98 +1,94 @@
 "use client";
 
 import { useState } from "react";
-import { Bottone } from "@/components/ui";
+import { Campo } from "@/components/ui";
+import { Checkout } from "@/components/Checkout";
+import { PIANI, euro, type Periodo, type PianoId } from "@/lib/prezzi";
 
 /**
  * In fondo al report, un solo invito: "Ricevilo ogni mese".
- * Email + scelta del piano, poi checkout Stripe (TODO).
+ * Email + piano + periodo, poi Stripe Checkout con l'email già compilata.
  */
-export function InvitoAbbonamento() {
+export function InvitoAbbonamento({ reportId, pagamentiAttivi }: { reportId: string; pagamentiAttivi: boolean }) {
   const [email, setEmail] = useState("");
-  const [piano, setPiano] = useState<"base" | "pro">("base");
-  const [inviato, setInviato] = useState(false);
-
-  function invia(e: React.FormEvent) {
-    e.preventDefault();
-    // TODO: POST /api/checkout → Stripe; intanto conferma a schermo.
-    setInviato(true);
-  }
-
-  if (inviato) {
-    return (
-      <section className="no-print mt-8 rounded-2xl bg-accent-soft p-6">
-        <h2 className="text-xl font-semibold text-accent">Quasi fatto</h2>
-        <p className="mt-2 text-sm">
-          Ti abbiamo mandato un link a <strong>{email}</strong>. Il pagamento arriva con il
-          collegamento a Stripe.
-        </p>
-      </section>
-    );
-  }
+  const [pianoId, setPianoId] = useState<PianoId>("base");
+  const [periodo, setPeriodo] = useState<Periodo>("mensile");
+  const piani = PIANI.filter((p) => p.id !== "agenzia");
+  const emailValida = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   return (
-    <section className="no-print mt-8 rounded-2xl border border-accent bg-accent-soft/40 p-6">
-      <h2 className="text-xl font-semibold">Ricevilo ogni mese</h2>
-      <p className="mt-1 text-sm text-muted">
+    <section className="no-print mt-10 rounded-2xl border border-accent p-5 sm:p-7">
+      <h2 className="text-xl font-semibold sm:text-2xl">Ricevilo ogni mese</h2>
+      <p className="mt-1.5 max-w-prose text-[15px] text-muted">
         Ogni mese una sola email: punteggio, variazione rispetto al mese prima, due azioni e il link
-        al report completo. Nessun&apos;altra notifica.
+        al report. Vedi se le azioni hanno funzionato e se entra un concorrente nuovo.
       </p>
-      <form onSubmit={invia} className="mt-4 space-y-3">
-        <div className="grid gap-2 sm:grid-cols-2">
-          <label
-            className={`cursor-pointer rounded-lg border p-3 text-sm ${
-              piano === "base" ? "border-accent bg-bg" : "border-line"
-            }`}
-          >
-            <input
-              type="radio"
-              name="piano"
-              value="base"
-              checked={piano === "base"}
-              onChange={() => setPiano("base")}
-              className="sr-only"
-            />
-            <span className="block font-semibold">
-              Base · 9 €/mese <span className="font-normal text-muted">+ IVA</span>
-            </span>
-            <span className="text-muted">10 domande, 3 motori, scansione mensile, storico.</span>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        {piani.map((p) => {
+          const scelto = pianoId === p.id;
+          return (
+            <label
+              key={p.id}
+              className={`cursor-pointer rounded-xl border p-4 transition-colors ${
+                scelto ? "border-accent bg-accent-soft/50 ring-1 ring-accent" : "border-line hover:border-ink"
+              }`}
+            >
+              <input
+                type="radio"
+                name="piano"
+                value={p.id}
+                checked={scelto}
+                onChange={() => setPianoId(p.id)}
+                className="sr-only"
+              />
+              <span className="flex items-baseline justify-between">
+                <span className="font-semibold">{p.nome}</span>
+                <span className="tabular text-sm">
+                  <span className="text-lg font-bold">{euro(periodo === "annuale" ? p.annuale : p.mensile)}</span>
+                  <span className="text-muted"> {periodo === "annuale" ? "all'anno" : "al mese"}</span>
+                </span>
+              </span>
+              <span className="mt-1 block text-sm text-muted">{p.include.slice(1, 4).join(". ")}.</span>
+            </label>
+          );
+        })}
+      </div>
+
+      <div className="mt-3 flex items-center gap-2 text-sm">
+        <input
+          id="annuale"
+          type="checkbox"
+          checked={periodo === "annuale"}
+          onChange={(e) => setPeriodo(e.target.checked ? "annuale" : "mensile")}
+          className="h-4 w-4 accent-[var(--accent)]"
+        />
+        <label htmlFor="annuale">Pago una volta all&apos;anno e ho due mesi gratis</label>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
+        <div>
+          <label htmlFor="email-report" className="sr-only">
+            La tua email
           </label>
-          <label
-            className={`cursor-pointer rounded-lg border p-3 text-sm ${
-              piano === "pro" ? "border-accent bg-bg" : "border-line"
-            }`}
-          >
-            <input
-              type="radio"
-              name="piano"
-              value="pro"
-              checked={piano === "pro"}
-              onChange={() => setPiano("pro")}
-              className="sr-only"
-            />
-            <span className="block font-semibold">
-              Pro · 19 €/mese <span className="font-normal text-muted">+ IVA</span>
-            </span>
-            <span className="text-muted">
-              Settimanale, 20 domande, tutti i motori, 5 concorrenti, PDF.
-            </span>
-          </label>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <input
+          <Campo
+            id="email-report"
             type="email"
             required
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="La tua email"
-            className="w-full flex-1 rounded-lg border border-line bg-bg px-4 py-3 text-base outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
           />
-          <Bottone type="submit">Continua</Bottone>
         </div>
-        <p className="text-xs text-muted">
-          L&apos;email serve anche a rimandarti il link di questo report. Annuale: due mesi gratis.
-        </p>
-      </form>
+        <Checkout piano={pianoId} periodo={periodo} email={emailValida ? email : undefined} reportId={reportId} attivo={pagamentiAttivi}>
+          Attiva e paga
+        </Checkout>
+      </div>
+      <p className="mt-3 text-xs text-muted">
+        Prezzi IVA esclusa. Pagamento su Stripe, disdici quando vuoi. L&apos;email serve anche a
+        rimandarti il link di questo report.
+      </p>
     </section>
   );
 }

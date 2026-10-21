@@ -61,7 +61,7 @@ export function ConfermaProfilo({
   return (
     <div className="mt-6 space-y-6">
       <Scheda>
-        <h2 className="text-xl font-semibold">{attivita.nome}</h2>
+        <h2 className="text-2xl font-bold">{attivita.nome}</h2>
         <p className="text-muted">{attivita.citta}</p>
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
           {voci
@@ -149,7 +149,7 @@ export function ConfermaProfilo({
         </ol>
       </div>
 
-      <Scheda className="bg-soft">
+      <Scheda className="border-0 bg-soft">
         <h2 className="font-semibold">Cosa misuriamo</h2>
         <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4">
           {[

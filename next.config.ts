@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
@@ -12,6 +11,8 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // Il generatore di PDF gira in Node, fuori dal bundle.
+  serverExternalPackages: ["@react-pdf/renderer"],
 };
 
 export default nextConfig;

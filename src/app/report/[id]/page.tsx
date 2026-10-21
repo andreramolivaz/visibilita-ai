@@ -5,6 +5,7 @@ import { Pagina } from "@/components/ui";
 import { Report } from "@/components/report/Report";
 import { REPORT_ESEMPIO } from "@/lib/mock-report";
 import { InvitoAbbonamento } from "@/components/InvitoAbbonamento";
+import { config } from "@/lib/config";
 
 // TODO: caricare il report dal database per id (link inviato via email).
 function caricaReport(id: string) {
@@ -37,13 +38,13 @@ async function Contenuto({ params, searchParams }: PageProps<"/report/[id]">) {
   return (
     <>
       {nuovo && (
-        <p className="no-print mb-4 rounded-lg bg-accent-soft px-4 py-3 text-sm text-accent">
-          Il tuo test gratuito è pronto. Questa è un&apos;anteprima con dati di esempio: la scansione
-          vera arriva con il collegamento ai motori.
+        <p className="no-print mb-6 rounded-lg bg-accent-soft px-4 py-3 text-sm text-accent-ink">
+          Il tuo test è pronto. In questa anteprima i dati sono di esempio: la scansione vera arriva
+          con il collegamento ai motori.
         </p>
       )}
       <Report report={report} abbonato={abbonato === "1"} />
-      <InvitoAbbonamento />
+      <InvitoAbbonamento reportId={report.id} pagamentiAttivi={config.stripe} />
     </>
   );
 }
