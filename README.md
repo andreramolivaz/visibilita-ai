@@ -48,6 +48,8 @@ src/
 
 Sezioni, nell'ordine: intestazione con il campione (domande × assistenti × ripetizioni) · punteggio con scala a fasce e distribuzione delle posizioni · "In breve" (sintesi scritta dai dati) · per assistente · per tipo di domanda · chi consigliano al posto tuo + testa a testa · mappa domanda × assistente (heatmap, un solo colore: più scuro = posizione migliore) · le parole che usano · da dove prendono le informazioni · cosa dice ogni assistente di te + errori · tre azioni · come è stato fatto.
 Grafici ammessi: barre orizzontali, barre a segmenti, mappa a celle, una linea per l'andamento. Niente torte, radar, gauge.
+Il PDF è un rapporto tecnico: marchio e identificativo documento (`VAI-AAAAMMGG-ID`) in testata, sezioni numerate, tabelle, indice, allegati con metodo, pesi, limiti ed elenco domande. In white-label il nome dell'agenzia sostituisce il marchio (`logo` in `ReportPdf`).
+Test gratuito: 8 domande × 2 ripetizioni, senza "In breve", "Le parole che usano" e PDF; al loro posto "Nel piano Base trovi anche".
 Domande per piano: 8 nel test gratuito, 15 nel Base, 30 nel Pro e Agenzia (`src/lib/prezzi.ts`).
 
 ## Regole di prodotto (dalla roadmap)
