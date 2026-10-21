@@ -1,0 +1,18 @@
+{
+  "id": "museo",
+  "nome": "Museo, attrazione, esperienza",
+  "categorieGoogle": ["Museo", "Attrazione turistica", "Galleria d'arte", "Parco", "Castello"],
+  "domande": {
+    "generica": ["Cosa vedere a {citta}", "Musei a {citta}"],
+    "bisogno": ["Cosa fare a {citta} con i bambini", "Mostre in corso a {citta}", "{nome} orari e biglietti"],
+    "specialita": ["{specialita} a {citta}"],
+    "nome": "Com'è {nome} a {citta}?"
+  },
+  "fonti": ["Sito ufficiale", "TripAdvisor", "Google Maps", "Portale turistico del Comune", "Wikipedia"],
+  "metriche": ["inclusione negli itinerari suggeriti", "orari, prezzi ed eventi corretti"],
+  "azioni": [
+    { "codice": "orari-biglietti", "titolo": "Pagina orari e biglietti leggibile", "quando": "orari o prezzi sbagliati" },
+    { "codice": "eventi", "titolo": "Aggiorna gli eventi in corso", "quando": "eventi non citati" },
+    { "codice": "wikipedia", "titolo": "Allinea la voce Wikipedia", "quando": "voce assente o diversa" }
+  ]
+}

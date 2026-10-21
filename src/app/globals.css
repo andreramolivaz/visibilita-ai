@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+/*
+ * Un colore, un font, barre orizzontali.
+ * Accento: verde scuro, solo per "tu" e per le azioni.
+ * Rosso: solo per "Invisibile" e per gli errori di scheda.
+ */
+:root {
+  --bg: #ffffff;
+  --fg: #171717;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --soft: #f4f5f7;
+  --accent: #0b5d4b;
+  --accent-soft: #e3f1ec;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --warn: #b7791f;
+  --warn-soft: #fbf3df;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-soft: var(--soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Il punteggio: 64 px, come da roadmap. */
+.punteggio {
+  font-size: 64px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

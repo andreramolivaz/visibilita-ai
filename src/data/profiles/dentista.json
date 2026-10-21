@@ -1,0 +1,23 @@
+{
+  "id": "dentista",
+  "nome": "Dentista, medico, fisioterapista",
+  "categorieGoogle": ["Dentista", "Studio dentistico", "Fisioterapista", "Medico", "Poliambulatorio", "Nutrizionista"],
+  "domande": {
+    "generica": ["Miglior {categoria} a {citta}", "{categoria} consigliato a {citta}"],
+    "bisogno": [
+      "{categoria} urgente a {citta}",
+      "{categoria} convenzionato a {citta}",
+      "{categoria} che riceve il sabato a {citta}"
+    ],
+    "specialita": ["{categoria} per {specialita} a {citta}", "{specialita} a {citta} prezzi"],
+    "nome": "Com'è {nome} a {citta}?"
+  },
+  "fonti": ["MioDottore", "Google Maps", "Sito ufficiale", "Dottori.it", "Ordine professionale"],
+  "metriche": ["presenza per prestazione", "urgenze e orari", "titoli e convenzioni corretti"],
+  "azioni": [
+    { "codice": "miodottore", "titolo": "Apri il profilo MioDottore", "quando": "fonte MioDottore assente" },
+    { "codice": "pagina-prestazione", "titolo": "Una pagina per ogni prestazione sul sito", "quando": "invisibile sulle domande per prestazione" },
+    { "codice": "prenotazione", "titolo": "Attiva la prenotazione online", "quando": "prenotazione online non citata" },
+    { "codice": "titoli", "titolo": "Correggi titoli e convenzioni sulle schede", "quando": "l'AI riporta dati sbagliati" }
+  ]
+}

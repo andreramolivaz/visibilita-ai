@@ -1,0 +1,24 @@
+{
+  "id": "hotel",
+  "nome": "Hotel, B&B, casa vacanze",
+  "categorieGoogle": ["Hotel", "Bed & Breakfast", "Casa vacanze", "Albergo", "Affittacamere", "Agriturismo"],
+  "domande": {
+    "generica": ["Miglior {categoria} a {citta}", "Dove dormire a {citta}"],
+    "bisogno": [
+      "{categoria} in centro a {citta} con parcheggio",
+      "{categoria} economico a {citta}",
+      "{categoria} a {citta} che accetta animali",
+      "{categoria} vicino alla stazione di {citta}"
+    ],
+    "specialita": ["{categoria} con {specialita} a {citta}"],
+    "nome": "Com'è {nome} a {citta}?"
+  },
+  "fonti": ["Booking", "Google Hotels", "TripAdvisor", "Airbnb", "Sito ufficiale", "Google Maps"],
+  "metriche": ["zona e servizi citati", "fascia di prezzo riportata dall'AI contro quella reale"],
+  "azioni": [
+    { "codice": "booking", "titolo": "Completa la scheda Booking", "quando": "scheda Booking assente o incompleta" },
+    { "codice": "google-hotels", "titolo": "Completa la scheda Google Hotels", "quando": "scheda assente" },
+    { "codice": "come-arrivare", "titolo": "Aggiungi servizi e 'come arrivare' sul sito", "quando": "zona o servizi non citati" },
+    { "codice": "prezzo", "titolo": "Correggi la fascia di prezzo sui portali", "quando": "l'AI riporta un prezzo diverso" }
+  ]
+}

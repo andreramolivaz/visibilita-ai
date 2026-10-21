@@ -1,0 +1,18 @@
+{
+  "id": "professionista",
+  "nome": "Avvocato, commercialista, consulenti",
+  "categorieGoogle": ["Avvocato", "Studio legale", "Commercialista", "Consulente del lavoro", "Notaio"],
+  "domande": {
+    "generica": ["Miglior {categoria} a {citta}", "{categoria} consigliato a {citta}"],
+    "bisogno": ["{categoria} online a {citta}", "{categoria} primo colloquio gratuito a {citta}"],
+    "specialita": ["{categoria} per {specialita} a {citta}"],
+    "nome": "Com'è {nome} a {citta}?"
+  },
+  "fonti": ["Google Maps", "Sito ufficiale", "LinkedIn", "Ordine professionale"],
+  "metriche": ["presenza per area di competenza", "titoli e sede corretti"],
+  "azioni": [
+    { "codice": "pagina-area", "titolo": "Una pagina per ogni area di competenza", "quando": "invisibile sulle domande per area" },
+    { "codice": "linkedin", "titolo": "Allinea il profilo LinkedIn", "quando": "LinkedIn assente o diverso dal sito" },
+    { "codice": "articoli", "titolo": "Pubblica articoli sul sito", "quando": "nessuna fonte propria citata" }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "altro",
+  "nome": "Altro: qualsiasi mestiere",
+  "categorieGoogle": [],
+  "generatoDaAI": true,
+  "domande": {
+    "generica": ["{categoria} a {citta}", "{categoria} in provincia di {citta}"],
+    "bisogno": ["{categoria} con {requisito} a {citta}"],
+    "specialita": ["{specialita} a {citta}", "{specialita} in {regione}"],
+    "nome": "Com'è {nome} a {citta}?"
+  },
+  "fonti": ["Google Maps", "Sito ufficiale", "PagineGialle", "Europages", "Kompass", "LinkedIn"],
+  "metriche": ["presenza per lavorazione o servizio", "presenza per area servita", "sede e certificazioni corrette"],
+  "azioni": [
+    { "codice": "pagina-lavorazione", "titolo": "Una pagina per ogni lavorazione", "quando": "invisibile sulle domande per lavorazione" },
+    { "codice": "europages", "titolo": "Schede Europages e Kompass", "quando": "fonti B2B assenti" },
+    { "codice": "casi-cliente", "titolo": "Casi cliente sul sito", "quando": "nessuna fonte propria citata" }
+  ],
+  "nota": "Claude genera il profilo dal sito e dalla categoria Google, lo salva e, dopo 10 attività simili, lo promuove a categoria standard."
+}

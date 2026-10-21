@@ -1,0 +1,18 @@
+{
+  "id": "idraulico",
+  "nome": "Idraulico, elettricista, fabbro",
+  "categorieGoogle": ["Idraulico", "Elettricista", "Fabbro", "Termoidraulico", "Antennista"],
+  "domande": {
+    "generica": ["{categoria} a {citta}", "{categoria} consigliato a {citta}"],
+    "bisogno": ["{categoria} urgente a {citta}", "{categoria} 24 ore a {citta}", "{categoria} a {citta} preventivo gratuito"],
+    "specialita": ["{categoria} in zona {zona} a {citta}", "{specialita} a {citta}"],
+    "nome": "Com'è {nome} a {citta}?"
+  },
+  "fonti": ["Google Maps", "PagineGialle", "ProntoPro", "Instapro", "Habitissimo"],
+  "metriche": ["copertura per quartiere", "reperibilità citata"],
+  "azioni": [
+    { "codice": "paginegialle", "titolo": "Apri la scheda PagineGialle o ProntoPro", "quando": "fonte assente" },
+    { "codice": "pagina-zona", "titolo": "Una pagina per ogni zona servita", "quando": "invisibile sulle domande per quartiere" },
+    { "codice": "numero", "titolo": "Numero e orari in evidenza sul sito e su Google", "quando": "reperibilità non citata" }
+  ]
+}

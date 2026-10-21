@@ -1,0 +1,17 @@
+{
+  "id": "immobiliare",
+  "nome": "Agenzia immobiliare",
+  "categorieGoogle": ["Agenzia immobiliare"],
+  "domande": {
+    "generica": ["Miglior agenzia immobiliare a {citta}", "Agenzia immobiliare consigliata a {citta}"],
+    "bisogno": ["Vendere casa a {citta}: quale agenzia", "Affitti in zona {zona} a {citta}", "Valutazione casa gratuita a {citta}"],
+    "specialita": ["Agenzia immobiliare {specialita} a {citta}"],
+    "nome": "Com'è {nome} a {citta}?"
+  },
+  "fonti": ["Immobiliare.it", "Idealista", "Casa.it", "Google Maps"],
+  "metriche": ["presenza per zona", "presenza per vendita o affitto", "annunci citati"],
+  "azioni": [
+    { "codice": "annunci", "titolo": "Completa gli annunci sui portali", "quando": "annunci non citati" },
+    { "codice": "pagina-zona", "titolo": "Una pagina per ogni zona", "quando": "invisibile sulle domande per zona" }
+  ]
+}

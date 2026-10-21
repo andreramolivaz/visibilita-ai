@@ -1,0 +1,17 @@
+{
+  "id": "palestra",
+  "nome": "Palestra, piscina, yoga",
+  "categorieGoogle": ["Palestra", "Piscina", "Centro yoga", "Centro fitness", "Crossfit"],
+  "domande": {
+    "generica": ["Miglior {categoria} a {citta}", "{categoria} consigliata a {citta}"],
+    "bisogno": ["{categoria} aperta 24 ore a {citta}", "{categoria} con prova gratuita a {citta}"],
+    "specialita": ["{categoria} con corsi di {specialita} a {citta}", "{categoria} con piscina a {citta}"],
+    "nome": "Com'è {nome} a {citta}?"
+  },
+  "fonti": ["Google Maps", "Sito ufficiale", "Instagram"],
+  "metriche": ["presenza per corso", "orari e prova gratuita citati"],
+  "azioni": [
+    { "codice": "pagina-corsi", "titolo": "Pagina corsi con orari e listino", "quando": "corsi non citati" },
+    { "codice": "prova", "titolo": "Metti la prova gratuita in evidenza", "quando": "prova non citata" }
+  ]
+}
