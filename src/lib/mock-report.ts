@@ -238,7 +238,7 @@ const BISOGNO = PER_TIPO.find((t) => t.tipo === "bisogno")!;
 
 export const REPORT_ESEMPIO: Report = {
   ...BASE,
-  sintesi: `Compari in ${TUE_CITAZIONI} risposte su ${TOTALE_RISPOSTE} (${PCT}%), in ${DOMANDE_IN_CUI_COMPARI} domande su ${DOMANDE_ESEMPIO.length}. Ti citano quasi solo quando la domanda riguarda il forno a legna o la pizza napoletana: sulle domande generiche compari poco, su quelle per bisogno (asporto, delivery, pranzo, domenica) quasi mai. Gemini e Perplexity sono i motori che ti conoscono meglio; ChatGPT e Google AI, i più usati, quasi non ti nominano. Pizzeria Fratelli Rossi compare in ${TESTA_A_TESTA[0].loroSenzaTe} domande dove tu non ci sei. La fonte più citata dai motori è TheFork, dove non hai una scheda: è la prima cosa da sistemare.`,
+  sintesi: `Compari in ${TUE_CITAZIONI} risposte su ${TOTALE_RISPOSTE} (${PCT}%), in ${DOMANDE_IN_CUI_COMPARI} domande su ${DOMANDE_ESEMPIO.length}. Ti citano quasi solo quando la domanda riguarda il forno a legna o la pizza napoletana: sulle domande generiche compari poco, su quelle per bisogno (asporto, delivery, pranzo, domenica) quasi mai. Gemini e Perplexity ti conoscono; ChatGPT e Google AI, i più usati, quasi non ti nominano. Due assistenti riportano dati sbagliati su di te (categoria e orari del lunedì), e questo ti esclude proprio dalle domande per bisogno.`,
   termini: [
     { termine: "forno a legna", volte: 61, ceLHai: true, volteTue: 3 },
     { termine: "impasto a lunga lievitazione", volte: 38, ceLHai: false, volteTue: 0 },

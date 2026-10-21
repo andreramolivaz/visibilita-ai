@@ -11,6 +11,8 @@ import { Potenziale } from "./Potenziale";
 import { CitaChi } from "./CitaChi";
 import { Statistiche } from "./Statistiche";
 import { Guida } from "./Guida";
+import { InTrentaSecondi } from "./InTrentaSecondi";
+import { takeawayAssistenti, takeawayAzioni, takeawayConcorrenti, takeawayDicono, takeawayFonti, takeawayMappa, takeawayParole, takeawayTipi } from "@/lib/takeaway";
 import { punteggioPerMotore } from "@/lib/stats";
 
 const dataIt = (iso: string) =>
@@ -54,14 +56,26 @@ function spiegazioneVerdetto(v: Verdetto) {
   }
 }
 
+function VuolDire({ testo }: { testo: string }) {
+  if (!testo) return null;
+  return (
+    <p className="mt-3 max-w-prose border-l-[3px] border-accent pl-3 text-[16px] leading-snug">
+      <span className="text-xs font-semibold text-muted">Cosa vuol dire </span>
+      <span className="block sm:inline">{testo}</span>
+    </p>
+  );
+}
+
 function Blocco({
   titolo,
   sotto,
+  vuolDire,
   children,
   id,
 }: {
   titolo: string;
   sotto?: string;
+  vuolDire?: string;
   children: React.ReactNode;
   id?: string;
 }) {
@@ -69,6 +83,7 @@ function Blocco({
     <section id={id} className="scroll-mt-20 py-7 sm:py-9">
       <h2 className="text-xl font-semibold sm:text-2xl">{titolo}</h2>
       {sotto && <p className="mt-1 max-w-prose text-[15px] text-muted">{sotto}</p>}
+      {vuolDire && <VuolDire testo={vuolDire} />}
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -150,14 +165,15 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
         </dl>
         <nav className="no-print mt-6 -mb-1 flex gap-2 overflow-x-auto text-sm" aria-label="Sezioni del report">
           {[
+            ["#trenta", "In 30 secondi"],
             ["#punteggio", "Punteggio"],
-            ["#statistiche", "Numeri chiave"],
-            ["#assistenti", "Assistenti"],
+            ["#azioni", "Cosa fare"],
             ["#concorrenti", "Concorrenti"],
+            ["#assistenti", "Assistenti"],
             ["#mappa", "Mappa"],
-            ["#fonti", "Fonti"],
+            ["#fonti", "Fonti e parole"],
             ["#dicono", "Cosa dicono"],
-            ["#azioni", "Azioni"],
+            ["#statistiche", "Numeri chiave"],
             ["#guida", "Guida alla lettura"],
             ["#metodo", "Metodo"],
           ].map(([href, testo]) => (
@@ -167,6 +183,8 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
           ))}
         </nav>
       </header>
+
+      <InTrentaSecondi report={r} />
 
       {/* In breve + punteggio */}
       <section id="punteggio" className="scroll-mt-20 py-7 sm:py-9">
@@ -206,70 +224,48 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             <div>
               <h2 className="text-xl font-semibold sm:text-2xl">In breve</h2>
               <p className="mt-3 border-l-[3px] border-accent pl-4 text-[17px] leading-relaxed">{r.sintesi}</p>
-              {potenziale !== null && (
-                <p className="mt-4 text-sm text-muted">
-                  Con le tre azioni in fondo al report il punteggio stimato è <span className="tabular font-semibold text-ink">{potenziale}</span>.{" "}
-                  <a href="#azioni" className="font-semibold text-accent underline underline-offset-2">
-                    Vai alle azioni
-                  </a>
-                </p>
-              )}
+
             </div>
           )}
         </div>
       </section>
 
-      <Statistiche report={r} />
-
-      {/* Per motore + per tipo */}
-      <section id="assistenti" className="scroll-mt-20 py-7 sm:py-9">
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
-          <div>
-            <h2 className="text-xl font-semibold sm:text-2xl">Per assistente</h2>
-            <p className="mt-1 text-[15px] text-muted">
-              Domande in cui compari almeno una volta, su {r.domande}, e punteggio parziale (0–100) di ogni assistente. In ordine di quanti italiani lo usano.
-            </p>
-            <div className="mt-4">
-              {r.perMotore.map((m) => (
-                <Barra
-                  key={m.motore}
-                  etichetta={engine(m.motore).nome}
-                  valore={m.comparse}
-                  massimo={m.totale}
-                  testo={`${m.comparse} su ${m.totale}`}
-                  sotto={`${engine(m.motore).utentiMln.toLocaleString("it-IT")} mln · punteggio ${parziali[m.motore] ?? 0}`}
-                  accento
-                />
-              ))}
-            </div>
+      {/* Tre azioni */}
+      <Blocco id="azioni" titolo="Cosa fare, in ordine di impatto" sotto="Tre azioni, ognuna con il dato che la motiva. Fatte queste, il mese prossimo si misura la differenza." vuolDire={takeawayAzioni(r)}>
+        {potenziale !== null && (
+          <div className="mb-5">
+            <Potenziale punteggio={r.punteggio} azioni={r.azioni} />
           </div>
-          <div>
-            <h2 className="text-xl font-semibold sm:text-2xl">Per tipo di domanda</h2>
-            <p className="mt-1 text-[15px] text-muted">
-              Dove ti trovano e dove no. Risposte in cui compari, sul totale di quel tipo.
-            </p>
-            <div className="mt-4">
-              {r.perTipo.map((t) => (
-                <Barra
-                  key={t.tipo}
-                  etichetta={NOME_TIPO[t.tipo].titolo}
-                  valore={t.comparse}
-                  massimo={t.totale}
-                  testo={`${t.comparse} su ${t.totale}`}
-                  sotto={`${t.domande} ${t.domande === 1 ? "domanda" : "domande"} · ${NOME_TIPO[t.tipo].esempio}`}
-                  accento
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+        )}
+        <ol className="space-y-3">
+          {r.azioni.map((a, i) => (
+            <li key={i}>
+              <Scheda className={a.fatta ? "border-accent bg-accent-soft" : ""}>
+                <div className="flex items-start gap-3.5">
+                  <span className="tabular mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
+                    {a.fatta ? "✓" : i + 1}
+                  </span>
+                  <div>
+                    <p className="text-[17px] font-semibold">{a.titolo}</p>
+                    <p className="mt-1 text-[15px] text-muted">{a.dato}</p>
+                    <p className="mt-2 flex flex-wrap gap-2">
+                      <Etichetta tono={a.impatto === "alto" ? "accento" : "neutro"}>impatto {a.impatto}</Etichetta>
+                      {a.impattoStimato !== undefined && <Etichetta tono="neutro">+{a.impattoStimato} punti stimati</Etichetta>}
+                    </p>
+                  </div>
+                </div>
+              </Scheda>
+            </li>
+          ))}
+        </ol>
+      </Blocco>
 
       {/* Concorrenti */}
       <Blocco
         id="concorrenti"
         titolo="Chi consigliano al posto tuo"
         sotto={`I cinque nomi più citati nelle ${totaleRisposte} risposte, e il confronto diretto domanda per domanda.`}
+        vuolDire={takeawayConcorrenti(r)}
       >
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
           <div>
@@ -299,11 +295,58 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
         )}
       </Blocco>
 
+      {/* Per motore + per tipo */}
+      <section id="assistenti" className="scroll-mt-20 py-7 sm:py-9">
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
+          <div>
+            <h2 className="text-xl font-semibold sm:text-2xl">Per assistente</h2>
+            <p className="mt-1 text-[15px] text-muted">
+              Domande in cui compari almeno una volta, su {r.domande}, e punteggio parziale (0–100) di ogni assistente. In ordine di quanti italiani lo usano.
+            </p>
+            <VuolDire testo={takeawayAssistenti(r)} />
+            <div className="mt-4">
+              {r.perMotore.map((m) => (
+                <Barra
+                  key={m.motore}
+                  etichetta={engine(m.motore).nome}
+                  valore={m.comparse}
+                  massimo={m.totale}
+                  testo={`${m.comparse} su ${m.totale}`}
+                  sotto={`${engine(m.motore).utentiMln.toLocaleString("it-IT")} mln · punteggio ${parziali[m.motore] ?? 0}`}
+                  accento
+                />
+              ))}
+            </div>
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold sm:text-2xl">Per tipo di domanda</h2>
+            <p className="mt-1 text-[15px] text-muted">
+              Dove ti trovano e dove no. Risposte in cui compari, sul totale di quel tipo.
+            </p>
+            <VuolDire testo={takeawayTipi(r)} />
+            <div className="mt-4">
+              {r.perTipo.map((t) => (
+                <Barra
+                  key={t.tipo}
+                  etichetta={NOME_TIPO[t.tipo].titolo}
+                  valore={t.comparse}
+                  massimo={t.totale}
+                  testo={`${t.comparse} su ${t.totale}`}
+                  sotto={`${t.domande} ${t.domande === 1 ? "domanda" : "domande"} · ${NOME_TIPO[t.tipo].esempio}`}
+                  accento
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Domanda per domanda */}
       <Blocco
         id="mappa"
         titolo="Dove ti trovano, domanda per domanda"
         sotto="Una cella per ogni domanda e assistente: più è scura, più in alto ti mettono. Passa il mouse o tocca una cella per il dettaglio."
+        vuolDire={takeawayMappa(r)}
       >
         <Heatmap righe={r.righe} motori={r.motori} ripetizioni={r.ripetizioni} />
       </Blocco>
@@ -329,6 +372,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
               I termini più frequenti quando gli assistenti consigliano nella tua categoria, e se compaiono
               già nelle tue recensioni o sul tuo sito.
             </p>
+            <VuolDire testo={takeawayParole(r)} />
             <div className="mt-4">
               {r.termini.map((t) => (
                 <Barra
@@ -351,6 +395,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             <p className="mt-1 text-[15px] text-muted">
               Le otto fonti più citate per la tua categoria. Dove non ci sei, i motori non possono trovarti.
             </p>
+            <VuolDire testo={takeawayFonti(r)} />
             <div className="mt-4">
               {r.fonti.map((f) => (
                 <Barra
@@ -375,6 +420,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
         id="dicono"
         titolo="Cosa dicono di te"
         sotto="La descrizione che ogni assistente dà della tua attività quando gli chiedi di te, e gli errori nei dati."
+        vuolDire={takeawayDicono(r)}
       >
         <ul className="grid gap-3 sm:grid-cols-2">
           {r.descrizioniPerMotore.map((d) => (
@@ -398,35 +444,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
         )}
       </Blocco>
 
-      {/* Tre azioni */}
-      <Blocco id="azioni" titolo="Tre azioni, in ordine di impatto" sotto="Ognuna nasce da un dato di questo report. Fatte queste, il mese prossimo si misura la differenza.">
-        {potenziale !== null && (
-          <div className="mb-5">
-            <Potenziale punteggio={r.punteggio} azioni={r.azioni} />
-          </div>
-        )}
-        <ol className="space-y-3">
-          {r.azioni.map((a, i) => (
-            <li key={i}>
-              <Scheda className={a.fatta ? "border-accent bg-accent-soft" : ""}>
-                <div className="flex items-start gap-3.5">
-                  <span className="tabular mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
-                    {a.fatta ? "✓" : i + 1}
-                  </span>
-                  <div>
-                    <p className="text-[17px] font-semibold">{a.titolo}</p>
-                    <p className="mt-1 text-[15px] text-muted">{a.dato}</p>
-                    <p className="mt-2 flex flex-wrap gap-2">
-                      <Etichetta tono={a.impatto === "alto" ? "accento" : "neutro"}>impatto {a.impatto}</Etichetta>
-                      {a.impattoStimato !== undefined && <Etichetta tono="neutro">+{a.impattoStimato} punti stimati</Etichetta>}
-                    </p>
-                  </div>
-                </div>
-              </Scheda>
-            </li>
-          ))}
-        </ol>
-      </Blocco>
+      <Statistiche report={r} />
 
       <Guida />
 

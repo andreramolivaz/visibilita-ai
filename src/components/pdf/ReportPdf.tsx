@@ -70,7 +70,7 @@ const s = StyleSheet.create({
   punteggio: { fontSize: 44, fontFamily: "Helvetica-Bold", letterSpacing: -1.5, lineHeight: 1.05 },
   barraSfondo: { height: 4, backgroundColor: C.soft },
   barra: { height: 4 },
-  cella: { height: 16, alignItems: "center", justifyContent: "center", borderRightWidth: 0.5, borderRightColor: "#ffffff" },
+  cella: { height: 14, alignItems: "center", justifyContent: "center", borderRightWidth: 0.5, borderRightColor: "#ffffff" },
   riquadro: { borderWidth: 0.5, borderColor: C.accent, padding: 8 },
 });
 
@@ -280,13 +280,13 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
 
   const sezioni = [
     "1. Sintesi dei risultati",
-    "2. Visibilità per assistente e per tipo di domanda",
+    "2. Azioni consigliate",
     "3. Concorrenti citati e confronto diretto",
-    "4. Mappa domanda × assistente",
-    gratuito ? "5. Fonti citate" : "5. Fonti citate e terminologia",
-    "6. Descrizione dell'attività secondo gli assistenti",
-    "7. Azioni consigliate",
-    "Allegato A. Metodo e limiti",
+    "4. Visibilità per assistente e per tipo di domanda",
+    "5. Mappa domanda × assistente",
+    gratuito ? "6. Fonti citate" : "6. Fonti citate e terminologia",
+    "7. Descrizione dell'attività secondo gli assistenti",
+    "Allegato A. Metodo, dati della scansione e limiti",
     "Allegato B. Elenco delle domande",
     "Allegato C. Guida alla lettura delle metriche",
   ];
@@ -306,28 +306,46 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           {r.attivita.telefono ? ` · ${r.attivita.telefono}` : ""}
         </Text>
 
-        <View style={[s.colonne, { marginTop: 14 }]}>
-          <View style={s.col}>
-            <Chiavi
-              voci={[
-                ["Identificativo", docId(r)],
-                ["Data scansione", `${dataLunga(r.metodo.inizio)}, ${oraIt(r.metodo.inizio)}–${oraIt(r.metodo.fine)} (${Math.floor(durata / 60)} min ${durata % 60} s)`],
-                ["Posizione impostata", r.metodo.posizione],
-                ["Lingua", r.metodo.lingua],
-                ["Piano", gratuito ? "Test gratuito" : maiuscola(r.piano)],
-              ]}
-            />
+        <Text style={[s.mono, { marginTop: 6, color: C.muted }]}>
+          {docId(r)} · {dataLunga(r.metodo.inizio)}, {oraIt(r.metodo.inizio)}–{oraIt(r.metodo.fine)} · {r.metodo.posizione} · {r.domande} domande × {r.motori.length} assistenti × {r.ripetizioni} ripetizioni = {totale} risposte · {gratuito ? "test gratuito" : `piano ${r.piano}`} · metodo v1.0
+        </Text>
+
+        {/* In 30 secondi: dove sei, chi ti passa davanti, cosa fare prima */}
+        <View style={[s.riga, { marginTop: 12, gap: 6, alignItems: "stretch" }]}>
+          <View style={[s.kpi, { flex: 1 }]}>
+            <Text style={s.kpiTesto}>Dove sei</Text>
+            <View style={[s.riga, { alignItems: "flex-end", gap: 6, marginTop: 2 }]}>
+              <Text style={[s.kpiNumero, { fontSize: 24, color: col }]}>{r.punteggio}</Text>
+              <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold", color: col, marginBottom: 2 }}>{r.verdetto}</Text>
+            </View>
+            <Text style={[s.p, { fontSize: 8.5, marginTop: 3 }]}>
+              {r.contesto ? `Più alto del ${r.contesto.percentile}% delle ${r.contesto.categoria} analizzate a ${r.contesto.citta} (mediana ${r.contesto.mediana}).` : `Compari in ${tueCitazioni} risposte su ${totale}.`}
+            </Text>
           </View>
-          <View style={s.col}>
-            <Chiavi
-              voci={[
-                ["Assistenti interrogati", `${r.motori.length}: ${r.motori.map(nomeMotore).join(", ")}`],
-                ["Domande", String(r.domande)],
-                ["Ripetizioni per domanda", String(r.ripetizioni)],
-                ["Risposte analizzate", `${totale} (${r.domande} × ${r.motori.length} × ${r.ripetizioni})`],
-                ["Metodo", "v1.0 · pesi Audicom/Comscore, luglio 2026"],
-              ]}
-            />
+          <View style={[s.kpi, { flex: 1.2 }]}>
+            <Text style={s.kpiTesto}>Chi ti passa davanti</Text>
+            {r.concorrenti.filter((c) => !c.seiTu).slice(0, 3).map((c, i) => {
+              const t = r.testaATesta.find((x) => x.nome === c.nome);
+              return (
+                <Text key={c.nome} style={[s.p, { fontSize: 8.5, marginTop: i === 0 ? 2 : 1 }]}>
+                  <Text style={{ fontFamily: "Helvetica-Bold" }}>{i + 1}. {c.nome}</Text> · {c.citazioni} citazioni (tu {tueCitazioni}){t ? `, in ${t.loroSenzaTe} domande senza di te` : ""}
+                </Text>
+              );
+            })}
+          </View>
+          <View style={[s.kpi, { flex: 1.2, backgroundColor: C.accentSoft, borderColor: C.accent }]}>
+            <Text style={s.kpiTesto}>La prima cosa da fare</Text>
+            {r.azioni[0] && (
+              <>
+                <Text style={{ fontSize: 9.5, fontFamily: "Helvetica-Bold", marginTop: 2 }}>{r.azioni[0].titolo}</Text>
+                <Text style={[s.p, { fontSize: 8.5, marginTop: 2 }]}>{r.azioni[0].dato}</Text>
+                {r.azioni[0].impattoStimato !== undefined && (
+                  <Text style={{ fontSize: 8.5, marginTop: 3, fontFamily: "Helvetica-Bold", color: C.accent }}>
+                    Vale circa +{r.azioni[0].impattoStimato} punti{potenziale !== null ? `; con tutte e tre, ${potenziale}.` : "."}
+                  </Text>
+                )}
+              </>
+            )}
           </View>
         </View>
 
@@ -350,7 +368,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
             {potenziale !== null && (
               <View style={{ marginTop: 6 }}>
                 <View style={[s.riga, { justifyContent: "space-between", marginBottom: 2 }]}>
-                  <Text style={{ fontSize: 8.5, fontFamily: "Helvetica-Bold" }}>Stima con le azioni della sezione 7</Text>
+                  <Text style={{ fontSize: 8.5, fontFamily: "Helvetica-Bold" }}>Stima con le azioni della sezione 2</Text>
                   <Text style={{ fontSize: 8.5 }}>
                     {r.punteggio} → <Text style={{ fontFamily: "Helvetica-Bold", color: C.accent }}>{potenziale}</Text>
                   </Text>
@@ -431,48 +449,21 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
         <Pie r={r} />
       </Page>
 
-      {/* Pagina 2: assistenti, tipi, concorrenti */}
+      {/* Pagina 2: azioni e concorrenti */}
       <Page size="A4" style={s.page}>
         <Testata r={r} logo={logo} />
-        <Text style={[s.h2, { marginTop: 0 }]}>2. Visibilità per assistente e per tipo di domanda</Text>
-        <Text style={[s.h3, { marginTop: 4 }]}>2.1 Per assistente</Text>
+        <Text style={[s.h2, { marginTop: 0 }]}>2. Azioni consigliate</Text>
         <Tabella
           colonne={[
-            { testo: "Assistente", larghezza: 1.2 },
-            { testo: "Utenti in Italia (mln)", larghezza: 1, num: true },
-            { testo: "Peso", larghezza: 0.6, num: true },
-            { testo: `Domande in cui compari (su ${r.domande})`, larghezza: 1.3, num: true },
-            { testo: `Risposte in cui compari (su ${r.domande * r.ripetizioni})`, larghezza: 1.4, num: true },
-            { testo: "Posizione media", larghezza: 0.9, num: true },
-            { testo: "Punteggio parziale", larghezza: 0.9, num: true },
-            { testo: "", larghezza: 1.1 },
+            { testo: "Priorità", larghezza: 0.5 },
+            { testo: "Azione", larghezza: 2 },
+            { testo: "Dato di riferimento", larghezza: 2.6 },
+            { testo: "Impatto atteso", larghezza: 0.8 },
+            { testo: "Punti stimati", larghezza: 0.7, num: true },
           ]}
-          righe={r.perMotore.map((m) => {
-            const celle = r.righe.map((x) => x.celle.find((c) => c.motore === m.motore)!);
-            const risposte = celle.reduce((acc, c) => acc + volteDi(c), 0);
-            const pm = posizioneMedia(celle);
-            const e = motore(m.motore);
-            return [nomeMotore(m.motore), e ? n1(e.utentiMln) : "–", e ? pct(e.peso, 1) : "–", String(m.comparse), String(risposte), pm ? `${n1(pm)}°` : "–", String(parziali[m.motore] ?? 0), <BarraCella key={m.motore} valore={parziali[m.motore] ?? 0} massimo={100} />];
-          })}
+          righe={r.azioni.map((a, i) => [String(i + 1), a.titolo, a.dato, maiuscola(a.impatto), a.impattoStimato !== undefined ? `+${a.impattoStimato}` : "–"])}
         />
-        <Text style={[s.nota, { marginTop: 4 }]}>
-          Assistenti in ordine di quota d&apos;uso in Italia; peso rinormalizzato sugli assistenti interrogati. Punteggio parziale: stessa formula del punteggio totale, ristretta alle risposte di quell&apos;assistente. Fonte utenti: Osservatorio Cosenza su dati Audicom, luglio 2026; per Google AI, Sensemakers su dati Comscore.
-        </Text>
-
-        <Text style={s.h3}>2.2 Per tipo di domanda</Text>
-        <Tabella
-          colonne={[
-            { testo: "Tipo di domanda", larghezza: 1.4 },
-            { testo: "Domande", larghezza: 0.8, num: true },
-            { testo: "Risposte analizzate", larghezza: 1, num: true },
-            { testo: "Risposte in cui compari", larghezza: 1.1, num: true },
-            { testo: "Quota", larghezza: 0.8, num: true },
-            { testo: "", larghezza: 1.6 },
-          ]}
-          righe={r.perTipo.map((t) => [NOME_TIPO[t.tipo], String(t.domande), String(t.totale), String(t.comparse), pct(t.comparse, t.totale), <BarraCella key={t.tipo} valore={t.comparse} massimo={t.totale} />])}
-        />
-        <Text style={[s.nota, { marginTop: 4 }]}>Generica: «miglior pizzeria a Bergamo». Per bisogno: orario, prezzo, servizio. Per specialità: un piatto o una lavorazione. Sul nome: cosa dice l&apos;assistente quando gli chiedi direttamente dell&apos;attività.</Text>
-
+        <Text style={[s.nota, { marginTop: 4 }]}>Le azioni sono scelte tra quelle previste per la categoria dell&apos;attività e ordinate per impatto atteso. I punti stimati sono una stima dai dati di questo report{potenziale !== null ? ` (punteggio stimato dopo le azioni: ${potenziale})` : ""}; la verifica avviene alla scansione successiva.</Text>
         <Text style={s.h2}>3. Concorrenti citati e confronto diretto</Text>
         <Tabella
           colonne={[
@@ -508,15 +499,54 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
         <Pie r={r} />
       </Page>
 
-      {/* Pagina 3: mappa, fonti, terminologia */}
+      {/* Pagina 3: assistenti, tipi, mappa */}
       <Page size="A4" style={s.page}>
         <Testata r={r} logo={logo} />
-        <Text style={[s.h2, { marginTop: 0 }]}>4. Mappa domanda × assistente</Text>
+        <Text style={[s.h2, { marginTop: 0 }]}>4. Visibilità per assistente e per tipo di domanda</Text>
+        <Text style={[s.h3, { marginTop: 4 }]}>4.1 Per assistente</Text>
+        <Tabella
+          colonne={[
+            { testo: "Assistente", larghezza: 1.2 },
+            { testo: "Utenti in Italia (mln)", larghezza: 1, num: true },
+            { testo: "Peso", larghezza: 0.6, num: true },
+            { testo: `Domande in cui compari (su ${r.domande})`, larghezza: 1.3, num: true },
+            { testo: `Risposte in cui compari (su ${r.domande * r.ripetizioni})`, larghezza: 1.4, num: true },
+            { testo: "Posizione media", larghezza: 0.9, num: true },
+            { testo: "Punteggio parziale", larghezza: 0.9, num: true },
+            { testo: "", larghezza: 1.1 },
+          ]}
+          righe={r.perMotore.map((m) => {
+            const celle = r.righe.map((x) => x.celle.find((c) => c.motore === m.motore)!);
+            const risposte = celle.reduce((acc, c) => acc + volteDi(c), 0);
+            const pm = posizioneMedia(celle);
+            const e = motore(m.motore);
+            return [nomeMotore(m.motore), e ? n1(e.utentiMln) : "–", e ? pct(e.peso, 1) : "–", String(m.comparse), String(risposte), pm ? `${n1(pm)}°` : "–", String(parziali[m.motore] ?? 0), <BarraCella key={m.motore} valore={parziali[m.motore] ?? 0} massimo={100} />];
+          })}
+        />
+        <Text style={[s.nota, { marginTop: 4 }]}>
+          In ordine di quota d&apos;uso in Italia (Audicom/Comscore, luglio 2026); peso rinormalizzato sugli assistenti interrogati. Punteggio parziale: la formula del punteggio, ristretta a quell&apos;assistente.
+        </Text>
+
+        <Text style={s.h3}>4.2 Per tipo di domanda</Text>
+        <Tabella
+          colonne={[
+            { testo: "Tipo di domanda", larghezza: 1.4 },
+            { testo: "Domande", larghezza: 0.8, num: true },
+            { testo: "Risposte analizzate", larghezza: 1, num: true },
+            { testo: "Risposte in cui compari", larghezza: 1.1, num: true },
+            { testo: "Quota", larghezza: 0.8, num: true },
+            { testo: "", larghezza: 1.6 },
+          ]}
+          righe={r.perTipo.map((t) => [NOME_TIPO[t.tipo], String(t.domande), String(t.totale), String(t.comparse), pct(t.comparse, t.totale), <BarraCella key={t.tipo} valore={t.comparse} massimo={t.totale} />])}
+        />
+        <Text style={[s.nota, { marginTop: 3 }]}>Generica: «miglior pizzeria a Bergamo». Per bisogno: orario, prezzo, servizio. Per specialità: un piatto o una lavorazione. Sul nome: la domanda diretta sull&apos;attività.</Text>
+
+        <Text style={s.h2}>5. Mappa domanda × assistente</Text>
         <Text style={[s.nota, { marginBottom: 6 }]}>Ogni cella è una domanda posta a un assistente: posizione media in cui compari e quante volte su {r.ripetizioni}. Più scura la cella, più in alto ti mettono. Vuota: non compari.</Text>
         <View style={s.th}>
           <Text style={[s.thTesto, { width: 16 }]}>#</Text>
-          <Text style={[s.thTesto, { flex: 2.3 }]}>Domanda</Text>
-          <Text style={[s.thTesto, { flex: 0.9 }]}>Tipo</Text>
+          <Text style={[s.thTesto, { flex: 2.8 }]}>Domanda</Text>
+          <Text style={[s.thTesto, { flex: 0.8 }]}>Tipo</Text>
           {r.motori.map((m) => (
             <Text key={m} style={[s.thTesto, { flex: 0.8, textAlign: "center" }]}>
               {nomeMotore(m)}
@@ -527,10 +557,10 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
         {r.righe.map((riga, i) => {
           const compari = riga.celle.reduce((acc, c) => acc + volteDi(c), 0);
           return (
-            <View key={riga.domanda.id} style={[s.tr, { paddingVertical: 1.5 }]} wrap={false}>
+            <View key={riga.domanda.id} style={[s.tr, { paddingVertical: 1 }]} wrap={false}>
               <Text style={[s.td, { width: 16, color: C.muted }]}>{i + 1}</Text>
-              <Text style={[s.td, { flex: 2.3, paddingRight: 4 }]}>{riga.domanda.testo}</Text>
-              <Text style={[s.td, { flex: 0.9, color: C.muted, fontSize: 7.5 }]}>{NOME_TIPO[riga.domanda.tipo]}</Text>
+              <Text style={[s.td, { flex: 2.8, paddingRight: 4, fontSize: 7.8 }]}>{riga.domanda.testo}</Text>
+              <Text style={[s.td, { flex: 0.8, color: C.muted, fontSize: 7 }]}>{NOME_TIPO[riga.domanda.tipo]}</Text>
               {riga.celle.map((c) => {
                 const volte = volteDi(c);
                 const vuota = c.posizione === null;
@@ -569,10 +599,16 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           </View>
         </View>
 
-        <Text style={s.h2}>{gratuito ? "5. Fonti citate" : "5. Fonti citate e terminologia"}</Text>
+        <Pie r={r} />
+      </Page>
+
+      {/* Pagina 4: fonti, terminologia, descrizioni */}
+      <Page size="A4" style={s.page}>
+        <Testata r={r} logo={logo} />
+        <Text style={[s.h2, { marginTop: 0 }]}>{gratuito ? "6. Fonti citate" : "6. Fonti citate e terminologia"}</Text>
         <View style={s.colonne}>
           <View style={s.col}>
-            <Text style={[s.h3, { marginTop: 0 }]}>5.1 Fonti citate dagli assistenti</Text>
+            <Text style={[s.h3, { marginTop: 0 }]}>6.1 Fonti citate dagli assistenti</Text>
             <Tabella
               colonne={[
                 { testo: "Fonte", larghezza: 1.5 },
@@ -588,12 +624,12 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           <View style={s.col}>
             {gratuito ? (
               <View style={[s.riquadro, { marginTop: 14 }]}>
-                <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: C.accent }}>5.2 Terminologia: disponibile nel piano Base</Text>
+                <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: C.accent }}>6.2 Terminologia: disponibile nel piano Base</Text>
                 <Text style={[s.nota, { marginTop: 3 }]}>I termini più usati dagli assistenti quando consigliano nella categoria, e se compaiono già nelle recensioni e sul sito dell&apos;attività.</Text>
               </View>
             ) : (
               <>
-                <Text style={[s.h3, { marginTop: 0 }]}>5.2 Terminologia ricorrente</Text>
+                <Text style={[s.h3, { marginTop: 0 }]}>6.2 Terminologia ricorrente</Text>
                 <Tabella
                   colonne={[
                     { testo: "Termine", larghezza: 1.8 },
@@ -607,13 +643,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
             )}
           </View>
         </View>
-        <Pie r={r} />
-      </Page>
-
-      {/* Pagina 4: descrizioni, azioni, allegati */}
-      <Page size="A4" style={s.page}>
-        <Testata r={r} logo={logo} />
-        <Text style={[s.h2, { marginTop: 0 }]}>6. Descrizione dell&apos;attività secondo gli assistenti</Text>
+        <Text style={s.h2}>7. Descrizione dell&apos;attività secondo gli assistenti</Text>
         <Tabella
           colonne={[
             { testo: "Assistente", larghezza: 0.8 },
@@ -621,7 +651,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           ]}
           righe={r.descrizioniPerMotore.map((d) => [nomeMotore(d.motore), d.testo])}
         />
-        <Text style={s.h3}>6.1 Errori rilevati nei dati</Text>
+        <Text style={s.h3}>7.1 Errori rilevati nei dati</Text>
         {r.errori.length > 0 ? (
           <Tabella
             colonne={[
@@ -635,22 +665,32 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           <Text style={s.p}>Nessun errore rilevato.</Text>
         )}
 
-        <Text style={s.h2}>7. Azioni consigliate</Text>
-        <Tabella
-          colonne={[
-            { testo: "Priorità", larghezza: 0.5 },
-            { testo: "Azione", larghezza: 2 },
-            { testo: "Dato di riferimento", larghezza: 2.6 },
-            { testo: "Impatto atteso", larghezza: 0.8 },
-            { testo: "Punti stimati", larghezza: 0.7, num: true },
-          ]}
-          righe={r.azioni.map((a, i) => [String(i + 1), a.titolo, a.dato, maiuscola(a.impatto), a.impattoStimato !== undefined ? `+${a.impattoStimato}` : "–"])}
-        />
-        <Text style={[s.nota, { marginTop: 4 }]}>Le azioni sono scelte tra quelle previste per la categoria dell&apos;attività e ordinate per impatto atteso. I punti stimati sono una stima dai dati di questo report{potenziale !== null ? ` (punteggio stimato dopo le azioni: ${potenziale})` : ""}; la verifica avviene alla scansione successiva.</Text>
 
-        <Text style={[s.h2, { marginTop: 0 }]} break>
-          Allegato A. Metodo e limiti
-        </Text>
+        <Text style={s.h2}>Allegato A. Metodo, dati della scansione e limiti</Text>
+        <View style={[s.colonne, { marginBottom: 6 }]}>
+          <View style={s.col}>
+            <Chiavi
+              voci={[
+                ["Identificativo", docId(r)],
+                ["Data scansione", `${dataLunga(r.metodo.inizio)}, ${oraIt(r.metodo.inizio)}–${oraIt(r.metodo.fine)} (${Math.floor(durata / 60)} min ${durata % 60} s)`],
+                ["Posizione impostata", r.metodo.posizione],
+                ["Lingua", r.metodo.lingua],
+                ["Piano", gratuito ? "Test gratuito" : maiuscola(r.piano)],
+              ]}
+            />
+          </View>
+          <View style={s.col}>
+            <Chiavi
+              voci={[
+                ["Assistenti interrogati", `${r.motori.length}: ${r.motori.map(nomeMotore).join(", ")}`],
+                ["Domande", String(r.domande)],
+                ["Ripetizioni per domanda", String(r.ripetizioni)],
+                ["Risposte analizzate", `${totale} (${r.domande} × ${r.motori.length} × ${r.ripetizioni})`],
+                ["Metodo", "v1.0 · pesi Audicom/Comscore, luglio 2026"],
+              ]}
+            />
+          </View>
+        </View>
         <View style={s.colonne}>
           <View style={s.col}>
             <Text style={[s.h3, { marginTop: 0 }]}>A.1 Raccolta</Text>
