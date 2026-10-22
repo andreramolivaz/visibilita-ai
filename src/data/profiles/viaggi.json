@@ -30,7 +30,11 @@
     ],
     "requisito": [
       "agenzia di viaggi a {citta} che faccia {requisito}",
-      "agenzia di incoming in {regione} per gruppi stranieri"
+      "agenzia di incoming in {regione} per gruppi stranieri",
+      "{categoria} a {citta} con disponibilità oggi",
+      "{categoria} a {citta} con apertura il sabato",
+      "{categoria} a {citta} con orari dopo le 19",
+      "{categoria} a {citta} senza appuntamento"
     ],
     "confronto": [
       "meglio prenotare da solo o con {nome} a {citta} per {specialita}?"
@@ -40,6 +44,14 @@
     ],
     "inglese": [
       "local tour operator in {regione}, Italy, for private wine tours"
+    ],
+    "prezzo": [
+      "{categoria} a {citta} a buon prezzo",
+      "{categoria} a {citta} con prezzi onesti",
+      "quanto costa {un categoria} a {citta}? consigliami qualcuno con tariffe chiare",
+      "{categoria} a {citta} con buon rapporto qualità prezzo",
+      "{categoria} a {citta} con il listino prezzi pubblicato",
+      "{categoria} a {citta} che costi poco ma con buone recensioni"
     ],
     "occasione": [
       {
@@ -67,12 +79,26 @@
         "etichetta": "lavoro"
       }
     ],
+    "recensioni": [
+      "{categoria} a {citta} con le recensioni migliori",
+      "{categoria} affidabile a {citta}",
+      "{categoria} a {citta} con più di 4 stelle su Google",
+      "{categoria} a {citta} che consiglia chi ci va",
+      "{categoria} a {citta} affidabile e puntuale",
+      "{categoria} a {citta} con recensioni recenti positive"
+    ],
     "vicino": [
-      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "{categoria} vicino a me a {citta}",
       "qual è {il categoria} migliore qui vicino, a {citta}?",
       "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
       "{categoria} aperta adesso vicino a me, a {citta}",
       "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
+    ],
+    "informativa": [
+      "come scegliere {un categoria} a {citta}?",
+      "ogni quanto si va da {un categoria}?",
+      "quanto costa in media {un categoria} a {citta}?",
+      "cosa chiedere a {un categoria} la prima volta?"
     ]
   },
   "fonti": [

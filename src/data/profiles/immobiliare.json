@@ -32,13 +32,25 @@
     ],
     "requisito": [
       "agenzia immobiliare a {citta} con {requisito}",
-      "agenzia immobiliare a {citta} che parli inglese per acquirenti stranieri"
+      "agenzia immobiliare a {citta} che parli inglese per acquirenti stranieri",
+      "{categoria} a {citta} per un intervento urgente oggi",
+      "{categoria} a {citta} con disponibilità nel weekend",
+      "{categoria} a {citta} con reperibilità notturna",
+      "{categoria} a {citta} che venga entro domani"
     ],
     "confronto": [
       "meglio {nome} o {concorrente} per vendere casa a {citta}?"
     ],
     "nome": [
       "{nome} immobiliare {citta} recensioni, sono affidabili?"
+    ],
+    "prezzo": [
+      "{categoria} a {citta} con prezzi onesti",
+      "quanto costa {un categoria} a {citta}? chi fa preventivi gratuiti",
+      "{categoria} a {citta} a buon prezzo e affidabile",
+      "{categoria} a {citta} con preventivo gratuito e chiaro",
+      "{categoria} a {citta} che non costi una fortuna per un piccolo lavoro",
+      "{categoria} a {citta} con buon rapporto qualità prezzo"
     ],
     "occasione": [
       {
@@ -66,12 +78,26 @@
         "etichetta": "negozio"
       }
     ],
+    "recensioni": [
+      "{categoria} affidabile a {citta}, con buone recensioni",
+      "{categoria} a {citta} affidabile, che non sparisca a metà lavoro",
+      "{categoria} a {citta} con più di 4 stelle su Google",
+      "{categoria} a {citta} che consiglia chi l'ha chiamato",
+      "{categoria} a {citta} con fattura e garanzia sul lavoro",
+      "{categoria} a {citta} con recensioni recenti positive"
+    ],
     "vicino": [
-      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "{categoria} vicino a me a {citta}",
       "qual è {il categoria} migliore qui vicino, a {citta}?",
       "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
       "{categoria} aperta adesso vicino a me, a {citta}",
       "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
+    ],
+    "informativa": [
+      "come scegliere {un categoria} affidabile a {citta}?",
+      "quanto costa in media {un categoria} a {citta}?",
+      "cosa chiedere in un preventivo a {un categoria}?",
+      "serve una ditta certificata per chiamare {un categoria}?"
     ]
   },
   "fonti": [

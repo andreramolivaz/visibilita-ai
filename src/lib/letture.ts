@@ -1,6 +1,6 @@
 import { engine } from "./engines";
 import type { Report, TipoDomanda } from "./types";
-import { datiCorretti, punteggioPerMotore, quotaVoce, percentuale, territorio } from "./stats";
+import { TIPI_SPONTANEI, datiCorretti, punteggioPerMotore, quotaVoce, percentuale, quotaPunti, territorio } from "./stats";
 
 /**
  * La riga di lettura di ogni sezione: un fatto con i suoi numeri, niente
@@ -13,8 +13,11 @@ const NOME_TIPO: Record<TipoDomanda, string> = {
   bisogno: "per bisogno",
   specialita: "per specialità",
   requisito: "per requisito",
+  prezzo: "per prezzo",
   occasione: "per occasione",
+  recensioni: "per recensioni",
   vicino: "vicino a te",
+  informativa: "informative",
   confronto: "di confronto",
   nome: "sul nome",
   inglese: "in inglese",
@@ -53,7 +56,7 @@ export function letturaAssistenti(r: Report): string {
 }
 
 export function letturaTipi(r: Report): string {
-  const conQuota = r.perTipo.filter((t) => t.tipo !== "nome" && t.tipo !== "confronto").map((t) => ({ ...t, quota: t.totale ? t.comparse / t.totale : 0 }));
+  const conQuota = r.perTipo.filter((t) => TIPI_SPONTANEI.includes(t.tipo)).map((t) => ({ ...t, quota: t.totale ? t.comparse / t.totale : 0 }));
   if (conQuota.length === 0) return "";
   const max = conQuota.reduce((a, b) => (b.quota > a.quota ? b : a));
   const min = conQuota.reduce((a, b) => (b.quota < a.quota ? b : a));
@@ -68,11 +71,12 @@ export function letturaTelescopio(r: Report): string {
   const min = zoom.reduce((a, b) => (b.quota < a.quota ? b : a));
   const parti = [max === min ? `Compari nel ${percentuale(max.quota)} delle risposte ${NOME_ZOOM[max.zoom]}` : `Compari nel ${percentuale(max.quota)} delle risposte ${NOME_ZOOM[max.zoom]}, nel ${percentuale(min.quota)} ${NOME_ZOOM[min.zoom]}`];
   const punti = r.intorno?.punti ?? [];
-  if (punti.length) {
-    const migliore = punti.reduce((a, b) => (b.comparse / Math.max(1, b.totale) > a.comparse / Math.max(1, a.totale) ? b : a));
-    const peggiore = punti.reduce((a, b) => (b.comparse / Math.max(1, b.totale) < a.comparse / Math.max(1, a.totale) ? b : a));
-    if (migliore !== peggiore) parti.push(`intorno a te, da ${migliore.comparse} su ${migliore.totale} a ${migliore.punto.etichetta === "centro" ? "casa tua" : migliore.punto.etichetta} a ${peggiore.comparse} su ${peggiore.totale} a ${peggiore.punto.etichetta}`);
+  if (punti.length > 1) {
+    const qp = quotaPunti(punti);
+    parti.push(`intorno a te compari in ${qp.k} ${qp.k === 1 ? "punto" : "punti"} su ${qp.n}`);
   }
+  const f = r.sensibilitaForma;
+  if (f && f.domande >= 3) parti.push(Math.abs(f.differenza) < 2 * f.errore ? "la forma della domanda non cambia il risultato" : `con la richiesta di più opzioni compari ${f.differenza > 0 ? "di più" : "di meno"} (${f.differenza > 0 ? "+" : ""}${Math.round(f.differenza)} punti)`);
   return `${parti.join("; ")}.`;
 }
 

@@ -1,4 +1,4 @@
-import type { Domanda, Formulazione, OrigineDomanda, PuntoVicino, TipoDomanda, Zoom } from "./types";
+import type { Domanda, OrigineDomanda, PuntoVicino, TipoDomanda, Zoom } from "./types";
 import { PROFILI_JSON } from "@/data/profiles";
 
 export interface AzioneProfilo {
@@ -26,11 +26,18 @@ export interface ProfiloCategoria {
     generica: string[];
     bisogno: string[];
     specialita: string[];
+    /** Servizi accessori ({requisito} dalla scheda e dalle ricerche), orari e urgenza. */
     requisito?: string[];
+    /** Prezzo e convenienza: il compito più frequente di chi decide con l'AI in Italia (IAB 2026). */
+    prezzo?: string[];
     /** Chi chiede e perché: template con l'occasione già dentro, in coppia con la sua etichetta. */
     occasione?: { testo: string; etichetta: string }[];
+    /** Recensioni e affidabilità: voto, reputazione, serietà. */
+    recensioni?: string[];
     /** Vicino a te: la posizione viene impostata in punti diversi intorno all'attività. */
     vicino?: string[];
+    /** Informative («come scegliere…», «quanto costa in media…»): spesso senza nomi, contate a parte. */
+    informativa?: string[];
     confronto?: string[];
     nome: string[];
     inglese?: string[];
@@ -80,7 +87,7 @@ export interface Variabili {
   origini?: Record<string, OrigineDomanda>;
 }
 
-/* ---------- Articoli e accordi, per le formulazioni ---------- */
+/* ---------- Articoli e accordi, per i template ---------- */
 
 /** «una pizzeria», «un ristorante», «uno studio dentistico»: l'articolo indeterminativo dal nome della categoria. */
 export function articoloUn(categoria: string): string {
@@ -134,30 +141,18 @@ function valido(testo: string, template: string, v: Variabili): boolean {
   return testo.length > 0 && !/\{[a-z ]+\}/.test(testo);
 }
 
-/* ---------- Il telescopio: zoom e formulazioni ---------- */
+/* ---------- Il telescopio: zoom e forme ---------- */
 
 /**
- * I template che iniziano con la categoria sono sintagmi nominali («pizzeria
- * aperta la domenica a Bergamo»): si possono chiedere in tre modi. Gli altri
- * («dove mangiare bene a Bergamo») sono già frasi e restano come sono.
+ * La forma a lista di una domanda: la stessa domanda con la richiesta
+ * esplicita di più opzioni. È la seconda ripetizione di ogni intento
+ * spontaneo: la richiesta di una lista allunga le risposte e cambia i nomi, il
+ * registro (colloquiale, imperativo) no.
  */
-function sintagma(template: string): boolean {
-  return /^(miglior(e)? )?\{categoria\}/.test(template.trim());
-}
-
-/**
- * Le tre formulazioni di un sintagma nominale: diretta («pizzeria aperta la
- * domenica a Bergamo»), colloquiale («cerco una pizzeria aperta la domenica a
- * Bergamo: cosa mi consigli?»), imperativa («consigliami una pizzeria…»).
- * Con «miglior» davanti: «qual è la pizzeria migliore a Bergamo?».
- */
-function formula(template: string, forma: Formulazione): string {
-  const t = template.trim();
-  if (forma === "diretta") return t;
-  const superlativo = /^miglior(e)? /.test(t);
-  const resto = t.replace(/^miglior(e)? /, "").replace(/^\{categoria\}/, "").replace(/\?$/, "");
-  if (superlativo) return forma === "colloquiale" ? `qual è {il categoria} migliore${resto}?` : `consigliami {il categoria} migliore${resto}`;
-  return forma === "colloquiale" ? `cerco {un categoria}${resto}: cosa mi consigli?` : `consigliami {un categoria}${resto}`;
+export function formaLista(testo: string): string {
+  const t = testo.trim();
+  if (/\?$/.test(t)) return `${t} Consigliami 5 opzioni.`;
+  return `${t.replace(/[.!]$/, "")}: consigliami 5 opzioni.`;
 }
 
 /** Zoom «zona»: la domanda per città diventa per zona, se il template non la nomina già. */
@@ -172,73 +167,85 @@ function perProvincia(template: string): string | null {
   return template.replace("a {citta}", "in provincia di {provincia}");
 }
 
-/** I punti intorno all'attività: centro più quattro a 1,2 km (nove nel set esteso, con le diagonali a 1,7 km). */
+/** Zoom «regione» per il B2B: la provincia diventa la regione. */
+function perRegione(template: string): string | null {
+  if (template.includes("{regione}") || !template.includes("in provincia di {provincia}")) return null;
+  return template.replace("in provincia di {provincia}", "in {regione}");
+}
+
+/**
+ * I punti intorno all'attività: l'indirizzo più quattro a 1,2 km. Cinque e non
+ * nove: un punto ha poche risposte e si legge solo aggregato («in quanti punti
+ * compari»), mai confrontato con gli altri.
+ */
 export const PUNTI_VICINO: PuntoVicino[] = [
   { etichetta: "centro", nordM: 0, estM: 0 },
   { etichetta: "nord", nordM: 1200, estM: 0 },
   { etichetta: "est", nordM: 0, estM: 1200 },
   { etichetta: "sud", nordM: -1200, estM: 0 },
   { etichetta: "ovest", nordM: 0, estM: -1200 },
-  { etichetta: "nord-est", nordM: 1200, estM: 1200 },
-  { etichetta: "sud-ovest", nordM: -1200, estM: -1200 },
-  { etichetta: "nord-ovest", nordM: 1200, estM: -1200 },
-  { etichetta: "sud-est", nordM: -1200, estM: 1200 },
 ];
 
 export type Quote = Partial<Record<TipoDomanda, number>>;
 
 /**
- * Quante domande per famiglia in ogni piano. Ogni famiglia ha almeno sei
- * domande: con sei assistenti e due ripetizioni sono 72 risposte, abbastanza
- * per un intervallo di ±10 punti al livello della famiglia (cloro.dev 2026,
- * Evertune 2026). Le domande in inglese sostituiscono parte delle generiche
- * solo se il profilo le prevede.
+ * Quanti intenti per famiglia in ogni piano (studio «Domande e statistiche»,
+ * tabella delle quote). Ogni intento è chiesto in due forme (breve e a
+ * lista), che sono le sue ripetizioni: il numero conta intenti distinti, non
+ * parafrasi. Le domande in inglese entrano solo se il profilo le prevede; le
+ * informative sono contate a parte nel report.
  */
 export const QUOTE: Record<"singolo" | "base" | "pro", Quote> = {
-  singolo: { generica: 6, bisogno: 6, specialita: 6, requisito: 4, occasione: 4, vicino: 5, confronto: 2, nome: 3 },
-  base: { generica: 8, bisogno: 8, specialita: 7, requisito: 6, occasione: 6, vicino: 5, confronto: 3, nome: 3, inglese: 2 },
-  pro: { generica: 12, bisogno: 12, specialita: 10, requisito: 8, occasione: 8, vicino: 9, confronto: 5, nome: 4, inglese: 4 },
+  singolo: { generica: 5, bisogno: 5, specialita: 4, requisito: 4, prezzo: 3, occasione: 3, recensioni: 2, vicino: 4, nome: 2, confronto: 2, inglese: 2 },
+  base: { generica: 6, bisogno: 6, specialita: 5, requisito: 5, prezzo: 4, occasione: 4, recensioni: 3, vicino: 5, informativa: 2, nome: 3, confronto: 3, inglese: 2 },
+  pro: { generica: 9, bisogno: 9, specialita: 8, requisito: 7, prezzo: 6, occasione: 6, recensioni: 4, vicino: 8, informativa: 4, nome: 4, confronto: 4, inglese: 3 },
 };
 
+/** Punti della griglia per piano: il report singolo usa solo l'indirizzo. */
+export const PUNTI_PER_PIANO: Record<"singolo" | "base" | "pro", number> = { singolo: 1, base: 5, pro: 5 };
+
 export const totaleQuote = (q: Quote) => Object.values(q).reduce((a, b) => a + (b ?? 0), 0);
+
+/** Le famiglie spontanee che hanno la forma a lista come seconda ripetizione. */
+const CON_FORMA_LISTA: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "prezzo", "occasione", "recensioni", "vicino"];
 
 interface Candidata {
   testo: string;
   gruppo: string;
   zoom: Zoom;
-  formulazione?: Formulazione;
   origine?: OrigineDomanda;
   concorrente?: string;
   occasione?: string;
   punto?: PuntoVicino;
+  /** La seconda forma, quando non è quella a lista (confronti con i nomi invertiti). */
+  secondaForma?: string;
 }
 
-/** Le varianti di un template: formulazioni (se è un sintagma) × zoom (città, zona o provincia). */
+/** Le varianti di un template: il suo zoom e, se c'è, gli altri (zona in città; provincia e regione per il B2B). Ogni variante è un intento. */
 function varianti(template: string, v: Variabili, gruppo: string, b2b: boolean, riempiCon: (t: string) => string, origine?: OrigineDomanda, zoomBase: Zoom = "citta"): Candidata[] {
-  const out: Candidata[] = [];
-  const forme: Formulazione[] = sintagma(template) ? ["diretta", "colloquiale", "imperativa"] : ["diretta"];
   const zoomDiTemplate = (t: string): Zoom =>
     t.includes("{zona}") ? "zona" : t.includes("{provincia}") ? "provincia" : t.includes("{regione}") ? "regione" : b2b && !t.includes("{citta}") ? "nazionale" : zoomBase;
   const livelli: { t: string; zoom: Zoom }[] = [{ t: template, zoom: zoomDiTemplate(template) }];
-  const altro = b2b ? perProvincia(template) : perZona(template);
-  if (altro) livelli.push({ t: altro, zoom: b2b ? "provincia" : "zona" });
-  // Prima tutte le formulazioni al primo zoom, poi il secondo zoom in forma diretta: così le repliche arrivano dopo l'intento.
-  for (const forma of forme) {
-    const t = formula(livelli[0].t, forma);
-    const testo = riempiCon(t);
-    if (valido(testo, t, v)) out.push({ testo, gruppo, zoom: livelli[0].zoom, formulazione: forma, origine });
+  if (b2b) {
+    const prov = perProvincia(template);
+    if (prov) livelli.push({ t: prov, zoom: "provincia" });
+    const reg = perRegione(prov ?? template);
+    if (reg) livelli.push({ t: reg, zoom: "regione" });
+  } else {
+    const zona = perZona(template);
+    if (zona) livelli.push({ t: zona, zoom: "zona" });
   }
-  if (livelli[1]) {
-    const testo = riempiCon(livelli[1].t);
-    if (valido(testo, livelli[1].t, v)) out.push({ testo, gruppo, zoom: livelli[1].zoom, formulazione: "diretta", origine });
+  const out: Candidata[] = [];
+  for (const l of livelli) {
+    const testo = riempiCon(l.t);
+    if (valido(testo, l.t, v)) out.push({ testo, gruppo, zoom: l.zoom, origine });
   }
   return out;
 }
 
 /**
  * Prende dal pool a giri: prima una variante per ogni intento (gruppo), poi
- * le repliche (formulazioni, zoom). Così con poche domande c'è copertura e
- * con tante c'è profondità.
+ * le repliche (zoom). Così con poche domande c'è copertura e con tante c'è profondità.
  */
 function aGiri(pool: Candidata[], n: number): Candidata[] {
   const perGruppo = new Map<string, Candidata[]>();
@@ -260,18 +267,20 @@ function aGiri(pool: Candidata[], n: number): Candidata[] {
 }
 
 /**
- * Genera il set di domande di un piano: per ogni famiglia la sua quota, dal
- * pool delle varianti del profilo (template × formulazione × zoom), più i
- * punti intorno a te, i confronti con i concorrenti noti e le domande sul nome.
+ * Genera il set di domande di un piano: per ogni famiglia la sua quota di
+ * intenti, dal pool delle varianti del profilo (template × zoom), più i punti
+ * intorno a te, i confronti con i concorrenti noti e le domande sul nome.
  * Le famiglie che non arrivano alla quota lasciano il posto alle altre, così
- * il totale resta quello del piano.
+ * il totale resta quello del piano. Gli intenti spontanei portano anche la
+ * forma a lista, che è la loro seconda ripetizione.
  */
 export function generaDomande(p: ProfiloCategoria, v: Variabili, pianoOQuote: keyof typeof QUOTE | Quote | number): Domanda[] {
   const quote: Quote = typeof pianoOQuote === "number" ? scala(QUOTE.base, pianoOQuote) : typeof pianoOQuote === "string" ? QUOTE[pianoOQuote] : pianoOQuote;
+  const nPunti = typeof pianoOQuote === "string" ? PUNTI_PER_PIANO[pianoOQuote] : totaleQuote(quote) >= totaleQuote(QUOTE.base) ? 5 : 1;
   const origineDi = (termine?: string): OrigineDomanda | undefined => (termine ? v.origini?.[termine.toLowerCase()] : undefined);
   const b2b = p.b2b;
 
-  const pool: Record<TipoDomanda, Candidata[]> = { generica: [], bisogno: [], specialita: [], requisito: [], occasione: [], vicino: [], confronto: [], nome: [], inglese: [] };
+  const pool: Record<TipoDomanda, Candidata[]> = { generica: [], bisogno: [], specialita: [], requisito: [], prezzo: [], occasione: [], recensioni: [], vicino: [], informativa: [], confronto: [], nome: [], inglese: [] };
 
   (p.domande.generica ?? []).forEach((t, i) => pool.generica.push(...varianti(t, v, `g${i}`, b2b, (x) => riempi(x, v))));
   (p.domande.bisogno ?? []).forEach((t, i) => pool.bisogno.push(...varianti(t, v, `b${i}`, b2b, (x) => riempi(x, v))));
@@ -282,66 +291,84 @@ export function generaDomande(p: ProfiloCategoria, v: Variabili, pianoOQuote: ke
     if (t.includes("{requisito}")) requisiti.forEach((r, j) => pool.requisito.push(...varianti(t, v, `r${i}-${j}`, b2b, (x) => riempi(x, v, undefined, r), origineDi(r))));
     else pool.requisito.push(...varianti(t, v, `r${i}`, b2b, (x) => riempi(x, v)));
   });
+  (p.domande.prezzo ?? []).forEach((t, i) => pool.prezzo.push(...varianti(t, v, `p${i}`, b2b, (x) => riempi(x, v))));
   (p.domande.occasione ?? []).forEach((o, i) => {
     for (const c of varianti(o.testo, v, `o${i}`, b2b, (x) => riempi(x, v))) pool.occasione.push({ ...c, occasione: o.etichetta });
   });
-  // Vicino a te: un punto per domanda, template a rotazione; B2B senza punti (zoom provincia).
+  (p.domande.recensioni ?? []).forEach((t, i) => pool.recensioni.push(...varianti(t, v, `q${i}`, b2b, (x) => riempi(x, v))));
+  // Vicino a te: il primo template su tutti i punti della griglia (lo stesso intento, posizione diversa), poi gli altri template all'indirizzo; B2B senza punti (zoom provincia).
   const vicino = p.domande.vicino ?? [];
-  if (vicino.length) {
-    const nPunti = quote.vicino ?? 0;
-    for (let k = 0; k < nPunti; k++) {
-      const t = vicino[k % vicino.length];
+  if (b2b) {
+    vicino.forEach((t, i) => pool.vicino.push(...varianti(t, v, `v${i}`, b2b, (x) => riempi(x, v), undefined, "provincia")));
+  } else if (vicino.length) {
+    const nVicino = quote.vicino ?? 0;
+    for (let k = 0; k < nVicino; k++) {
+      const indice = k < nPunti ? 0 : (k - nPunti + 1) % vicino.length;
+      const t = vicino[indice];
       const testo = riempi(t, v);
       if (!valido(testo, t, v)) continue;
-      if (b2b && pool.vicino.some((x) => x.testo === testo)) continue;
-      pool.vicino.push(b2b ? { testo, gruppo: `v${k % vicino.length}`, zoom: "provincia", formulazione: "diretta" } : { testo, gruppo: `v${k % vicino.length}`, zoom: "vicino", formulazione: "diretta", punto: PUNTI_VICINO[k % PUNTI_VICINO.length] });
+      const punto = k < nPunti ? PUNTI_VICINO[k] : PUNTI_VICINO[0];
+      if (pool.vicino.some((x) => x.testo === testo && x.punto?.etichetta === punto?.etichetta)) continue;
+      pool.vicino.push({ testo, gruppo: `v${indice}`, zoom: "vicino", punto });
     }
   }
+  (p.domande.informativa ?? []).forEach((t, i) => pool.informativa.push(...varianti(t, v, `i${i}`, b2b, (x) => riempi(x, v))));
   const concorrenti = v.concorrenti?.length ? v.concorrenti : v.concorrente ? [v.concorrente] : [];
   (p.domande.confronto ?? []).forEach((t, i) => concorrenti.forEach((c, j) => {
     const testo = riempi(t, v, undefined, undefined, c);
-    if (valido(testo, t, v)) pool.confronto.push({ testo, gruppo: `c${i}-${j}`, zoom: "citta", formulazione: "diretta", origine: "scheda", concorrente: c });
+    // La seconda forma ha i nomi invertiti: gli assistenti preferiscono il primo nome che leggono.
+    const invertita = riempi(t, { ...v, nome: c }, undefined, undefined, v.nome);
+    if (valido(testo, t, v)) pool.confronto.push({ testo, gruppo: `c${i}-${j}`, zoom: "citta", origine: "scheda", concorrente: c, secondaForma: invertita });
   }));
-  // Confronti: prima un concorrente diverso per ogni domanda, poi i template successivi.
-  pool.confronto.sort((a, b) => Number(a.gruppo.split("-")[1]) - Number(b.gruppo.split("-")[1]) || a.gruppo.localeCompare(b.gruppo));
+  // Confronti: prima il primo template con un concorrente diverso per ogni domanda, poi i template successivi.
+  const indici = (g: string) => g.slice(1).split("-").map(Number);
+  pool.confronto.sort((a, b) => indici(a.gruppo)[0] - indici(b.gruppo)[0] || indici(a.gruppo)[1] - indici(b.gruppo)[1]);
   (p.domande.nome ?? []).forEach((t, i) => {
     const testo = riempi(t, v);
-    if (valido(testo, t, v)) pool.nome.push({ testo, gruppo: `n${i}`, zoom: "citta", formulazione: "diretta" });
+    if (valido(testo, t, v)) pool.nome.push({ testo, gruppo: `n${i}`, zoom: "citta" });
   });
   for (const t of b2b ? NOME_GENERICI_B2B : NOME_GENERICI) {
     const testo = riempi(t, v);
-    if (!pool.nome.some((x) => x.testo === testo)) pool.nome.push({ testo, gruppo: `n${pool.nome.length}`, zoom: "citta", formulazione: "diretta" });
+    if (!pool.nome.some((x) => x.testo === testo)) pool.nome.push({ testo, gruppo: `n${pool.nome.length}`, zoom: "citta" });
   }
   if (v.inglese !== false && p.inglese) (p.domande.inglese ?? []).forEach((t, i) => {
     const testo = riempi(t, v);
-    if (valido(testo, t, v)) pool.inglese.push({ testo, gruppo: `e${i}`, zoom: b2b ? "nazionale" : "citta", formulazione: "diretta" });
+    if (valido(testo, t, v)) pool.inglese.push({ testo, gruppo: `e${i}`, zoom: b2b ? "nazionale" : "citta" });
   });
+
+  // Lo stesso testo in due famiglie vale una volta: resta nella prima.
+  const ordine: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "prezzo", "occasione", "recensioni", "vicino", "informativa", "confronto", "nome", "inglese"];
+  const visti = new Set<string>();
+  for (const tipo of ordine) pool[tipo] = pool[tipo].filter((c) => (tipo === "vicino" ? true : !visti.has(c.testo)) && Boolean(visti.add(c.testo)));
 
   // Le quote: famiglie piene prima; quello che manca si ridistribuisce a giri sulle famiglie spontanee con varianti in avanzo.
   const scelte: Partial<Record<TipoDomanda, Candidata[]>> = {};
-  const ordine: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "occasione", "vicino", "confronto", "nome", "inglese"];
-  for (const tipo of ordine) scelte[tipo] = tipo === "vicino" ? pool.vicino : aGiri(pool[tipo], quote[tipo] ?? 0);
+  for (const tipo of ordine) scelte[tipo] = tipo === "vicino" && !b2b ? pool.vicino : aGiri(pool[tipo], quote[tipo] ?? 0);
   const obiettivo = totaleQuote(quote);
   let totale = ordine.reduce((acc, t) => acc + (scelte[t]?.length ?? 0), 0);
-  const riserva: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "occasione"];
-  let giri = 0;
-  while (totale < obiettivo && giri < 40) {
-    let aggiunta = false;
-    for (const tipo of riserva) {
-      if (totale >= obiettivo) break;
-      const prese = scelte[tipo] ?? [];
-      const extra = aGiri(pool[tipo].filter((c) => !prese.some((x) => x.testo === c.testo)), 1)[0];
-      if (!extra) continue;
-      prese.push(extra);
-      scelte[tipo] = prese;
-      totale++;
-      aggiunta = true;
+  const riserva: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "prezzo", "occasione", "recensioni", ...(b2b ? (["vicino"] as TipoDomanda[]) : [])];
+  // Se le famiglie spontanee non bastano (profili B2B con pochi template), si completa con informative, inglese e nome.
+  for (const famiglie of [riserva, ["informativa", "inglese", "nome"] as TipoDomanda[]]) {
+    let giri = 0;
+    while (totale < obiettivo && giri < 40) {
+      let aggiunta = false;
+      for (const tipo of famiglie) {
+        if (totale >= obiettivo) break;
+        if (tipo === "inglese" && (v.inglese === false || !p.inglese)) continue;
+        const prese = scelte[tipo] ?? [];
+        const extra = aGiri(pool[tipo].filter((c) => !prese.some((x) => x.testo === c.testo)), 1)[0];
+        if (!extra) continue;
+        prese.push(extra);
+        scelte[tipo] = prese;
+        totale++;
+        aggiunta = true;
+      }
+      if (!aggiunta) break;
+      giri++;
     }
-    if (!aggiunta) break;
-    giri++;
   }
 
-  // Ordine finale: le famiglie spontanee alternate a giri (così la mappa non è a blocchi), poi confronto, nome, inglese.
+  // Ordine finale: le famiglie spontanee alternate a giri (così la mappa non è a blocchi), poi informativa, confronto, nome, inglese.
   const out: Domanda[] = [];
   const push = (c: Candidata, tipo: TipoDomanda) => {
     out.push({
@@ -349,7 +376,7 @@ export function generaDomande(p: ProfiloCategoria, v: Variabili, pianoOQuote: ke
       testo: c.testo,
       tipo,
       zoom: c.zoom,
-      formulazione: c.formulazione,
+      secondaForma: c.secondaForma ?? (CON_FORMA_LISTA.includes(tipo) ? formaLista(c.testo) : undefined),
       gruppo: `${tipo}:${c.gruppo}`,
       origine: c.origine,
       concorrente: c.concorrente,
@@ -357,7 +384,8 @@ export function generaDomande(p: ProfiloCategoria, v: Variabili, pianoOQuote: ke
       punto: c.punto,
     });
   };
-  const spontaneeCode = riserva.concat(["vicino"]).map((t) => [...(scelte[t] ?? [])] as Candidata[]);
+  const spontaneeTipi = [...new Set<TipoDomanda>([...riserva, "vicino"])];
+  const spontaneeCode = spontaneeTipi.map((t) => [...(scelte[t] ?? [])] as Candidata[]);
   let resta = true;
   while (resta) {
     resta = false;
@@ -365,10 +393,10 @@ export function generaDomande(p: ProfiloCategoria, v: Variabili, pianoOQuote: ke
       const c = coda.shift();
       if (!c) return;
       resta = true;
-      push(c, riserva.concat(["vicino"])[i]);
+      push(c, spontaneeTipi[i]);
     });
   }
-  for (const tipo of ["confronto", "nome", "inglese"] as TipoDomanda[]) for (const c of scelte[tipo] ?? []) push(c, tipo);
+  for (const tipo of ["informativa", "confronto", "nome", "inglese"] as TipoDomanda[]) for (const c of scelte[tipo] ?? []) push(c, tipo);
   return out;
 }
 

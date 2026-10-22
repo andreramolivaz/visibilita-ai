@@ -32,13 +32,25 @@
     ],
     "requisito": [
       "{categoria} a {citta} con {requisito}",
-      "{categoria} a {citta} che lavori anche online"
+      "{categoria} a {citta} che lavori anche online",
+      "{categoria} a {citta} che risponda oggi",
+      "{categoria} a {citta} con appuntamento entro la settimana",
+      "{categoria} a {citta} con disponibilità anche il sabato",
+      "{categoria} a {citta} che riceva dopo le 18"
     ],
     "confronto": [
       "meglio {nome} o {concorrente} come {categoria} a {citta}?"
     ],
     "nome": [
       "{nome} {citta} recensioni"
+    ],
+    "prezzo": [
+      "{categoria} a {citta} con tariffe chiare",
+      "{categoria} a {citta} a buon prezzo",
+      "quanto costa {un categoria} a {citta}? consigliami qualcuno con preventivo",
+      "{categoria} a {citta} con primo incontro gratuito",
+      "{categoria} a {citta} con prezzi onesti per un privato",
+      "{categoria} a {citta} con costi contenuti per una piccola impresa"
     ],
     "occasione": [
       {
@@ -66,12 +78,26 @@
         "etichetta": "budget"
       }
     ],
+    "recensioni": [
+      "{categoria} a {citta} con le recensioni migliori",
+      "{categoria} affidabile a {citta}",
+      "{categoria} a {citta} che i clienti consigliano",
+      "{categoria} a {citta} affidabile e con esperienza",
+      "{categoria} a {citta} con più di 4 stelle su Google",
+      "{categoria} a {citta} con buona reputazione"
+    ],
     "vicino": [
-      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "{categoria} vicino a me a {citta}",
       "qual è {il categoria} migliore qui vicino, a {citta}?",
       "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
       "{categoria} aperta adesso vicino a me, a {citta}",
       "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
+    ],
+    "informativa": [
+      "come scegliere {un categoria} a {citta}?",
+      "quanto costa in media {un categoria} a {citta}?",
+      "quando serve davvero {un categoria}?",
+      "cosa chiedere a {un categoria} al primo incontro?"
     ]
   },
   "fonti": [

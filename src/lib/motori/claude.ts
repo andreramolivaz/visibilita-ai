@@ -1,5 +1,5 @@
 import type { Interrogazione, Motore, RispostaGrezza } from "./tipi";
-import { ISTRUZIONE, chiama, fallita, urlDentro } from "./tipi";
+import { chiama, fallita, istruzione, urlDentro } from "./tipi";
 
 /**
  * Claude via Messages API con lo strumento di ricerca web e la località
@@ -20,7 +20,7 @@ export const claude: Motore = {
         body: JSON.stringify({
           model: modello(),
           max_tokens: 1500,
-          system: ISTRUZIONE,
+          system: istruzione(q.lingua),
           messages: [{ role: "user", content: q.domanda }],
           tools: [
             {

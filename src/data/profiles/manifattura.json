@@ -21,11 +21,15 @@
   "domande": {
     "generica": [
       "produttori di {specialita} in {regione}",
-      "aziende di {categoria} in provincia di {provincia}"
+      "aziende di {categoria} in provincia di {provincia}",
+      "{categoria} a {citta} con buone referenze",
+      "chi produce {specialita} in provincia di {provincia}?"
     ],
     "bisogno": [
       "fornitore di {specialita} conto terzi per piccole quantità in {regione}",
-      "laboratorio di {specialita} conto terzi vicino a {citta}"
+      "laboratorio di {specialita} conto terzi vicino a {citta}",
+      "{categoria} a {citta} che accetti ordini da una piccola azienda",
+      "fornitore di {specialita} in {regione} con campionatura prima dell'ordine"
     ],
     "specialita": [
       "produttore di {specialita} in {regione} che faccia private label",
@@ -33,7 +37,11 @@
     ],
     "requisito": [
       "aziende con certificazione {requisito} in {regione}",
-      "produttore di {specialita} in Italia con {requisito}"
+      "produttore di {specialita} in Italia con {requisito}",
+      "{categoria} in provincia di {provincia} con consegna entro una settimana",
+      "{categoria} in {regione} che risponda a un preventivo in giornata",
+      "{categoria} in provincia di {provincia} con produzione urgente",
+      "{categoria} in {regione} che lavori su turni per una commessa urgente"
     ],
     "confronto": [
       "meglio {nome} o {concorrente} come fornitore di {specialita}?"
@@ -43,6 +51,14 @@
     ],
     "inglese": [
       "Italian manufacturer of {specialita} for private label, minimum order 500 units"
+    ],
+    "prezzo": [
+      "{categoria} in provincia di {provincia} con prezzi competitivi",
+      "{categoria} in {regione} con prezzi bassi per piccole serie",
+      "{categoria} in provincia di {provincia} con preventivo rapido e prezzi chiari",
+      "{categoria} in {regione} con il miglior rapporto qualità prezzo",
+      "{categoria} in provincia di {provincia} con prezzi convenienti per grandi volumi",
+      "{categoria} in {regione} con listino trasparente"
     ],
     "occasione": [
       {
@@ -70,10 +86,24 @@
         "etichetta": "estero"
       }
     ],
+    "recensioni": [
+      "{categoria} affidabile in provincia di {provincia}",
+      "{categoria} in {regione} con buone referenze",
+      "{categoria} in provincia di {provincia} affidabile e puntuale nelle consegne",
+      "{categoria} in {regione} con referenze di altre aziende",
+      "{categoria} in provincia di {provincia} con recensioni positive",
+      "{categoria} in {regione} con buona reputazione nel settore"
+    ],
     "vicino": [
       "{categoria} in provincia di {provincia}, il più vicino a {citta}",
       "{categoria} nei dintorni di {citta} che venga a fare un sopralluogo",
       "{categoria} in {regione} vicino a {citta} con consegna a breve"
+    ],
+    "informativa": [
+      "come scegliere {un categoria} in provincia di {provincia}?",
+      "cosa chiedere in un preventivo a {un categoria}?",
+      "quali certificazioni deve avere {un categoria}?",
+      "come si valuta {un categoria} prima di una fornitura?"
     ]
   },
   "fonti": [

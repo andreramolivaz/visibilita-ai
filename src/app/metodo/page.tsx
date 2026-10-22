@@ -50,7 +50,7 @@ const MODELLI = [
 const LIMITI = [
   "Le risposte degli assistenti cambiano nel tempo e tra una ripetizione e l'altra: la stessa lista ricompare meno di una volta su cento, nello stesso ordine circa una su mille (SparkToro, 2026). Per questo ogni domanda viene posta più volte, in giorni diversi nell'abbonamento, e ogni numero ha il suo campione e, dove serve, il suo intervallo.",
   "Le interfacce ufficiali (API) possono differire dalle app che usano i clienti: su domande aperte lo scarto può essere grande (Brandlight, 2026), su domande chiuse le classifiche coincidono nell'87% dei casi (Massive, 2026). Dichiariamo il canale in ogni report e ogni trimestre confrontiamo 50 domande con le app vere, pubblicando lo scarto.",
-  "Con 270 risposte l'intervallo al 95% di una quota del 19% è circa ±5 punti; la singola cella «2 su 3» è un'indicazione, non una misura. Il report mostra il primo come numero chiave e la seconda solo nella mappa.",
+  "Con 384 risposte spontanee una quota del 25% ha un intervallo di Wilson di ±4 punti, ma quello tra domande, l'unico che vale per domande di quel tipo, è ±10–12; la singola cella «2 su 3» è un'indicazione, non una misura. Tra due report una variazione sotto gli 8–13 punti non è rilevabile.",
   "Copilot e Meta AI non hanno un'interfaccia ufficiale di ricerca: non sono nel punteggio finché non potremo leggerli in modo affidabile.",
   "Il punteggio misura i consigli degli assistenti AI, non Google tradizionale, non le recensioni, non il fatturato.",
   "Usiamo solo dati pubblici dell'attività e, per l'abbonamento, l'email del titolare.",
@@ -95,24 +95,30 @@ export default function Metodo() {
               confermi con un tocco, e vedi da dove viene ogni domanda.
             </p>
             <p>
-              Le domande sono quelle che un cliente fa davvero. Le abbiamo studiate sui prompt reali: sono frasi di 8–25 parole con un luogo e
-              almeno un vincolo (Semrush 2025–26), e circa una su quattro è un confronto tra due nomi (Citations.press 2026). I modelli sono
-              scritti per {PROFILI.filter((p) => p.imprese > 0).length} categorie, in ordine di numerosità, e riempiti con città, zona o
-              provincia, con le specialità che emergono dalle tue recensioni e dal tuo sito e con i requisiti della scheda e delle ricerche; per chi
-              esporta o riceve stranieri ci sono anche domande in inglese. Il set non si vede prima della scansione e non si cambia: è il metodo, e
-              resta uguale da una scansione all&apos;altra perché il confronto nel tempo regga.
+              Le domande sono quelle che un cliente fa davvero, e sono corte: con la ricerca attiva un prompt a ChatGPT ha in media 4 parole
+              (Semrush, 80 milioni di righe di clickstream), in Google AI Mode 7, e tre sessioni su quattro di chi cerca un professionista
+              contengono una domanda in stile parola chiave, come «dentista Bergamo» (Search Engine Land, 2026). I modelli sono scritti per{" "}
+              {PROFILI.filter((p) => p.imprese > 0).length} categorie, in ordine di numerosità, e riempiti con città, zona o provincia, con le
+              specialità che emergono dalle tue recensioni e dal tuo sito e con i requisiti della scheda e delle ricerche; per chi esporta o
+              riceve stranieri ci sono anche domande in inglese. Il set non si vede prima della scansione e non si cambia: è il metodo, e resta
+              uguale da una scansione all&apos;altra perché il confronto nel tempo regga.
             </p>
             <p>
-              <strong>Il telescopio.</strong> Il set è una struttura, non una lista. Nove famiglie: generiche («miglior pizzeria a Bergamo»), per
-              bisogno («aperta la domenica sera»), per specialità («con forno a legna»), per requisito («con dehors», «certificata EN 1090»), per
-              occasione («con bambini piccoli», «pranzo di lavoro», «per un prototipo»), vicino a te («vicino a me», con la posizione impostata in
-              punti diversi intorno all&apos;attività), di confronto («meglio X o Y?», una per concorrente), sul nome, in inglese. Ogni famiglia ha
-              almeno sei domande, così ha abbastanza risposte per un intervallo proprio; lo stesso intento è chiesto a tre livelli di zoom (città,
-              zona, vicino a te; provincia, regione e Italia per le aziende) e in tre formulazioni (diretta, colloquiale, imperativa). Zoom e
-              formulazioni sono repliche dello stesso intento: la ricerca sulla variabilità delle risposte dice che la varianza tra domande è più
-              grande di quella tra ripetizioni, e che le parafrasi sono il modo più efficiente di aggiungere campione dopo lingue e modelli (Dice
-              Roll Method 2026; variance components 2026; cloro.dev 2026). Il report singolo e il piano Base hanno il set completo; il Pro quello
-              esteso, con più occasioni, più zoom e nove punti intorno a te.
+              <strong>Il telescopio.</strong> Il set è una struttura, non una lista. Dodici famiglie: generiche («miglior pizzeria a Bergamo»),
+              per bisogno («per una cena romantica»), per specialità («con forno a legna»), per requisito, orari e urgenza («con dehors», «aperta
+              adesso», «certificata EN 1090»), per prezzo («buon rapporto qualità prezzo»: in Italia il compito più frequente di chi decide con
+              l&apos;AI, IAB 2026), per occasione («con bambini piccoli», «pranzo di lavoro», «per un prototipo»), per recensioni («con più di 4
+              stelle», «affidabile»), vicino a te («vicino a me», con la posizione impostata), informative («come scegliere…», contate a parte
+              perché spesso non fanno nomi), di confronto («meglio X o Y?», una per concorrente), sul nome, in inglese. Lo stesso intento è
+              chiesto a più livelli di zoom (città, zona, vicino a te; provincia, regione e Italia per le aziende).
+            </p>
+            <p>
+              <strong>Intenti, non parafrasi.</strong> Contiamo intenti distinti: 36 nel report singolo, 48 nel Base, 72 nel Pro. Ogni intento
+              spontaneo è chiesto in due forme, breve («pizzeria aperta la domenica a Bergamo») e con la richiesta esplicita di più opzioni
+              («…: consigliami 5 opzioni»), e le due forme sono le sue ripetizioni, non due domande: il registro colloquiale non cambia i nomi
+              nelle risposte, la richiesta di una lista sì (Peec 2026, 37.804 risposte; Dice Roll Method 2026). Nei confronti la seconda forma
+              inverte l&apos;ordine dei nomi, perché gli assistenti preferiscono il primo che leggono. La griglia intorno a te (indirizzo più
+              quattro punti a 1,2 km) entra nel Base e nel Pro, solo sugli assistenti che accettano le coordinate in italiano.
             </p>
           </div>
         </div>
@@ -124,14 +130,15 @@ export default function Metodo() {
               italiana: {elencoMotori(attivi)}. In arrivo: {elencoMotori(motoriInArrivo())}.
             </p>
             <p>
-              Ogni domanda viene posta 2 volte nel report singolo, nella stessa giornata, e 3 nel piano Base, in tre giorni diversi della stessa
-              settimana, perché le risposte cambiano più tra un giorno e l&apos;altro che tra un minuto e l&apos;altro. Oltre cinque ripetizioni
-              il guadagno è minimo: conviene spendere in domande, formulazioni e assistenti (variance components 2026). Gli assistenti con ricerca
-              web convergono in pochi passaggi: con cinque ripetizioni la lista dei nomi è completa (finite-sample audit 2026). Nelle domande
-              vicino a te la posizione è impostata con le coordinate su Gemini, Google AI e Perplexity; ChatGPT e Claude accettano solo la città,
-              Grok nessuna posizione. Per ogni risposta salviamo assistente, modello,
-              canale, località impostata, data e ora, testo della domanda, testo della risposta, ordine dei nomi citati e fonti consultate (URL
-              restituiti dalle interfacce): senza questi campi un dato non è ricostruibile.
+              Ogni intento viene posto 2 volte nel report singolo, nella stessa giornata (forma breve e a lista), e 3 nel piano Base, in tre
+              giorni diversi della stessa settimana, perché le risposte cambiano più tra un giorno e l&apos;altro che tra un minuto e
+              l&apos;altro. La varianza sta tra le domande, non tra le ripetizioni: oltre due o tre ripetizioni il guadagno è minimo e conviene
+              spendere in intenti e assistenti (variance components 2026; Dice Roll Method 2026). Gli assistenti con ricerca web convergono in
+              pochi passaggi (finite-sample audit 2026). Nelle domande vicino a te la posizione è impostata con le coordinate su Google AI e
+              Perplexity; Gemini le accetta solo con il grounding Maps, documentato per il solo inglese; ChatGPT e Claude accettano la città,
+              Grok nessuna posizione: per loro «vicino a me» è la città, e il report lo dice. Per ogni risposta salviamo assistente, modello
+              restituito, canale, località impostata, data e ora, forma della domanda, testo della risposta, ordine dei nomi citati, fonti
+              consultate e, dove l&apos;interfaccia le espone, le ricerche fatte per rispondere: senza questi campi un dato non è ricostruibile.
             </p>
           </div>
           <table className="mt-5 w-full text-sm">
@@ -187,11 +194,15 @@ export default function Metodo() {
               per quanti italiani lo usano, portata su 100.
             </p>
             <p>
-              Accanto al punteggio diamo sempre il campione e, per le quote, l&apos;intervallo di confidenza al 95% (Wilson): con 270 risposte, un 19% ha
-              un&apos;incertezza di circa ±5 punti. La quota di voce è la tua parte di tutte le citazioni di attività nelle risposte, come la
-              definiscono Peec, Profound, Semrush e BrightLocal. Al posto della posizione media usiamo «nei primi tre», perché l&apos;ordine esatto
-              oscilla e i primi tre nomi sono quelli che un cliente legge. La stabilità misura quante celle della mappa concordano su tutte le
-              ripetizioni. La mediana della categoria viene dalle attività della stessa categoria e città analizzate negli ultimi 90 giorni.
+              Accanto al punteggio diamo sempre il campione e due intervalli al 95%: quello di Wilson sulle risposte, che vale per «queste
+              domande, questi assistenti, questi giorni», e quello «tra domande», da un bootstrap che ricampiona le domande intere, che vale per
+              domande di quel tipo ed è più largo, perché le risposte alla stessa domanda sono correlate. Le famiglie con poche domande e i punti
+              della griglia hanno anche una stima ridotta, tirata verso la media del report in proporzione a quante poche risposte hanno, con il
+              peso dichiarato. La quota di voce è la tua parte di tutte le citazioni di attività nelle risposte, come la definiscono Peec,
+              Profound, Semrush e BrightLocal. Al posto della posizione media usiamo «nei primi tre», perché l&apos;ordine esatto oscilla e i
+              primi tre nomi sono quelli che un cliente legge. La stabilità misura quante celle della mappa concordano su tutte le ripetizioni;
+              la sensibilità alla forma dice se la richiesta di una lista cambia il risultato. La mediana della categoria viene dalle attività
+              della stessa categoria e città analizzate negli ultimi 90 giorni.
             </p>
             <p className="text-sm text-muted">
               Tutte le definizioni, una per una, sono nella{" "}
@@ -250,26 +261,27 @@ export default function Metodo() {
           </ul>
         </div>
         <div>
-          <h2 className="text-2xl font-bold">7. Quante ripetizioni servono</h2>
+          <h2 className="text-2xl font-bold">7. Quanto sono larghi gli intervalli</h2>
           <p className="mt-3 text-muted">
-            La quota di risposte in cui compari è una proporzione: il suo intervallo al 95% dipende da quante risposte leggiamo. Per questo i
-            numeri chiave sono sull&apos;intero report e la singola cella della mappa è solo un&apos;indicazione.
+            La quota di risposte in cui compari è una proporzione, e le risposte alla stessa domanda si somigliano: l&apos;intervallo onesto è
+            quello «tra domande», più largo di quello sulle risposte. Per questo i numeri chiave sono sull&apos;intero report, una famiglia si
+            legge con la sua stima ridotta e un punto della griglia solo nell&apos;insieme.
           </p>
           <table className="mt-5 w-full text-sm">
             <thead>
               <tr className="text-left text-xs text-muted">
-                <th className="pb-2 pr-3 font-medium">Risposte lette</th>
-                <th className="tabular pb-2 pr-3 text-right font-medium">Quota osservata 10%</th>
-                <th className="tabular pb-2 pr-3 text-right font-medium">20%</th>
-                <th className="tabular pb-2 text-right font-medium">50%</th>
+                <th className="pb-2 pr-3 font-medium">Con una quota osservata del 25%</th>
+                <th className="tabular pb-2 pr-3 text-right font-medium">Risposte</th>
+                <th className="tabular pb-2 pr-3 text-right font-medium">Wilson</th>
+                <th className="tabular pb-2 text-right font-medium">Tra domande</th>
               </tr>
             </thead>
             <tbody>
               {[
-                ["12 (una domanda, 6 assistenti × 2)", "1–35%", "5–45%", "25–75%"],
-                ["72 (una famiglia nel report singolo)", "5–19%", "12–30%", "39–61%"],
-                ["432 (report singolo)", "7–13%", "16–24%", "45–55%"],
-                ["864 (piano Base)", "8–12%", "17–23%", "47–53%"],
+                ["Un punto della griglia (2 assistenti × 3)", "6", "±29", "non si legge da solo"],
+                ["Una famiglia da 4 intenti (× 6 × 2)", "48", "±12", "±25–35"],
+                ["Report singolo, domande spontanee (32 × 6 × 2)", "384", "±4", "±10–12"],
+                ["Piano Base, domande spontanee (40 × 6 × 3)", "720", "±3", "±8–10"],
               ].map(([n, a, b, c]) => (
                 <tr key={n} className="border-t border-line">
                   <td className="py-2 pr-3">{n}</td>
@@ -280,7 +292,10 @@ export default function Metodo() {
               ))}
             </tbody>
           </table>
-          <p className="mt-2 text-xs text-muted">Intervalli di Wilson al 95%. Due scansioni sono diverse davvero solo se i loro intervalli non si sovrappongono.</p>
+          <p className="mt-2 text-xs text-muted">
+            Punti percentuali, intervalli al 95%. Tra due report, con le stesse domande, una variazione sotto gli 8–13 punti non è rilevabile:
+            guardare se due intervalli si sovrappongono non basta; una tendenza si dichiara solo dopo quattro scansioni.
+          </p>
         </div>
       </section>
 

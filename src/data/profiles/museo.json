@@ -33,7 +33,11 @@
     ],
     "requisito": [
       "musei a {citta} con {requisito}",
-      "museo a {citta} accessibile in carrozzina"
+      "museo a {citta} accessibile in carrozzina",
+      "{categoria} a {citta} con apertura adesso",
+      "{categoria} a {citta} con apertura il lunedì",
+      "{categoria} a {citta} con apertura serale",
+      "{categoria} a {citta} con apertura nei festivi"
     ],
     "confronto": [
       "meglio {nome} o {concorrente} se ho solo mezza giornata a {citta}?"
@@ -44,6 +48,14 @@
     ],
     "inglese": [
       "best museums in {citta}, Italy, for first-time visitors, skip the line"
+    ],
+    "prezzo": [
+      "{categoria} a {citta} con ingresso a basso costo",
+      "cosa visitare a {citta} spendendo poco",
+      "{categoria} a {citta} con ingresso gratuito la prima domenica del mese",
+      "{categoria} a {citta} con biglietto famiglia conveniente",
+      "{categoria} a {citta} che vale il prezzo del biglietto",
+      "{categoria} a {citta} con sconto studenti"
     ],
     "occasione": [
       {
@@ -71,12 +83,26 @@
         "etichetta": "accessibilità"
       }
     ],
+    "recensioni": [
+      "{categoria} a {citta} con le recensioni migliori",
+      "{categoria} a {citta} che vale la visita secondo chi c'è stato",
+      "{categoria} a {citta} che i visitatori consigliano",
+      "{categoria} a {citta} con più di 4 stelle",
+      "{categoria} a {citta} che piace alle famiglie",
+      "{categoria} a {citta} con recensioni recenti positive"
+    ],
     "vicino": [
-      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "{categoria} vicino a me a {citta}",
       "qual è {il categoria} migliore qui vicino, a {citta}?",
       "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
       "{categoria} aperta adesso vicino a me, a {citta}",
       "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
+    ],
+    "informativa": [
+      "cosa vedere a {citta} in un giorno?",
+      "quanto costa in media visitare {un categoria} a {citta}?",
+      "quando conviene visitare {un categoria} a {citta} per evitare la fila?",
+      "come organizzare una visita a {citta} con bambini?"
     ]
   },
   "fonti": [

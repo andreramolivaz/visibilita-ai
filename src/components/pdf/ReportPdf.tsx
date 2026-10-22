@@ -2,7 +2,7 @@ import { Document, Page, Text, View, StyleSheet, Font, Svg, Rect, Circle, Path }
 import type { Report, TipoDomanda, Verdetto } from "@/lib/types";
 import { ENGINES } from "@/lib/engines";
 import { distribuzionePosizioni } from "@/components/report/Posizioni";
-import { coerenzaDati, concentrazione, confrontoPerConcorrente, copertura, datiCorretti, percentuale, posizioneMedia, primiTre, punteggioPerMotore, quotaVoce, spontanee, stabilita, tassoCitazione, territorio } from "@/lib/stats";
+import { TIPI_SPONTANEI, coerenzaDati, concentrazione, confrontoPerConcorrente, copertura, datiCorretti, perFamiglia, percentuale, posizioneMedia, primiTre, punteggioIntervallo, punteggioPerMotore, quotaVoce, spontanee, stabilita, tassoCitazione, territorio } from "@/lib/stats";
 import { GLOSSARIO } from "@/lib/glossario";
 import { RIFERIMENTI } from "@/lib/riferimenti";
 
@@ -37,8 +37,11 @@ const NOME_TIPO: Record<TipoDomanda, string> = {
   bisogno: "Per bisogno",
   specialita: "Per specialità",
   requisito: "Per requisito",
+  prezzo: "Per prezzo",
   occasione: "Per occasione",
+  recensioni: "Per recensioni",
   vicino: "Vicino a te",
+  informativa: "Informative",
   confronto: "Confronto",
   nome: "Sul nome",
   inglese: "In inglese",
@@ -282,6 +285,8 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
   const qv = quotaVoce(r.concorrenti, r.citazioniTotali);
   const top3 = primiTre(r.righe);
   const posMedia = posizioneMedia(r.righe);
+  const icPunteggio = punteggioIntervallo(r.righe, r.ripetizioni);
+  const famiglie = perFamiglia(r.righe, r.ripetizioni);
   const terr = territorio(r.righe);
   const dc = datiCorretti(r.descrizioniPerMotore);
   const critici = r.descrizioniPerMotore.filter((d) => d.tono === "critico");
@@ -358,7 +363,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
               <Text style={[s.punteggio, { color: col }]}>{r.punteggio}</Text>
               <View style={{ marginBottom: 5 }}>
                 <Text style={{ fontSize: 12, fontFamily: "Helvetica-Bold", color: col }}>{r.verdetto}</Text>
-                <Text style={s.nota}>su 100</Text>
+                <Text style={s.nota}>su 100 · tra domande {icPunteggio.basso}–{icPunteggio.alto}</Text>
               </View>
             </View>
             <Scala punteggio={r.punteggio} riferimento={r.contesto?.mediana} />
@@ -395,21 +400,21 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
             <Text style={[s.h3, { marginTop: 0 }]}>1.1 Numeri chiave</Text>
             <Tabella
               colonne={[
-                { testo: "Metrica", larghezza: 1.5 },
-                { testo: "Valore", larghezza: 0.6, num: true },
-                { testo: "Campione e nota", larghezza: 2 },
+                { testo: "Metrica", larghezza: 1.25 },
+                { testo: "Valore", larghezza: 0.5, num: true },
+                { testo: "Campione e nota", larghezza: 2.35 },
               ]}
               righe={[
-                ["Risposte in cui compari", percentuale(cit.quota), `${cit.k} su ${cit.n}; intervallo al 95%: ${percentuale(cit.ic.basso)}–${percentuale(cit.ic.alto)}`],
+                ["Risposte in cui compari", percentuale(cit.quota), `${cit.k} su ${cit.n}; Wilson ${percentuale(cit.ic.basso)}–${percentuale(cit.ic.alto)}; tra domande ${percentuale(cit.icDomande.basso)}–${percentuale(cit.icDomande.alto)}`],
                 ["Quota di voce", percentuale(qv[tue?.nome ?? ""] ?? 0), `${tueCitazioni} su ${r.citazioniTotali ?? conc.totale} citazioni di attività; primo: ${primo ? percentuale(qv[primo.nome] ?? 0) : "–"}`],
                 ["Domande in cui compari", percentuale(cop.quota), `${cop.k} su ${cop.n}; ${terr.contese.length} con un concorrente e non tu, ${terr.libere.length} senza nessuno`],
-                ["Nei primi tre, quando compari", percentuale(top3.quota), `${top3.k} su ${top3.n}; posizione media ${posMedia ? n1(posMedia) : "–"}`],
+                ["Nei primi tre, quando compari", percentuale(top3.quota), `${top3.k} su ${top3.n}; tra domande ${percentuale(top3.icDomande.basso)}–${percentuale(top3.icDomande.alto)}; pos. media ${posMedia ? n1(posMedia) : "–"}`],
                 ["Stabilità delle risposte", percentuale(stab.quota), `${stab.concordi} celle su ${stab.totale} concordano su ${r.ripetizioni} ripetizioni`],
-                ["Dati corretti", dc.n ? `${dc.k} su ${dc.n}` : `${coer.coerenti} su ${coer.totale}`, dc.n ? `assistenti che riportano i tuoi dati senza errori; ${r.errori.length} errori (sezione 7)` : coer.coerenti === coer.totale ? "nessuna incoerenza" : r.attivita.incoerenze.join(" ")],
+                ["Dati corretti", dc.n ? `${dc.k} su ${dc.n}` : `${coer.coerenti} su ${coer.totale}`, dc.n ? `assistenti senza errori; ${r.errori.length} errori (sezione 8)` : coer.coerenti === coer.totale ? "nessuna incoerenza" : r.attivita.incoerenze.join(" ")],
               ]}
             />
             <Text style={[s.nota, { marginTop: 4 }]}>
-              Punteggio = media, pesata per quota d&apos;uso di ogni assistente, del peso della posizione in cui compari (1° = 1,00 · 2° = 0,85 · 3° = 0,70 · 4° = 0,55 · 5° = 0,40 · assente = 0). Definizioni in Allegato C.
+              Punteggio = media, pesata per quota d&apos;uso di ogni assistente, del peso della posizione in cui compari (1° = 1,00 · 2° = 0,85 · 3° = 0,70 · 4° = 0,55 · 5° = 0,40 · assente = 0). «Tra domande»: l&apos;intervallo che vale per domande di quel tipo (sezione 4). Definizioni in Allegato C.
             </Text>
           </View>
         </View>
@@ -474,7 +479,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
           </Text>
         ))}
 
-        <Text style={s.h2}>4. Dove ti trovano</Text>
+        <Text style={s.h2}>4. Dove ti trovano, per assistente</Text>
         <Text style={s.lettura}>
           Ci sei in {terr.tue.length} domande su {terr.n}; in {terr.contese.length} c&apos;è un concorrente e tu no; in {terr.libere.length} non c&apos;è nessuno.
         </Text>
@@ -489,7 +494,6 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
         />
         <Text style={[s.nota, { marginTop: 3 }]}>Le domande con un concorrente e non tu sono da conquistare: l&apos;assistente ha già una risposta. Quelle senza nessuno sono libere: basta una fonte buona per essere l&apos;unico nome.</Text>
 
-        <Text style={s.h3}>4.1 Per assistente</Text>
         <Tabella
           colonne={[
             { testo: "Assistente", larghezza: 1.2 },
@@ -509,28 +513,45 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
         />
         <Text style={[s.nota, { marginTop: 3 }]}>Domande spontanee. In ordine di quota d&apos;uso in Italia (Audicom/Comscore, luglio 2026); peso rinormalizzato sugli assistenti interrogati. Punteggio parziale: la formula del punteggio, ristretta a quell&apos;assistente.</Text>
 
-        <Text style={s.h3}>4.2 Per tipo di domanda</Text>
-        <Tabella
-          colonne={[
-            { testo: "Tipo", larghezza: 1.2 },
-            { testo: "Domande", larghezza: 0.7, num: true },
-            { testo: "Risposte", larghezza: 0.8, num: true },
-            { testo: "In cui compari", larghezza: 0.9, num: true },
-            { testo: "Quota", larghezza: 0.7, num: true },
-            { testo: "", larghezza: 1.6 },
-          ]}
-          righe={r.perTipo.map((t) => [NOME_TIPO[t.tipo], String(t.domande), String(t.totale), String(t.comparse), pct(t.comparse, t.totale), <BarraCella key={t.tipo} valore={t.comparse} massimo={t.totale} />])}
-        />
-        <Text style={[s.nota, { marginTop: 3 }]}>Le definizioni delle famiglie sono nell&apos;Allegato C. Confronto e sul nome: compari quasi per forza, non entrano nel punteggio.</Text>
         <Pie r={r} />
       </Page>
 
       {/* Pagina 3: mappa, fonti, terminologia */}
       <Page size="A4" style={s.page}>
         <Testata r={r} logo={logo} />
+        <Text style={[s.h2, { marginTop: 0 }]}>4. Dove ti trovano, per tipo di domanda</Text>
+        <Tabella
+          colonne={[
+            { testo: "Tipo", larghezza: 1.1 },
+            { testo: "Domande", larghezza: 0.6, num: true },
+            { testo: "Risposte", larghezza: 0.7, num: true },
+            { testo: "In cui compari", larghezza: 0.8, num: true },
+            { testo: "Quota", larghezza: 0.6, num: true },
+            { testo: "Tra domande", larghezza: 0.9, num: true },
+            { testo: "Ridotta", larghezza: 0.6, num: true },
+            { testo: "", larghezza: 1.1 },
+          ]}
+          righe={r.perTipo.map((t) => {
+            const f = famiglie.find((x) => x.tipo === t.tipo);
+            const spontanea = TIPI_SPONTANEI.includes(t.tipo);
+            return [
+              NOME_TIPO[t.tipo],
+              String(t.domande),
+              String(t.totale),
+              String(t.comparse),
+              pct(t.comparse, t.totale),
+              f && spontanea ? `${percentuale(f.icDomande.basso)}–${percentuale(f.icDomande.alto)}` : "–",
+              f && spontanea ? percentuale(f.ridotta) : "–",
+              <BarraCella key={t.tipo} valore={t.comparse} massimo={t.totale} />,
+            ];
+          })}
+        />
+        <Text style={[s.nota, { marginTop: 3 }]}>
+          Definizioni nell&apos;Allegato C. «Tra domande»: intervallo al 95% per domande di quel tipo. «Ridotta»: stima tirata verso la media del report quando la famiglia ha poche risposte. Confronto, sul nome e informative non entrano nel punteggio.
+        </Text>
         {(r.perZoom?.length || r.perOccasione?.length) && (
           <>
-            <Text style={[s.h2, { marginTop: 0 }]}>5. Da lontano a vicino, e per chi</Text>
+            <Text style={s.h2}>5. Da lontano a vicino, e per chi</Text>
             <View style={s.colonne}>
               {r.perZoom && r.perZoom.length > 0 && (
                 <View style={s.col}>
@@ -544,15 +565,17 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
                     ]}
                     righe={r.perZoom.map((z) => [NOME_ZOOM[z.zoom] ?? z.zoom, String(z.domande), String(z.totale), String(z.comparse), pct(z.comparse, z.totale)])}
                   />
-                  {r.intorno && r.intorno.punti.length > 0 && (
-                    <Text style={[s.nota, { marginTop: 3 }]}>
-                      Intorno a te ({r.intorno.motori.map(nomeMotore).join(", ")}):{" "}
-                      {r.intorno.punti.map((p) => `${p.punto.etichetta === "centro" ? "da te" : p.punto.etichetta} ${p.comparse}/${p.totale}`).join(" · ")}.
-                    </Text>
-                  )}
-                  {r.formulazioni && r.formulazioni.gruppi > 0 && (
-                    <Text style={[s.nota, { marginTop: 2 }]}>Formulazione: in {r.formulazioni.concordi} intenti su {r.formulazioni.gruppi} chiesti in più modi il risultato non cambia con le parole.</Text>
-                  )}
+                  <Text style={[s.nota, { marginTop: 3 }]}>
+                    {r.intorno && r.intorno.punti.length > 1
+                      ? `Intorno a te (${r.intorno.motori.map(nomeMotore).join(", ")}): compari in ${r.intorno.punti.filter((p) => p.comparse > 0).length} punti su ${r.intorno.punti.length} (${r.intorno.punti.map((p) => `${p.punto.etichetta === "centro" ? "da te" : p.punto.etichetta} ${p.comparse}/${p.totale}`).join(" · ")}); pochi dati per punto, si legge solo l'insieme. `
+                      : ""}
+                    {r.sensibilitaForma && r.sensibilitaForma.domande >= 3
+                      ? `Forma della domanda: breve ${pct(r.sensibilitaForma.breve.comparse, r.sensibilitaForma.breve.totale)}, con richiesta di più opzioni ${pct(r.sensibilitaForma.lista.comparse, r.sensibilitaForma.lista.totale)}, differenza ${r.sensibilitaForma.differenza > 0 ? "+" : ""}${r.sensibilitaForma.differenza.toFixed(0)} punti (±${(2 * r.sensibilitaForma.errore).toFixed(0)})${Math.abs(r.sensibilitaForma.differenza) < 2 * r.sensibilitaForma.errore ? ", dentro il rumore" : ""}. `
+                      : ""}
+                    {r.informativa && r.informativa.domande > 0
+                      ? `Informative: ${r.informativa.domande} domande, ${r.informativa.risposte} risposte, ${r.informativa.conNomi} con almeno un nome, tu in ${r.informativa.comparse}; fuori dal punteggio.`
+                      : ""}
+                  </Text>
                 </View>
               )}
               {r.perOccasione && r.perOccasione.length > 0 && (
@@ -590,7 +613,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
                 { testo: "Ci sei", larghezza: 0.6, num: true },
                 { testo: "Concorrenti (su 5)", larghezza: 1, num: true },
               ]}
-              righe={r.fonti.map((f) => [f.nome, String(f.citazioni), pct(f.citazioni, totale), f.ciSei ? "Sì" : "No", f.concorrentiPresenti !== undefined ? String(f.concorrentiPresenti) : "–"])}
+              righe={r.fonti.slice(0, 7).map((f) => [f.nome, String(f.citazioni), pct(f.citazioni, totale), f.ciSei ? "Sì" : "No", f.concorrentiPresenti !== undefined ? String(f.concorrentiPresenti) : "–"])}
             />
             <Text style={[s.nota, { marginTop: 4 }]}>Ci sei: l&apos;attività ha una scheda o una pagina su quella fonte. Dove è «No», gli assistenti non possono trovarla lì. Il sito dell&apos;attività pesa più di ogni directory nelle domande sul nome (Insites, 2026).</Text>
           </View>
@@ -607,7 +630,7 @@ export function ReportPdf({ report: r, logo }: { report: Report; logo?: string }
                     { testo: "Nelle risposte", larghezza: 0.9, num: true },
                     { testo: "Nelle tue recensioni", larghezza: 1.1, num: true },
                   ]}
-                  righe={r.termini.map((t) => [t.termine, String(t.volte), t.volteTue !== undefined ? String(t.volteTue) : t.ceLHai ? "Sì" : "No"])}
+                  righe={r.termini.slice(0, 7).map((t) => [t.termine, String(t.volte), t.volteTue !== undefined ? String(t.volteTue) : t.ceLHai ? "Sì" : "No"])}
                 />
                 <Text style={[s.nota, { marginTop: 4 }]}>Occorrenze nelle {totale} risposte della categoria, e quante volte il termine compare nelle recensioni Google dell&apos;attività.</Text>
               

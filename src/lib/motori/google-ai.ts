@@ -43,7 +43,9 @@ async function leggi(endpoint: string, q: Interrogazione): Promise<{ testo: stri
         keyword: q.domanda,
         // Con le coordinate la posizione è il punto esatto (zoom 14 ≈ quartiere); altrimenti la città.
         ...(q.coordinate ? { location_coordinate: `${q.coordinate.lat},${q.coordinate.lng},14` } : { location_name: `${q.citta},${q.regione ? `${q.regione},` : ""}Italy` }),
-        language_code: "it",
+        // La pagina di aiuto di DataForSEO sull'AI Mode dichiara «solo inglese» (non datata; AI Mode è in italiano da ottobre 2025):
+        // la lingua va verificata su /v3/serp/google/ai_mode/languages e si può forzare con DATAFORSEO_LINGUA.
+        language_code: q.lingua === "en" ? "en" : (process.env.DATAFORSEO_LINGUA ?? "it"),
         device: "desktop",
         os: "windows",
         load_async_ai_overview: true,

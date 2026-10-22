@@ -41,7 +41,11 @@
     ],
     "requisito": [
       "{categoria} a {citta} con {requisito}",
-      "{categoria} con forno a legna a {citta} che faccia anche senza glutine"
+      "{categoria} con forno a legna a {citta} che faccia anche senza glutine",
+      "{categoria} a {citta} con apertura adesso",
+      "{categoria} a {citta} con apertura a pranzo in settimana",
+      "{categoria} a {citta} con cucina dopo le 23",
+      "{categoria} a {citta} con apertura il lunedì"
     ],
     "confronto": [
       "meglio {nome} o {concorrente} a {citta} per la pizza?",
@@ -49,6 +53,14 @@
     ],
     "nome": [
       "com'è {nome} a {citta}? ne vale la pena, recensioni"
+    ],
+    "prezzo": [
+      "{categoria} a {citta} dove si spende poco",
+      "dove mangiare bene a {citta} spendendo poco",
+      "{categoria} a {citta} con buon rapporto qualità prezzo",
+      "{categoria} a {citta} con menù a pranzo sotto i 15 euro",
+      "quanto si spende in {un categoria} a {citta}? consigliami posti onesti",
+      "{categoria} a {citta} con prezzi bassi e buona qualità"
     ],
     "occasione": [
       {
@@ -80,12 +92,26 @@
         "etichetta": "subito"
       }
     ],
+    "recensioni": [
+      "{categoria} a {citta} con le recensioni migliori",
+      "{categoria} a {citta} affidabile, dove non si resta delusi",
+      "{categoria} a {citta} che consiglia chi ci è stato di recente",
+      "{categoria} a {citta} con più di 4 stelle su Google",
+      "{categoria} a {citta} con recensioni recenti positive",
+      "{categoria} a {citta} di cui fidarsi per una cena importante"
+    ],
     "vicino": [
-      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "{categoria} vicino a me a {citta}",
       "qual è {il categoria} migliore qui vicino, a {citta}?",
       "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
       "{categoria} aperta adesso vicino a me, a {citta}",
       "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
+    ],
+    "informativa": [
+      "come scegliere {un categoria} a {citta} senza sbagliare?",
+      "conviene prenotare {un categoria} a {citta} il sabato sera?",
+      "cosa mangiare di tipico a {citta} e dove?",
+      "quanto costa in media una cena in {un categoria} a {citta}?"
     ]
   },
   "fonti": [

@@ -33,7 +33,11 @@
     ],
     "requisito": [
       "B&B a {citta} con {requisito}",
-      "agriturismo in {regione} con {requisito}"
+      "agriturismo in {regione} con {requisito}",
+      "{categoria} a {citta} con disponibilità stasera",
+      "{categoria} a {citta} con check-in tardi",
+      "{categoria} a {citta} con prenotazione all'ultimo minuto",
+      "{categoria} a {citta} con apertura tutto l'anno"
     ],
     "confronto": [
       "meglio {nome} o {concorrente} per un weekend in {zona}?"
@@ -43,6 +47,14 @@
     ],
     "inglese": [
       "farm stay in {regione}, Italy, with cooking classes, family friendly"
+    ],
+    "prezzo": [
+      "{categoria} a {citta} a buon prezzo",
+      "{categoria} a {citta} con buon rapporto qualità prezzo",
+      "{categoria} a {citta} sotto i 100 euro a notte",
+      "{categoria} a {citta} che costi poco, in centro e con buone recensioni",
+      "dove dormire a {citta} spendendo poco",
+      "{categoria} a {citta} con colazione inclusa a buon prezzo"
     ],
     "occasione": [
       {
@@ -70,12 +82,26 @@
         "etichetta": "gruppo"
       }
     ],
+    "recensioni": [
+      "{categoria} a {citta} con le recensioni migliori",
+      "{categoria} a {citta} con più di 4 stelle",
+      "{categoria} affidabile a {citta}, come nelle foto",
+      "{categoria} a {citta} che gli ospiti consigliano",
+      "{categoria} a {citta} con recensioni recenti positive",
+      "{categoria} a {citta} di cui fidarsi per una prenotazione"
+    ],
     "vicino": [
-      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "{categoria} vicino a me a {citta}",
       "qual è {il categoria} migliore qui vicino, a {citta}?",
       "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
       "{categoria} aperta adesso vicino a me, a {citta}",
       "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
+    ],
+    "informativa": [
+      "come scegliere dove dormire a {citta}?",
+      "quanto costa in media una notte in {un categoria} a {citta}?",
+      "quando conviene prenotare {un categoria} a {citta}?",
+      "quale zona di {citta} è meglio per dormire?"
     ]
   },
   "fonti": [

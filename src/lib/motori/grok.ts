@@ -1,5 +1,5 @@
 import type { Interrogazione, Motore, RispostaGrezza } from "./tipi";
-import { ISTRUZIONE, chiama, fallita, urlDentro } from "./tipi";
+import { chiama, fallita, istruzione, urlDentro } from "./tipi";
 
 /**
  * Grok via xAI API (Responses, compatibile con OpenAI) con lo strumento web_search.
@@ -19,7 +19,7 @@ export const grok: Motore = {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.XAI_API_KEY}` },
         body: JSON.stringify({
           model: modello(),
-          instructions: ISTRUZIONE,
+          instructions: istruzione(q.lingua),
           input: [{ role: "user", content: q.domanda }],
           tools: [{ type: "web_search" }],
         }),

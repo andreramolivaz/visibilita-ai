@@ -39,7 +39,11 @@
     ],
     "requisito": [
       "{categoria} a {citta} che fa anche {requisito}",
-      "negozio di {categoria} a {citta} con {requisito}"
+      "negozio di {categoria} a {citta} con {requisito}",
+      "negozio di {categoria} aperto adesso a {citta}",
+      "negozio di {categoria} aperto la domenica a {citta}",
+      "negozio di {categoria} a {citta} con orario continuato",
+      "negozio di {categoria} a {citta} aperto fino a tardi"
     ],
     "confronto": [
       "meglio {nome} o {concorrente} per comprare {specialita} a {citta}?"
@@ -48,38 +52,60 @@
       "{nome} a {citta} è un buon negozio? recensioni",
       "cosa vendono da {nome} a {citta} e che orari fa?"
     ],
+    "prezzo": [
+      "negozio di {categoria} a {citta} con i prezzi migliori",
+      "negozio di {categoria} economico a {citta}",
+      "negozio di {categoria} a {citta} con offerte e sconti",
+      "negozio di {categoria} a {citta} con buon rapporto qualità prezzo",
+      "{categoria} a {citta}: dove conviene comprare",
+      "negozio di {categoria} a {citta} con prezzi onesti"
+    ],
     "occasione": [
       {
-        "testo": "{categoria} a {citta} dove fare un regalo all'ultimo minuto",
+        "testo": "negozio di {categoria} a {citta} dove fare un regalo all'ultimo minuto",
         "etichetta": "regalo"
       },
       {
-        "testo": "{categoria} a {citta} con personale che consiglia, per chi non se ne intende",
+        "testo": "negozio di {categoria} a {citta} con personale che consiglia, per chi non se ne intende",
         "etichetta": "consiglio"
       },
       {
-        "testo": "{categoria} a {citta} con prezzi bassi, per una famiglia",
+        "testo": "negozio di {categoria} a {citta} con prezzi bassi, per una famiglia",
         "etichetta": "budget"
       },
       {
-        "testo": "{categoria} a {citta} di fascia alta, prodotti di qualità",
+        "testo": "negozio di {categoria} a {citta} di fascia alta, prodotti di qualità",
         "etichetta": "premium"
       },
       {
-        "testo": "{categoria} a {citta} aperto adesso, mi serve oggi",
+        "testo": "negozio di {categoria} a {citta} aperto adesso, mi serve oggi",
         "etichetta": "subito"
       },
       {
-        "testo": "{categoria} a {citta} comodo per chi arriva in auto, con parcheggio",
+        "testo": "negozio di {categoria} a {citta} comodo per chi arriva in auto, con parcheggio",
         "etichetta": "in auto"
       }
     ],
+    "recensioni": [
+      "negozio di {categoria} a {citta} con le recensioni migliori",
+      "negozio di {categoria} affidabile a {citta}",
+      "negozio di {categoria} a {citta} con più di 4 stelle su Google",
+      "negozio di {categoria} a {citta} consigliato dai clienti",
+      "negozio di {categoria} a {citta} serio, senza fregature",
+      "negozio di {categoria} a {citta} con recensioni recenti positive"
+    ],
     "vicino": [
-      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "{categoria} vicino a me a {citta}",
       "qual è {il categoria} migliore qui vicino, a {citta}?",
       "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
       "{categoria} aperta adesso vicino a me, a {citta}",
       "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
+    ],
+    "informativa": [
+      "come scegliere un buon negozio di {categoria} a {citta}?",
+      "conviene comprare {categoria} in un negozio di {citta} o online?",
+      "cosa controllare prima di comprare in un negozio di {categoria}?",
+      "quanto si spende in media in un negozio di {categoria} a {citta}?"
     ]
   },
   "fonti": [

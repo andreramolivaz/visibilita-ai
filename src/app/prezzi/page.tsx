@@ -12,7 +12,7 @@ const FAQ = [
   },
   {
     d: "Da dove prendete le domande, e perché non le vedo prima?",
-    r: "Da uno studio dei prompt reali: le domande agli assistenti sono frasi intere con un luogo e almeno un vincolo, non parole chiave. Le costruiamo dal tuo profilo per famiglie (generiche, per bisogno, per specialità, per requisito, per occasione, vicino a te, di confronto, sul nome), a più livelli di zoom e in più formulazioni. Il set è il metodo: resta lo stesso da una scansione all'altra, così il confronto nel tempo regge. Nel report le vedi tutte, domanda per domanda, con il risultato.",
+    r: "Da uno studio dei prompt reali: le domande agli assistenti sono corte, con un luogo e un vincolo, come le scrive davvero un cliente. Le costruiamo dal tuo profilo per famiglie (generiche, per bisogno, per specialità, per requisito e orari, per prezzo, per occasione, per recensioni, vicino a te, informative, di confronto, sul nome), a più livelli di zoom, e ogni intento in due forme: breve e con la richiesta di più opzioni. Il set è il metodo: resta lo stesso da una scansione all'altra, così il confronto nel tempo regge. Nel report le vedi tutte, domanda per domanda, con il risultato.",
   },
   {
     d: "Cosa compro con il report singolo?",

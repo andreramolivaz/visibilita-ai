@@ -6,6 +6,7 @@ import { analizzaRisposta } from "../analisi/riconoscimento";
 import { costruisciReport } from "../analisi/costruisci";
 import { deposito } from "./deposito";
 import type { Avanzamento, Cella, Scansione } from "./tipi";
+import { formaDellaRipetizione } from "./tipi";
 
 /**
  * La coda di scansione: una cella per domanda × assistente × ripetizione.
@@ -13,8 +14,10 @@ import type { Avanzamento, Cella, Scansione } from "./tipi";
  * di celle scadute, con un assistente alla volta per assistente e gli
  * assistenti in parallelo, entro un tempo massimo; se restano celle scadute,
  * chi chiama si richiama. Le ripetizioni dell'abbonamento stanno in giorni
- * diversi: le celle future aspettano il passaggio giornaliero.
+ * diversi: le celle future aspettano il passaggio giornaliero. La seconda
+ * ripetizione di un intento spontaneo è la sua forma a lista.
  */
+
 
 const GIORNO_MS = 24 * 60 * 60 * 1000;
 
@@ -49,7 +52,7 @@ export async function creaScansione(x: {
     for (let r = 1; r <= ripetizioni; r++) {
       // Report singolo: tutto subito. Abbonamento: una ripetizione al giorno.
       const scadenza = subito ? ora : new Date(ora.getTime() + (r - 1) * GIORNO_MS);
-      for (const d of x.domande) for (const m of motori) celle.push({ domandaId: d.id, motore: m, ripetizione: r, eseguiDopo: scadenza.toISOString(), stato: "da fare" });
+      for (const d of x.domande) for (const m of motori) celle.push({ domandaId: d.id, motore: m, ripetizione: r, forma: formaDellaRipetizione(d, r), eseguiDopo: scadenza.toISOString(), stato: "da fare" });
     }
   }
   const s: Scansione = {
@@ -140,7 +143,14 @@ export async function avanza(id: string, opzioni: { maxCelle?: number; budgetMs?
 
   const q = (c: Cella) => {
     const d = s.domande.find((x) => x.id === c.domandaId)!;
-    return { domanda: d.testo, citta: s.attivita.citta, regione: s.attivita.regione, coordinate: coordinateDi(s.attivita.coordinate, d.punto), lingua: "it" as const };
+    const forma = c.forma ?? formaDellaRipetizione(d, c.ripetizione);
+    return {
+      domanda: forma !== "breve" && d.secondaForma ? d.secondaForma : d.testo,
+      citta: s.attivita.citta,
+      regione: s.attivita.regione,
+      coordinate: coordinateDi(s.attivita.coordinate, d.punto),
+      lingua: (d.tipo === "inglese" ? "en" : "it") as "it" | "en",
+    };
   };
 
   await Promise.all(

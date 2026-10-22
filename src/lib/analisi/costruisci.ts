@@ -1,12 +1,13 @@
-import type { CitaChi, Concorrente, DescrizioneMotore, ErroreScheda, Fonte, Posizione, Report, RigaDomanda, Risposta, RisultatoMotore, RisultatoTipo, Termine, TestaATesta, Tono } from "../types";
+import type { CellaDomanda, CitaChi, Concorrente, DescrizioneMotore, ErroreScheda, Fonte, Posizione, Report, RigaDomanda, Risposta, RisultatoMotore, RisultatoTipo, Termine, TestaATesta, Tono } from "../types";
 import { TIPI_DOMANDA } from "../types";
 import { punteggio as calcolaPunteggio, verdetto as calcolaVerdetto } from "../score";
-import { MOTORI_CON_COORDINATE, TIPI_SPONTANEI, formulazioni, intornoATe, perOccasione, perZoom } from "../stats";
+import { MOTORI_CON_COORDINATE, TIPI_SPONTANEI, informativa, intornoATe, perOccasione, perZoom, sensibilitaForma } from "../stats";
 import { estraiTermini } from "../profilo/termini";
 import { ePortale } from "./fonti";
 import { azioniDaRegole } from "./azioni";
 import { stessoNome } from "./riconoscimento";
 import type { Cella, Scansione } from "../scansione/tipi";
+import { formaDellaRipetizione } from "../scansione/tipi";
 
 /**
  * Dalle celle analizzate al Report: stesse formule del report di esempio,
@@ -74,7 +75,17 @@ export function costruisciReport(s: Scansione, id = s.id): Report {
     const celle = s.motori.map((m) => {
       const perMotore = mie.filter((c) => c.motore === m);
       const presenti = perMotore.map((c) => c.analisi!.posizione).filter((p): p is 1 | 2 | 3 | 4 | 5 => p !== null);
-      return { motore: m, posizione: posizioneMediaCella(presenti), frequenza: `${presenti.length} su ${s.ripetizioni}`, volte: presenti.length };
+      // Le volte per forma (breve, a lista) e le risposte con almeno un nome, per sensibilità alla forma e informative.
+      const perForma: NonNullable<CellaDomanda["perForma"]> = {};
+      for (const c of perMotore) {
+        const f = c.forma ?? formaDellaRipetizione(d, c.ripetizione);
+        const v = perForma[f] ?? { volte: 0, totale: 0 };
+        v.totale++;
+        if (c.analisi!.posizione !== null) v.volte++;
+        perForma[f] = v;
+      }
+      const conNomi = perMotore.filter((c) => c.analisi!.citati.length > 0).length;
+      return { motore: m, posizione: posizioneMediaCella(presenti), frequenza: `${presenti.length} su ${s.ripetizioni}`, volte: presenti.length, perForma, conNomi };
     });
     const nomi = new Set<string>();
     for (const c of mie) for (const x of c.analisi!.citati) if (!x.seiTu) nomi.add(x.nome);
@@ -197,7 +208,7 @@ export function costruisciReport(s: Scansione, id = s.id): Report {
   const fallite = s.celle.filter((c) => c.stato === "errore").length;
   // Intorno a te: solo con le coordinate della scheda e sugli assistenti che le accettano.
   const motoriConCoordinate = a.coordinate ? s.motori.filter((m) => MOTORI_CON_COORDINATE.includes(m)) : [];
-  const punti = s.domande.filter((d) => d.punto).length;
+  const punti = new Set(s.domande.filter((d) => d.punto).map((d) => d.punto!.etichetta)).size;
   const primo = concorrenti.find((c) => !c.seiTu);
   const pct = totaleSpontanee ? Math.round((tueCitazioni / totaleSpontanee) * 100) : 0;
   const qv = citazioniTotali ? Math.round((tueCitazioni / citazioniTotali) * 100) : 0;
@@ -216,10 +227,11 @@ export function costruisciReport(s: Scansione, id = s.id): Report {
     sintesi: `Compari in ${tueCitazioni} risposte su ${totaleSpontanee} alle ${nSpont} domande in cui il cliente non fa il tuo nome (${pct}%). Quota di voce ${qv}%${primo ? `, contro il ${citazioniTotali ? Math.round((primo.citazioni / citazioniTotali) * 100) : 0}% di ${primo.nome}` : ""}.${guadagno ? ` Con le tre azioni, stima da ${punteggio} a ${Math.min(100, punteggio + guadagno)}.` : ""}`,
     perMotore,
     perTipo,
-    perZoom: perZoom(righe, s.ripetizioni),
-    intorno: motoriConCoordinate.length ? { punti: intornoATe(righe, s.ripetizioni, motoriConCoordinate), motori: motoriConCoordinate } : undefined,
+    perZoom: perZoom(righe, s.ripetizioni, motoriConCoordinate),
+    intorno: motoriConCoordinate.length && punti > 1 ? { punti: intornoATe(righe, s.ripetizioni, motoriConCoordinate), motori: motoriConCoordinate } : undefined,
     perOccasione: perOccasione(righe, s.ripetizioni),
-    formulazioni: formulazioni(righe),
+    sensibilitaForma: sensibilitaForma(righe),
+    informativa: informativa(righe, s.ripetizioni),
     concorrenti,
     citazioniTotali,
     testaATesta,
@@ -238,10 +250,10 @@ export function costruisciReport(s: Scansione, id = s.id): Report {
       lingua: "italiano",
       canale: "interfacce ufficiali (API), località impostata, senza memoria",
       note: [
-        `Ogni domanda è stata posta ${s.ripetizioni} ${s.ripetizioni === 1 ? "volta" : "volte"} a ogni assistente${s.ripetizioni > 1 && inizio.slice(0, 10) !== fine.slice(0, 10) ? ", in giorni diversi" : ""}.`,
+        `Ogni domanda è stata posta ${s.ripetizioni} ${s.ripetizioni === 1 ? "volta" : "volte"} a ogni assistente${s.ripetizioni > 1 && inizio.slice(0, 10) !== fine.slice(0, 10) ? ", in giorni diversi" : ""}${s.ripetizioni > 1 ? ": in forma breve e, la seconda volta, con la richiesta esplicita di più opzioni" : ""}.`,
         "Compari quando il nome, l'indirizzo o il telefono coincidono con la tua scheda Google; i concorrenti sono le attività vicine della tua categoria e i nomi che le risposte mettono in elenco.",
         "La presenza sui portali è quella dichiarata dalla scheda: la verifica portale per portale arriva con la scansione successiva.",
-        ...(punti ? [motoriConCoordinate.length ? `Nelle domande vicino a te la posizione è stata impostata in ${punti} punti intorno all'attività sugli assistenti che accettano le coordinate (${motoriConCoordinate.join(", ")}); gli altri hanno ricevuto la città.` : "Nelle domande vicino a te la posizione è la città: la scheda non ha coordinate."] : []),
+        ...(punti ? [motoriConCoordinate.length ? `Nelle domande vicino a te la posizione è stata impostata ${punti > 1 ? `in ${punti} punti intorno all'attività` : "all'indirizzo"} sugli assistenti che accettano le coordinate (${motoriConCoordinate.join(", ")}); per gli altri «vicino a te» è la città.` : "Nelle domande vicino a te la posizione è la città: la scheda non ha coordinate."] : []),
         ...(fallite ? [`${fallite} ${fallite === 1 ? "risposta non è arrivata" : "risposte non sono arrivate"} (errore dell'interfaccia): non ${fallite === 1 ? "entra" : "entrano"} nei conteggi.`] : []),
         "Le risposte degli assistenti cambiano nel tempo: i numeri sono quelli dei giorni della scansione.",
       ],

@@ -9,12 +9,13 @@ export interface Interrogazione {
   citta: string;
   regione?: string;
   coordinate?: { lat: number; lng: number };
-  lingua: "it";
+  lingua: "it" | "en";
 }
 
 /**
  * La risposta grezza, con tutto quello che serve a ricostruire il dato:
- * assistente, modello, canale, quando, testo integrale, URL consultate o citate.
+ * assistente, modello, canale, quando, testo integrale, URL consultate o citate,
+ * e — dove l'API le restituisce — le ricerche fatte per rispondere (il fan-out).
  */
 export interface RispostaGrezza {
   motore: EngineId;
@@ -25,6 +26,10 @@ export interface RispostaGrezza {
   testo: string;
   /** URL citate o consultate, così come le restituisce l'interfaccia. */
   fonti: string[];
+  /** Le query di ricerca che l'assistente ha fatto per rispondere, se l'API le espone. */
+  ricerche?: string[];
+  /** L'assistente ha davvero cercato sul web? Senza ricerca la risposta è parametrica e vale meno. */
+  cercato?: boolean;
   errore?: string;
 }
 
@@ -37,6 +42,10 @@ export interface Motore {
 
 /** Istruzione minima e uguale per tutti: solo la lingua, niente che guidi la risposta. */
 export const ISTRUZIONE = "Rispondi in italiano.";
+
+export function istruzione(lingua: Interrogazione["lingua"]): string {
+  return lingua === "en" ? "Answer in English." : ISTRUZIONE;
+}
 
 /** fetch con timeout per le API dei motori; lancia su errore di rete. */
 export async function chiama(url: string, init: RequestInit, timeoutMs = 60000): Promise<Response> {
@@ -69,4 +78,11 @@ export function urlDentro(x: unknown, out: Set<string> = new Set(), profondita =
     }
   }
   return [...out];
+}
+
+/** Le stringhe non vuote di un campo che può essere una stringa o un elenco. */
+export function stringhe(x: unknown): string[] {
+  if (typeof x === "string") return x.trim() ? [x.trim()] : [];
+  if (Array.isArray(x)) return x.flatMap(stringhe);
+  return [];
 }

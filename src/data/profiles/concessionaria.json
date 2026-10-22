@@ -33,13 +33,25 @@
     ],
     "requisito": [
       "noleggio auto a {citta} {requisito}",
-      "noleggio a lungo termine a {citta} per partita IVA"
+      "noleggio a lungo termine a {citta} per partita IVA",
+      "{categoria} a {citta} con apertura adesso",
+      "{categoria} a {citta} con apertura la domenica",
+      "{categoria} a {citta} con orario continuato",
+      "{categoria} a {citta} con apertura fino a tardi"
     ],
     "confronto": [
       "meglio {nome} o {concorrente} per comprare un usato a {citta}?"
     ],
     "nome": [
       "{nome} concessionaria {citta} recensioni"
+    ],
+    "prezzo": [
+      "{categoria} a {citta} con i prezzi migliori",
+      "{categoria} a {citta} a buon prezzo",
+      "{categoria} a {citta} con offerte e sconti",
+      "{categoria} a {citta} con buon rapporto qualità prezzo",
+      "{categoria} a {citta} che non costi una fortuna",
+      "{categoria} a {citta} con prezzi onesti"
     ],
     "occasione": [
       {
@@ -67,12 +79,26 @@
         "etichetta": "in auto"
       }
     ],
+    "recensioni": [
+      "{categoria} a {citta} con le recensioni migliori",
+      "{categoria} affidabile a {citta}",
+      "{categoria} a {citta} con più di 4 stelle su Google",
+      "{categoria} a {citta} che i clienti consigliano",
+      "{categoria} a {citta} affidabile, senza fregature",
+      "{categoria} a {citta} con recensioni recenti positive"
+    ],
     "vicino": [
-      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "{categoria} vicino a me a {citta}",
       "qual è {il categoria} migliore qui vicino, a {citta}?",
       "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
       "{categoria} aperta adesso vicino a me, a {citta}",
       "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
+    ],
+    "informativa": [
+      "come scegliere {un categoria} a {citta}?",
+      "conviene andare in {un categoria} di {citta} o comprare online?",
+      "cosa controllare prima di scegliere {un categoria}?",
+      "quanto si spende in media in {un categoria} a {citta}?"
     ]
   },
   "fonti": [

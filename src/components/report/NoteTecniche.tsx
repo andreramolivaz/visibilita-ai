@@ -33,10 +33,10 @@ export function NoteTecniche({ report: r }: { report: Report }) {
   const totale = r.domande * r.motori.length * r.ripetizioni;
 
   const tiles: [string, string, string][] = [
-    ["Risposte in cui compari", percentuale(cit.quota), `${cit.k} su ${cit.n} · intervallo al 95%: ${percentuale(cit.ic.basso)}–${percentuale(cit.ic.alto)}`],
+    ["Risposte in cui compari", percentuale(cit.quota), `${cit.k} su ${cit.n} · Wilson 95%: ${percentuale(cit.ic.basso)}–${percentuale(cit.ic.alto)} · tra domande: ${percentuale(cit.icDomande.basso)}–${percentuale(cit.icDomande.alto)}`],
     ["Domande in cui compari", percentuale(cop.quota), `${cop.k} su ${cop.n}`],
-    ["Nei primi tre, quando compari", percentuale(top3.quota), `${top3.k} su ${top3.n} citazioni · posizione media ${pos ? pos.toLocaleString("it-IT", { maximumFractionDigits: 1 }) : "–"}`],
-    ["Stabilità delle risposte", percentuale(stab.quota), `${stab.concordi} celle su ${stab.totale} concordano su tutte le ${r.ripetizioni} ripetizioni`],
+    ["Nei primi tre, quando compari", percentuale(top3.quota), `${top3.k} su ${top3.n} citazioni · tra domande ${percentuale(top3.icDomande.basso)}–${percentuale(top3.icDomande.alto)} · posizione media ${pos ? pos.toLocaleString("it-IT", { maximumFractionDigits: 1 }) : "–"}, solo descrittiva`],
+    ["Stabilità delle risposte", percentuale(stab.quota), `${stab.concordi} celle su ${stab.totale} concordano su tutte le ${r.ripetizioni} ripetizioni (forma breve e a lista comprese)`],
     ["Concentrazione dei consigli", percentuale(conc.quotaTop3), `quota dei tre nomi più citati su ${conc.totale} citazioni`],
     ["Dati di scheda coerenti", `${coer.coerenti} su ${coer.totale}`, coer.coerenti === coer.totale ? "nome, indirizzo, telefono, orari, categoria, sito" : r.attivita.incoerenze.join(" ")],
   ];
@@ -85,8 +85,10 @@ export function NoteTecniche({ report: r }: { report: Report }) {
               <div>
                 <dt className="text-xs text-muted">Campione</dt>
                 <dd className="tabular">
-                  {r.domande} domande × {r.motori.length} assistenti × {r.ripetizioni} ripetizioni = {totale} risposte. Punteggio e numeri chiave sulle {r.domandeSpontanee} domande
-                  spontanee ({r.domandeSpontanee * r.motori.length * r.ripetizioni} risposte): quelle in cui il cliente non fa il tuo nome.
+                  {r.domande} intenti × {r.motori.length} assistenti × {r.ripetizioni} ripetizioni = {totale} risposte. Ogni intento spontaneo è chiesto in forma breve e, la seconda volta, con la
+                  richiesta esplicita di più opzioni: due forme, non due domande. Punteggio e numeri chiave sulle {r.domandeSpontanee} domande spontanee (
+                  {r.domandeSpontanee * r.motori.length * r.ripetizioni} risposte): quelle in cui il cliente non fa il tuo nome. Gli intervalli «tra domande» vengono da un bootstrap
+                  che ricampiona le domande intere, perché le risposte alla stessa domanda sono correlate: sono più larghi di quelli di Wilson e sono quelli da usare.
                 </dd>
               </div>
               <div>

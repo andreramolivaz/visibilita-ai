@@ -1,13 +1,14 @@
-import type { Report, ProfiloAttivita, Domanda, EngineId, Posizione, Risposta, RigaDomanda, RisultatoMotore, RisultatoTipo, TipoDomanda, Piano, CitaChi } from "./types";
+import type { Report, ProfiloAttivita, Domanda, EngineId, Posizione, Risposta, RigaDomanda, RisultatoMotore, RisultatoTipo, TipoDomanda, Piano, CitaChi, CellaDomanda, Formulazione } from "./types";
 import { TIPI_DOMANDA } from "./types";
 import { motoriAttivi } from "./engines";
 import { punteggio as calcolaPunteggio, verdetto as calcolaVerdetto } from "./score";
-import { TIPI_SPONTANEI, formulazioni, intornoATe, perOccasione, perZoom } from "./stats";
+import { MOTORI_CON_COORDINATE, TIPI_SPONTANEI, informativa, intornoATe, perOccasione, perZoom, sensibilitaForma } from "./stats";
 import { generaDomande, profilo } from "./profiles";
+import { formaDellaRipetizione } from "./scansione/tipi";
 
 /**
  * Report di esempio: pizzeria a Bergamo. Le domande sono quelle vere del
- * generatore (il telescopio: famiglie, zoom, formulazioni, punti intorno);
+ * generatore (il telescopio: famiglie, zoom, due forme, punti intorno);
  * le risposte sono simulate in modo deterministico da probabilità per
  * famiglia, assistente, zoom e vincolo, così il report è coerente con sé
  * stesso e ogni numero resta calcolato dalle celle con le formule vere.
@@ -72,7 +73,7 @@ function caso(seme: string): number {
   return ((h >>> 0) % 100000) / 100000;
 }
 
-const BASE_TIPO: Record<TipoDomanda, number> = { generica: 0.2, bisogno: 0.07, specialita: 0.4, requisito: 0.14, occasione: 0.13, vicino: 0.28, confronto: 0.85, nome: 0.95, inglese: 0.1 };
+const BASE_TIPO: Record<TipoDomanda, number> = { generica: 0.2, bisogno: 0.07, specialita: 0.4, requisito: 0.14, prezzo: 0.09, occasione: 0.13, recensioni: 0.24, vicino: 0.28, informativa: 0.06, confronto: 0.85, nome: 0.95, inglese: 0.1 };
 const MOLT_MOTORE: Record<string, number> = { chatgpt: 0.55, gemini: 1.7, "google-ai": 0.12, claude: 1.0, perplexity: 1.5, grok: 0.45 };
 const MOLT_PUNTO: Record<string, number> = { centro: 1.7, nord: 0.9, est: 1.25, sud: 0.45, ovest: 1.0, "nord-est": 0.8, "nord-ovest": 0.6, "sud-est": 0.7, "sud-ovest": 0.4 };
 const MOLT_OCCASIONE: Record<string, number> = { famiglia: 0.6, coppia: 1.4, lavoro: 0.9, gruppo: 0.8, turisti: 1.2, budget: 0.35, subito: 0.7 };
@@ -92,18 +93,22 @@ const VINCOLI: [RegExp, number][] = [
   [/dehors/i, 0.9],
   [/città alta/i, 0.2],
   [/turist/i, 0.8],
+  [/4 stelle|recensioni migliori|affidabil/i, 1.15],
+  [/prezz|rapporto qualità|menù a pranzo/i, 0.6],
+  [/aperta adesso|dopo le 23|il lunedì/i, 0.5],
 ];
 
-/** Probabilità che una singola risposta ti citi, per domanda e assistente. */
-function probabilita(d: Domanda, motore: EngineId): number {
+/** Probabilità che una singola risposta ti citi, per domanda, assistente e forma (a lista: risposte più lunghe, qualche nome in più). */
+function probabilita(d: Domanda, motore: EngineId, forma: Formulazione = "breve"): number {
   // Sul nome e nei confronti si compare quasi per forza: l'assistente conta meno.
   const moltMotore = d.tipo === "nome" || d.tipo === "confronto" ? Math.min(1, Math.max(0.8, MOLT_MOTORE[motore] ?? 1)) : (MOLT_MOTORE[motore] ?? 1);
   let p = BASE_TIPO[d.tipo] * moltMotore;
   if (d.zoom === "zona") p *= 1.25;
-  if (d.zoom === "vicino" && d.punto) p *= MOLT_PUNTO[d.punto.etichetta] ?? 1;
+  // Le coordinate arrivano solo a Google AI e Perplexity: per gli altri «vicino a te» è la città.
+  if (d.zoom === "vicino" && d.punto) p *= MOTORI_CON_COORDINATE.includes(motore) ? (MOLT_PUNTO[d.punto.etichetta] ?? 1) : 1.1;
   if (d.occasione) p *= MOLT_OCCASIONE[d.occasione] ?? 1;
-  if (d.formulazione === "colloquiale") p *= 0.9;
-  if (d.formulazione === "imperativa") p *= 1.05;
+  if (forma === "lista") p *= 1.15;
+  if (forma === "invertita") p *= 0.9;
   for (const [re, m] of VINCOLI) if (re.test(d.testo)) p *= m;
   return Math.min(0.97, p);
 }
@@ -122,16 +127,30 @@ function posizione(d: Domanda, motore: EngineId, seme: string): Posizione {
   return 5;
 }
 
-type Cella = [Posizione, number];
+type PerForma = NonNullable<CellaDomanda["perForma"]>;
+type Cella = [Posizione, number, PerForma, number];
 
-/** Per ogni domanda, per ogni motore: [posizione quando compari, quante volte su `ripetizioni`]. */
+/** Per ogni domanda, per ogni motore: posizione quando compari, quante volte su `ripetizioni`, le volte per forma, le risposte con almeno un nome. */
 function simula(domande: Domanda[], ripetizioni: number): Cella[][] {
   return domande.map((d) =>
     MOTORI.map((m) => {
-      const p = probabilita(d, m);
       let volte = 0;
-      for (let r = 0; r < ripetizioni; r++) if (caso(`${d.testo}|${m}|${r}`) < p) volte++;
-      return [volte > 0 ? posizione(d, m, `${d.testo}|${m}`) : null, volte] as Cella;
+      let conNomi = 0;
+      const perForma: PerForma = {};
+      for (let r = 1; r <= ripetizioni; r++) {
+        const forma = formaDellaRipetizione(d, r);
+        const f = perForma[forma] ?? { volte: 0, totale: 0 };
+        f.totale++;
+        const citato = caso(`${d.testo}|${m}|${r - 1}`) < probabilita(d, m, forma);
+        if (citato) {
+          volte++;
+          f.volte++;
+        }
+        perForma[forma] = f;
+        // Le informative spesso non fanno nomi; le altre quasi sempre.
+        if (citato || caso(`${d.testo}|${m}|${r}|nomi`) < (d.tipo === "informativa" ? 0.45 : 0.96)) conNomi++;
+      }
+      return [volte > 0 ? posizione(d, m, `${d.testo}|${m}`) : null, volte, perForma, conNomi] as Cella;
     }),
   );
 }
@@ -191,11 +210,13 @@ function costruisci(opzioni: { id: string; piano: Piano; domande: Domanda[]; rip
 
   const righe: RigaDomanda[] = risultati.map((celle, i) => ({
     domanda: domande[i],
-    celle: celle.map(([pos, volte], j) => ({
+    celle: celle.map(([pos, volte, perForma, conNomi], j) => ({
       motore: MOTORI[j],
       posizione: volte > 0 ? pos : null,
       frequenza: `${volte} su ${ripetizioni}`,
       volte,
+      perForma,
+      conNomi,
     })),
     concorrentiCitati: concorrentiPerDomanda(domande[i]),
   }));
@@ -267,9 +288,10 @@ function costruisci(opzioni: { id: string; piano: Piano; domande: Domanda[]; rip
     perMotore,
     perTipo,
     perZoom: perZoom(righe, ripetizioni),
-    intorno: { punti: intornoATe(righe, ripetizioni), motori: ["gemini", "google-ai", "perplexity"] },
+    intorno: new Set(domande.filter((d) => d.punto).map((d) => d.punto!.etichetta)).size > 1 ? { punti: intornoATe(righe, ripetizioni), motori: MOTORI_CON_COORDINATE } : undefined,
     perOccasione: perOccasione(righe, ripetizioni),
-    formulazioni: formulazioni(righe),
+    sensibilitaForma: sensibilitaForma(righe),
+    informativa: informativa(righe, ripetizioni),
     concorrenti,
     citazioniTotali,
     testaATesta,

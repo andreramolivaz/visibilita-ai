@@ -1,5 +1,5 @@
 import type { Report, Verdetto } from "@/lib/types";
-import { percentuale, quotaVoce } from "@/lib/stats";
+import { percentuale, punteggioIntervallo, quotaVoce } from "@/lib/stats";
 import { ScalaPunteggio } from "./ScalaPunteggio";
 
 /**
@@ -19,6 +19,7 @@ export function InTrentaSecondi({ report: r, abbonato = false }: { report: Repor
   const prima = r.azioni[0];
   const guadagno = r.azioni.reduce((acc, a) => acc + (a.impattoStimato ?? 0), 0);
   const storico = abbonato && r.andamento && r.andamento.length >= 2 ? r.andamento : null;
+  const ic = punteggioIntervallo(r.righe, r.ripetizioni);
   const delta = storico ? storico[storico.length - 1].punteggio - storico[storico.length - 2].punteggio : null;
 
   return (
@@ -42,7 +43,8 @@ export function InTrentaSecondi({ report: r, abbonato = false }: { report: Repor
           <p className="tabular mt-3 text-[15px]">
             {tu && (
               <>
-                Compari in {tu.citazioni} risposte su {tu.totale} alle domande in cui il cliente non fa il tuo nome; quota di voce {percentuale(qv[tu.nome] ?? 0)}.
+                Compari in {tu.citazioni} risposte su {tu.totale} alle domande in cui il cliente non fa il tuo nome; quota di voce {percentuale(qv[tu.nome] ?? 0)}. Su domande di questo
+                tipo il punteggio sta tra {ic.basso} e {ic.alto}.
               </>
             )}{" "}
             {r.contesto && (

@@ -1,4 +1,4 @@
-import type { Domanda, EngineId, Piano, Posizione, ProfiloAttivita, SegnaliProfilo, TipoDomanda } from "../types";
+import type { Domanda, EngineId, Formulazione, Piano, Posizione, ProfiloAttivita, SegnaliProfilo, TipoDomanda } from "../types";
 import type { RispostaGrezza } from "../motori/tipi";
 
 /** Cosa abbiamo letto in una risposta: la tua posizione, chi è citato, da quali fonti. */
@@ -13,11 +13,19 @@ export interface AnalisiCella {
 
 export type StatoCella = "da fare" | "fatta" | "errore";
 
+/** La forma della ripetizione r (da 1): la seconda è la seconda forma, se la domanda ce l'ha (a lista; invertita nei confronti); le altre sono brevi. */
+export function formaDellaRipetizione(d: Domanda, r: number): Formulazione {
+  if (r !== 2 || !d.secondaForma) return "breve";
+  return d.tipo === "confronto" ? "invertita" : "lista";
+}
+
 /** Una domanda a un assistente, una volta. L'unità di lavoro della coda. */
 export interface Cella {
   domandaId: string;
   motore: EngineId;
   ripetizione: number;
+  /** La forma chiesta in questa ripetizione (breve o a lista); assente nelle scansioni vecchie. */
+  forma?: Formulazione;
   /** Prima di questo momento non va eseguita: le ripetizioni stanno in giorni diversi. */
   eseguiDopo: string;
   stato: StatoCella;

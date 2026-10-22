@@ -1,7 +1,7 @@
 // Genera i profili di categoria (src/data/profiles/*.json) dallo studio
 // "Visibilità AI per tutte le attività italiane" (21 ottobre 2026).
 // Un profilo per settore, in ordine di numerosità (ISTAT-ASIA 2023 via Eurostat).
-// Famiglie: generica, bisogno, specialita, requisito, occasione, vicino, confronto, nome (+ inglese per chi esporta).
+// Famiglie: generica, bisogno, specialita, requisito (con orari e urgenza), prezzo, occasione, recensioni, vicino, informativa, confronto, nome (+ inglese per chi esporta).
 import { writeFileSync, mkdirSync } from "node:fs";
 
 const OUT = process.argv[2];
@@ -78,6 +78,14 @@ const OCCASIONI = {
     { testo: "{categoria} a {citta} aperto adesso, mi serve oggi", etichetta: "subito" },
     { testo: "{categoria} a {citta} comodo per chi arriva in auto, con parcheggio", etichetta: "in auto" },
   ],
+  negozio: [
+    { testo: "negozio di {categoria} a {citta} dove fare un regalo all'ultimo minuto", etichetta: "regalo" },
+    { testo: "negozio di {categoria} a {citta} con personale che consiglia, per chi non se ne intende", etichetta: "consiglio" },
+    { testo: "negozio di {categoria} a {citta} con prezzi bassi, per una famiglia", etichetta: "budget" },
+    { testo: "negozio di {categoria} a {citta} di fascia alta, prodotti di qualità", etichetta: "premium" },
+    { testo: "negozio di {categoria} a {citta} aperto adesso, mi serve oggi", etichetta: "subito" },
+    { testo: "negozio di {categoria} a {citta} comodo per chi arriva in auto, con parcheggio", etichetta: "in auto" },
+  ],
   persona: [
     { testo: "{categoria} a {citta} per un'occasione importante, matrimonio o cerimonia", etichetta: "cerimonia" },
     { testo: "{categoria} a {citta} per la prima volta, che metta a proprio agio", etichetta: "prima volta" },
@@ -138,7 +146,7 @@ const OCCASIONI = {
 
 const VICINO = {
   locale: [
-    "{categoria} vicino a me a {citta}: quale mi consigli?",
+    "{categoria} vicino a me a {citta}",
     "qual è {il categoria} migliore qui vicino, a {citta}?",
     "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
     "{categoria} aperta adesso vicino a me, a {citta}",
@@ -151,10 +159,211 @@ const VICINO = {
   ],
 };
 
-// Gruppo di occasioni per profilo.
+
+// Prezzo e convenienza: in Italia il compito più frequente di chi decide con
+// l'AI è trovare il prezzo migliore (IAB Italia 2026, 31,4%). I template di
+// gruppo valgono per categorie di ogni genere: niente aggettivi accordati.
+const PREZZO = {
+  ristorazione: [
+    "{categoria} a {citta} dove si spende poco",
+    "dove mangiare bene a {citta} spendendo poco",
+    "{categoria} a {citta} con buon rapporto qualità prezzo",
+    "{categoria} a {citta} con menù a pranzo sotto i 15 euro",
+    "quanto si spende in {un categoria} a {citta}? consigliami posti onesti",
+    "{categoria} a {citta} con prezzi bassi e buona qualità",
+  ],
+  commercio: [
+    "{categoria} a {citta} con i prezzi migliori",
+    "{categoria} a {citta} a buon prezzo",
+    "{categoria} a {citta} con offerte e sconti",
+    "{categoria} a {citta} con buon rapporto qualità prezzo",
+    "{categoria} a {citta} che non costi una fortuna",
+    "{categoria} a {citta} con prezzi onesti",
+  ],
+  negozio: [
+    "negozio di {categoria} a {citta} con i prezzi migliori",
+    "negozio di {categoria} economico a {citta}",
+    "negozio di {categoria} a {citta} con offerte e sconti",
+    "negozio di {categoria} a {citta} con buon rapporto qualità prezzo",
+    "{categoria} a {citta}: dove conviene comprare",
+    "negozio di {categoria} a {citta} con prezzi onesti",
+  ],
+  persona: [
+    "{categoria} a {citta} a buon prezzo",
+    "{categoria} a {citta} con prezzi onesti",
+    "quanto costa {un categoria} a {citta}? consigliami qualcuno con tariffe chiare",
+    "{categoria} a {citta} con buon rapporto qualità prezzo",
+    "{categoria} a {citta} con il listino prezzi pubblicato",
+    "{categoria} a {citta} che costi poco ma con buone recensioni",
+  ],
+  casa: [
+    "{categoria} a {citta} con prezzi onesti",
+    "quanto costa {un categoria} a {citta}? chi fa preventivi gratuiti",
+    "{categoria} a {citta} a buon prezzo e affidabile",
+    "{categoria} a {citta} con preventivo gratuito e chiaro",
+    "{categoria} a {citta} che non costi una fortuna per un piccolo lavoro",
+    "{categoria} a {citta} con buon rapporto qualità prezzo",
+  ],
+  sanita: [
+    "{categoria} a {citta} con prezzi contenuti",
+    "{categoria} a {citta} in convenzione o con tariffe agevolate",
+    "quanto costa una visita da {un categoria} a {citta}? consigliami dove andare",
+    "{categoria} a {citta} con tariffe chiare pubblicate",
+    "{categoria} a {citta} a buon prezzo e con buone recensioni",
+    "{categoria} a {citta} con pagamento a rate",
+  ],
+  professionista: [
+    "{categoria} a {citta} con tariffe chiare",
+    "{categoria} a {citta} a buon prezzo",
+    "quanto costa {un categoria} a {citta}? consigliami qualcuno con preventivo",
+    "{categoria} a {citta} con primo incontro gratuito",
+    "{categoria} a {citta} con prezzi onesti per un privato",
+    "{categoria} a {citta} con costi contenuti per una piccola impresa",
+  ],
+  b2b: [
+    "{categoria} in provincia di {provincia} con prezzi competitivi",
+    "{categoria} in {regione} con prezzi bassi per piccole serie",
+    "{categoria} in provincia di {provincia} con preventivo rapido e prezzi chiari",
+    "{categoria} in {regione} con il miglior rapporto qualità prezzo",
+    "{categoria} in provincia di {provincia} con prezzi convenienti per grandi volumi",
+    "{categoria} in {regione} con listino trasparente",
+  ],
+  ricettivo: [
+    "{categoria} a {citta} a buon prezzo",
+    "{categoria} a {citta} con buon rapporto qualità prezzo",
+    "{categoria} a {citta} sotto i 100 euro a notte",
+    "{categoria} a {citta} che costi poco, in centro e con buone recensioni",
+    "dove dormire a {citta} spendendo poco",
+    "{categoria} a {citta} con colazione inclusa a buon prezzo",
+  ],
+  cultura: [
+    "{categoria} a {citta} con ingresso a basso costo",
+    "cosa visitare a {citta} spendendo poco",
+    "{categoria} a {citta} con ingresso gratuito la prima domenica del mese",
+    "{categoria} a {citta} con biglietto famiglia conveniente",
+    "{categoria} a {citta} che vale il prezzo del biglietto",
+    "{categoria} a {citta} con sconto studenti",
+  ],
+};
+
+// Orari e urgenza: entrano nella famiglia requisito («aperto adesso», «entro oggi»).
+const ORARI = {
+  ristorazione: ["{categoria} a {citta} con apertura adesso", "{categoria} a {citta} con apertura a pranzo in settimana", "{categoria} a {citta} con cucina dopo le 23", "{categoria} a {citta} con apertura il lunedì"],
+  commercio: ["{categoria} a {citta} con apertura adesso", "{categoria} a {citta} con apertura la domenica", "{categoria} a {citta} con orario continuato", "{categoria} a {citta} con apertura fino a tardi"],
+  negozio: ["negozio di {categoria} aperto adesso a {citta}", "negozio di {categoria} aperto la domenica a {citta}", "negozio di {categoria} a {citta} con orario continuato", "negozio di {categoria} a {citta} aperto fino a tardi"],
+  persona: ["{categoria} a {citta} con disponibilità oggi", "{categoria} a {citta} con apertura il sabato", "{categoria} a {citta} con orari dopo le 19", "{categoria} a {citta} senza appuntamento"],
+  casa: ["{categoria} a {citta} per un intervento urgente oggi", "{categoria} a {citta} con disponibilità nel weekend", "{categoria} a {citta} con reperibilità notturna", "{categoria} a {citta} che venga entro domani"],
+  sanita: ["{categoria} a {citta} con visita entro oggi", "{categoria} a {citta} con apertura il sabato", "{categoria} a {citta} con orari serali", "{categoria} a {citta} senza lista d'attesa"],
+  professionista: ["{categoria} a {citta} che risponda oggi", "{categoria} a {citta} con appuntamento entro la settimana", "{categoria} a {citta} con disponibilità anche il sabato", "{categoria} a {citta} che riceva dopo le 18"],
+  b2b: ["{categoria} in provincia di {provincia} con consegna entro una settimana", "{categoria} in {regione} che risponda a un preventivo in giornata", "{categoria} in provincia di {provincia} con produzione urgente", "{categoria} in {regione} che lavori su turni per una commessa urgente"],
+  ricettivo: ["{categoria} a {citta} con disponibilità stasera", "{categoria} a {citta} con check-in tardi", "{categoria} a {citta} con prenotazione all'ultimo minuto", "{categoria} a {citta} con apertura tutto l'anno"],
+  cultura: ["{categoria} a {citta} con apertura adesso", "{categoria} a {citta} con apertura il lunedì", "{categoria} a {citta} con apertura serale", "{categoria} a {citta} con apertura nei festivi"],
+};
+
+// Recensioni e affidabilità: il 47% non usa un'attività con meno di 20
+// recensioni, il 68% esige almeno 4 stelle (BrightLocal 2026).
+const RECENSIONI = {
+  ristorazione: [
+    "{categoria} a {citta} con le recensioni migliori",
+    "{categoria} a {citta} affidabile, dove non si resta delusi",
+    "{categoria} a {citta} che consiglia chi ci è stato di recente",
+    "{categoria} a {citta} con più di 4 stelle su Google",
+    "{categoria} a {citta} con recensioni recenti positive",
+    "{categoria} a {citta} di cui fidarsi per una cena importante",
+  ],
+  commercio: [
+    "{categoria} a {citta} con le recensioni migliori",
+    "{categoria} affidabile a {citta}",
+    "{categoria} a {citta} con più di 4 stelle su Google",
+    "{categoria} a {citta} che i clienti consigliano",
+    "{categoria} a {citta} affidabile, senza fregature",
+    "{categoria} a {citta} con recensioni recenti positive",
+  ],
+  negozio: [
+    "negozio di {categoria} a {citta} con le recensioni migliori",
+    "negozio di {categoria} affidabile a {citta}",
+    "negozio di {categoria} a {citta} con più di 4 stelle su Google",
+    "negozio di {categoria} a {citta} consigliato dai clienti",
+    "negozio di {categoria} a {citta} serio, senza fregature",
+    "negozio di {categoria} a {citta} con recensioni recenti positive",
+  ],
+  persona: [
+    "{categoria} a {citta} con le recensioni migliori",
+    "{categoria} affidabile a {citta}",
+    "{categoria} a {citta} con più di 4 stelle su Google",
+    "{categoria} a {citta} che consiglia chi ci va",
+    "{categoria} a {citta} affidabile e puntuale",
+    "{categoria} a {citta} con recensioni recenti positive",
+  ],
+  casa: [
+    "{categoria} affidabile a {citta}, con buone recensioni",
+    "{categoria} a {citta} affidabile, che non sparisca a metà lavoro",
+    "{categoria} a {citta} con più di 4 stelle su Google",
+    "{categoria} a {citta} che consiglia chi l'ha chiamato",
+    "{categoria} a {citta} con fattura e garanzia sul lavoro",
+    "{categoria} a {citta} con recensioni recenti positive",
+  ],
+  sanita: [
+    "{categoria} a {citta} con le recensioni migliori",
+    "{categoria} affidabile a {citta}",
+    "{categoria} a {citta} con più di 4 stelle su Google",
+    "{categoria} a {citta} che i pazienti consigliano",
+    "{categoria} a {citta} affidabile e che spieghi bene",
+    "{categoria} a {citta} con recensioni recenti positive",
+  ],
+  professionista: [
+    "{categoria} a {citta} con le recensioni migliori",
+    "{categoria} affidabile a {citta}",
+    "{categoria} a {citta} che i clienti consigliano",
+    "{categoria} a {citta} affidabile e con esperienza",
+    "{categoria} a {citta} con più di 4 stelle su Google",
+    "{categoria} a {citta} con buona reputazione",
+  ],
+  b2b: [
+    "{categoria} affidabile in provincia di {provincia}",
+    "{categoria} in {regione} con buone referenze",
+    "{categoria} in provincia di {provincia} affidabile e puntuale nelle consegne",
+    "{categoria} in {regione} con referenze di altre aziende",
+    "{categoria} in provincia di {provincia} con recensioni positive",
+    "{categoria} in {regione} con buona reputazione nel settore",
+  ],
+  ricettivo: [
+    "{categoria} a {citta} con le recensioni migliori",
+    "{categoria} a {citta} con più di 4 stelle",
+    "{categoria} affidabile a {citta}, come nelle foto",
+    "{categoria} a {citta} che gli ospiti consigliano",
+    "{categoria} a {citta} con recensioni recenti positive",
+    "{categoria} a {citta} di cui fidarsi per una prenotazione",
+  ],
+  cultura: [
+    "{categoria} a {citta} con le recensioni migliori",
+    "{categoria} a {citta} che vale la visita secondo chi c'è stato",
+    "{categoria} a {citta} che i visitatori consigliano",
+    "{categoria} a {citta} con più di 4 stelle",
+    "{categoria} a {citta} che piace alle famiglie",
+    "{categoria} a {citta} con recensioni recenti positive",
+  ],
+};
+
+// Informative: come scegliere, quanto costa in media. Spesso senza nomi: nel
+// report si contano sulle risposte che fanno almeno un nome, a parte dal punteggio.
+const INFORMATIVA = {
+  ristorazione: ["come scegliere {un categoria} a {citta} senza sbagliare?", "conviene prenotare {un categoria} a {citta} il sabato sera?", "cosa mangiare di tipico a {citta} e dove?", "quanto costa in media una cena in {un categoria} a {citta}?"],
+  commercio: ["come scegliere {un categoria} a {citta}?", "conviene andare in {un categoria} di {citta} o comprare online?", "cosa controllare prima di scegliere {un categoria}?", "quanto si spende in media in {un categoria} a {citta}?"],
+  negozio: ["come scegliere un buon negozio di {categoria} a {citta}?", "conviene comprare {categoria} in un negozio di {citta} o online?", "cosa controllare prima di comprare in un negozio di {categoria}?", "quanto si spende in media in un negozio di {categoria} a {citta}?"],
+  persona: ["come scegliere {un categoria} a {citta}?", "ogni quanto si va da {un categoria}?", "quanto costa in media {un categoria} a {citta}?", "cosa chiedere a {un categoria} la prima volta?"],
+  casa: ["come scegliere {un categoria} affidabile a {citta}?", "quanto costa in media {un categoria} a {citta}?", "cosa chiedere in un preventivo a {un categoria}?", "serve una ditta certificata per chiamare {un categoria}?"],
+  sanita: ["come scegliere {un categoria} a {citta}?", "quanto costa in media una visita da {un categoria} a {citta}?", "quando bisogna andare da {un categoria}?", "cosa chiedere a {un categoria} alla prima visita?"],
+  professionista: ["come scegliere {un categoria} a {citta}?", "quanto costa in media {un categoria} a {citta}?", "quando serve davvero {un categoria}?", "cosa chiedere a {un categoria} al primo incontro?"],
+  b2b: ["come scegliere {un categoria} in provincia di {provincia}?", "cosa chiedere in un preventivo a {un categoria}?", "quali certificazioni deve avere {un categoria}?", "come si valuta {un categoria} prima di una fornitura?"],
+  ricettivo: ["come scegliere dove dormire a {citta}?", "quanto costa in media una notte in {un categoria} a {citta}?", "quando conviene prenotare {un categoria} a {citta}?", "quale zona di {citta} è meglio per dormire?"],
+  cultura: ["cosa vedere a {citta} in un giorno?", "quanto costa in media visitare {un categoria} a {citta}?", "quando conviene visitare {un categoria} a {citta} per evitare la fila?", "come organizzare una visita a {citta} con bambini?"],
+};
+
+// Gruppo di settori per profilo: decide occasioni, prezzo, orari, recensioni e informative.
 const GRUPPO = {
   ristorante: "ristorazione", bar: "ristorazione",
-  negozio: "commercio", farmacia: "commercio", concessionaria: "commercio",
+  negozio: "negozio", farmacia: "commercio", concessionaria: "commercio",
   parrucchiere: "persona", estetica: "persona", palestra: "persona", formazione: "persona", fotografo: "persona", viaggi: "persona", altro: "persona",
   edile: "casa", idraulico: "casa", elettricista: "casa", finiture: "casa", pulizie: "casa", immobiliare: "casa", autofficina: "casa",
   medico: "sanita", dentista: "sanita", fisioterapista: "sanita", veterinario: "sanita",
@@ -279,8 +488,8 @@ const PROFILI = [
     categorieGoogle: ["Produttore", "Azienda alimentare", "Laboratorio artigianale", "Azienda tessile", "Mobilificio", "Falegnameria industriale", "Stampaggio plastica", "Packaging", "Produzione"],
     famiglia: "b2b", portali: "Europages e Kompass", inglese: true,
     domande: {
-      generica: ["produttori di {specialita} in {regione}", "aziende di {categoria} in provincia di {provincia}"],
-      bisogno: ["fornitore di {specialita} conto terzi per piccole quantità in {regione}", "laboratorio di {specialita} conto terzi vicino a {citta}"],
+      generica: ["produttori di {specialita} in {regione}", "aziende di {categoria} in provincia di {provincia}", "{categoria} a {citta} con buone referenze", "chi produce {specialita} in provincia di {provincia}?"],
+      bisogno: ["fornitore di {specialita} conto terzi per piccole quantità in {regione}", "laboratorio di {specialita} conto terzi vicino a {citta}", "{categoria} a {citta} che accetti ordini da una piccola azienda", "fornitore di {specialita} in {regione} con campionatura prima dell'ordine"],
       specialita: ["produttore di {specialita} in {regione} che faccia private label", "azienda in provincia di {provincia} che produce {specialita} su misura"],
       requisito: ["aziende con certificazione {requisito} in {regione}", "produttore di {specialita} in Italia con {requisito}"],
       confronto: ["meglio {nome} o {concorrente} come fornitore di {specialita}?"],
@@ -736,6 +945,7 @@ const PROFILI = [
 ];
 
 for (const p of PROFILI) {
+  const gruppo = GRUPPO[p.id] ?? (p.famiglia === "b2b" ? "b2b" : "persona");
   const azioni = p.famiglia === "b2b" ? AZIONI.b2b(p.portali) : p.famiglia === "cultura" ? AZIONI.cultura() : AZIONI[p.famiglia](p.portale);
   const json = {
     id: p.id,
@@ -749,8 +959,12 @@ for (const p of PROFILI) {
     generatoDaAI: Boolean(p.generatoDaAI),
     domande: {
       ...p.domande,
-      occasione: OCCASIONI[GRUPPO[p.id] ?? (p.famiglia === "b2b" ? "b2b" : "persona")],
+      requisito: [...(p.domande.requisito ?? []), ...ORARI[gruppo]],
+      prezzo: PREZZO[gruppo],
+      occasione: OCCASIONI[gruppo],
+      recensioni: RECENSIONI[gruppo],
       vicino: p.famiglia === "b2b" ? VICINO.b2b : VICINO.locale,
+      informativa: INFORMATIVA[gruppo],
     },
     fonti: p.fonti,
     metriche: p.metriche,

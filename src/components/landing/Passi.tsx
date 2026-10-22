@@ -62,7 +62,7 @@ function MiniDomande() {
           </li>
         ))}
       </ul>
-      <p className="mt-3 border-t border-line pt-2 text-[12px] text-muted">Per famiglia, per zoom, in più formulazioni · 6 assistenti · ogni domanda ripetuta</p>
+      <p className="mt-3 border-t border-line pt-2 text-[12px] text-muted">Per famiglia e per zoom · 6 assistenti · ogni domanda in due forme</p>
     </Riquadro>
   );
 }

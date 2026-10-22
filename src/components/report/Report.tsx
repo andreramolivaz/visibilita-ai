@@ -12,15 +12,18 @@ import { Territorio } from "./Territorio";
 import { NoteTecniche, periodoScansione } from "./NoteTecniche";
 import { Telescopio } from "./Telescopio";
 import { letturaAssistenti, letturaAzioni, letturaConcorrenti, letturaDicono, letturaFonti, letturaParole, letturaTelescopio, letturaTerritorio, letturaTipi } from "@/lib/letture";
-import { punteggioPerMotore } from "@/lib/stats";
+import { TIPI_SPONTANEI, perFamiglia, percentuale, punteggioPerMotore } from "@/lib/stats";
 
 export const NOME_TIPO: Record<TipoDomanda, { titolo: string; esempio: string }> = {
   generica: { titolo: "Generiche", esempio: "«miglior pizzeria a Bergamo»" },
   bisogno: { titolo: "Per bisogno", esempio: "«aperta la domenica», «stasera»" },
   specialita: { titolo: "Per specialità", esempio: "«forno a legna», «napoletana»" },
-  requisito: { titolo: "Per requisito", esempio: "«con dehors», «con parcheggio»" },
+  requisito: { titolo: "Per requisito", esempio: "«con dehors», «aperta adesso»" },
+  prezzo: { titolo: "Per prezzo", esempio: "«economica», «buon rapporto qualità prezzo»" },
   occasione: { titolo: "Per occasione", esempio: "«con bambini», «pranzo di lavoro»" },
+  recensioni: { titolo: "Per recensioni", esempio: "«con più di 4 stelle», «affidabile»" },
   vicino: { titolo: "Vicino a te", esempio: "«vicino a me», posizione impostata" },
+  informativa: { titolo: "Informative", esempio: "«come scegliere…», «quanto costa in media»" },
   confronto: { titolo: "Di confronto", esempio: "«meglio X o Y?»" },
   nome: { titolo: "Sul nome", esempio: "«com'è la Pizzeria Da Gino?»" },
   inglese: { titolo: "In inglese", esempio: "«best … in Bergamo»" },
@@ -46,6 +49,7 @@ function Blocco({ titolo, lettura, children, id }: { titolo: string; lettura?: s
 export function Report({ report, abbonato = false }: { report: ReportT; abbonato?: boolean }) {
   const r = report;
   const parziali = punteggioPerMotore(r.righe, r.ripetizioni);
+  const famiglie = perFamiglia(r.righe, r.ripetizioni);
   const guadagno = r.azioni.reduce((acc, a) => acc + (a.impattoStimato ?? 0), 0);
   const totaleRisposte = r.domande * r.motori.length * r.ripetizioni;
   const mostraAndamento = abbonato && !!r.andamento && r.andamento.length >= 2;
@@ -164,19 +168,27 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             <h3 className="font-semibold">Per tipo di domanda</h3>
             <p className="tabular mt-1 text-[15px]">{letturaTipi(r)}</p>
             <div className="mt-3">
-              {r.perTipo.map((t) => (
-                <Barra
-                  key={t.tipo}
-                  etichetta={NOME_TIPO[t.tipo].titolo}
-                  valore={t.comparse}
-                  massimo={t.totale}
-                  testo={`${t.comparse} su ${t.totale}`}
-                  sotto={`${t.domande} ${t.domande === 1 ? "domanda" : "domande"} · ${NOME_TIPO[t.tipo].esempio}`}
-                  accento
-                />
-              ))}
+              {r.perTipo.map((t) => {
+                const f = famiglie.find((x) => x.tipo === t.tipo);
+                const spontanea = TIPI_SPONTANEI.includes(t.tipo);
+                const dettaglio = f && spontanea ? ` · tra domande ${percentuale(f.icDomande.basso)}–${percentuale(f.icDomande.alto)}, stima ridotta ${percentuale(f.ridotta)}` : "";
+                return (
+                  <Barra
+                    key={t.tipo}
+                    etichetta={NOME_TIPO[t.tipo].titolo}
+                    valore={t.comparse}
+                    massimo={t.totale}
+                    testo={`${t.comparse} su ${t.totale}`}
+                    sotto={`${t.domande} ${t.domande === 1 ? "domanda" : "domande"} · ${NOME_TIPO[t.tipo].esempio}${dettaglio}`}
+                    accento
+                  />
+                );
+              })}
             </div>
-            <p className="mt-2 text-xs text-muted">Risposte in cui compari, sul totale delle risposte di quella famiglia. Nelle domande di confronto e sul nome compari quasi per forza: non entrano nel punteggio.</p>
+            <p className="mt-2 text-xs text-muted">
+              Risposte in cui compari, sul totale delle risposte di quella famiglia. «Tra domande» è l&apos;intervallo al 95% che vale per domande di quel tipo, non solo per quelle fatte; la stima
+              ridotta tira le famiglie con poche domande verso la media del report. Confronto, sul nome e informative non entrano nel punteggio.
+            </p>
           </div>
         </div>
       </Blocco>

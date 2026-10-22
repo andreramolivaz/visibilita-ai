@@ -33,7 +33,11 @@
     ],
     "requisito": [
       "autotrasportatore con {requisito} in provincia di {provincia}",
-      "azienda di logistica in {regione} con {requisito}"
+      "azienda di logistica in {regione} con {requisito}",
+      "{categoria} in provincia di {provincia} con consegna entro una settimana",
+      "{categoria} in {regione} che risponda a un preventivo in giornata",
+      "{categoria} in provincia di {provincia} con produzione urgente",
+      "{categoria} in {regione} che lavori su turni per una commessa urgente"
     ],
     "confronto": [
       "meglio {nome} o {concorrente} per spedizioni groupage da {regione}?"
@@ -43,6 +47,14 @@
     ],
     "inglese": [
       "3PL logistics provider in {regione}, Italy, with bonded warehouse"
+    ],
+    "prezzo": [
+      "{categoria} in provincia di {provincia} con prezzi competitivi",
+      "{categoria} in {regione} con prezzi bassi per piccole serie",
+      "{categoria} in provincia di {provincia} con preventivo rapido e prezzi chiari",
+      "{categoria} in {regione} con il miglior rapporto qualità prezzo",
+      "{categoria} in provincia di {provincia} con prezzi convenienti per grandi volumi",
+      "{categoria} in {regione} con listino trasparente"
     ],
     "occasione": [
       {
@@ -70,10 +82,24 @@
         "etichetta": "estero"
       }
     ],
+    "recensioni": [
+      "{categoria} affidabile in provincia di {provincia}",
+      "{categoria} in {regione} con buone referenze",
+      "{categoria} in provincia di {provincia} affidabile e puntuale nelle consegne",
+      "{categoria} in {regione} con referenze di altre aziende",
+      "{categoria} in provincia di {provincia} con recensioni positive",
+      "{categoria} in {regione} con buona reputazione nel settore"
+    ],
     "vicino": [
       "{categoria} in provincia di {provincia}, il più vicino a {citta}",
       "{categoria} nei dintorni di {citta} che venga a fare un sopralluogo",
       "{categoria} in {regione} vicino a {citta} con consegna a breve"
+    ],
+    "informativa": [
+      "come scegliere {un categoria} in provincia di {provincia}?",
+      "cosa chiedere in un preventivo a {un categoria}?",
+      "quali certificazioni deve avere {un categoria}?",
+      "come si valuta {un categoria} prima di una fornitura?"
     ]
   },
   "fonti": [

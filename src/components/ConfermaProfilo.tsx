@@ -116,9 +116,9 @@ export function ConfermaProfilo({
       <Scheda>
         <h2 className="font-semibold">Da dove vengono le domande</h2>
         <p className="mt-1 text-sm text-muted">
-          Le domande le costruiamo noi dal tuo profilo, per famiglie: generiche, per bisogno, per specialità, per requisito, per occasione, vicino a te, di
-          confronto, sul nome. Ogni famiglia a più livelli di zoom e in più formulazioni. Il testo esatto resta nel metodo: nel report vedi il risultato,
-          domanda per domanda.
+          Le domande le costruiamo noi dal tuo profilo, per famiglie: generiche, per bisogno, per specialità, per requisito e orari, per prezzo, per
+          occasione, per recensioni, vicino a te, informative, di confronto, sul nome. Ogni famiglia a più livelli di zoom, ogni domanda in due forme. Il testo
+          esatto resta nel metodo: nel report vedi il risultato, domanda per domanda.
         </p>
         <dl className="mt-3 space-y-2.5 text-sm">
           {segnali.recensioni.length > 0 && (

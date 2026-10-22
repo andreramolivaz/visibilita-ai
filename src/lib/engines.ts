@@ -23,7 +23,7 @@ export const ENGINES: Engine[] = [
     utentiMln: 9.4,
     peso: 0.25,
     fase: "mvp",
-    come: "Gemini API, grounding Google Search e Google Maps",
+    come: "Gemini API, grounding Google Search (Google Maps solo per le domande in inglese)",
   },
   {
     id: "google-ai",
@@ -63,7 +63,7 @@ export const ENGINES: Engine[] = [
     utentiMln: 1.0,
     peso: 0.04,
     fase: "mvp",
-    come: "Agent API, tool web_search",
+    come: "Agent API, tool web_search con user_location (coordinate)",
   },
   {
     id: "grok",

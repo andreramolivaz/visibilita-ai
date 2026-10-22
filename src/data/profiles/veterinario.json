@@ -31,13 +31,25 @@
     ],
     "requisito": [
       "veterinario a {citta} che faccia {requisito}",
-      "veterinario a domicilio a {citta}"
+      "veterinario a domicilio a {citta}",
+      "{categoria} a {citta} con visita entro oggi",
+      "{categoria} a {citta} con apertura il sabato",
+      "{categoria} a {citta} con orari serali",
+      "{categoria} a {citta} senza lista d'attesa"
     ],
     "confronto": [
       "meglio {nome} o {concorrente} per il mio cane a {citta}?"
     ],
     "nome": [
       "{nome} veterinario {citta} recensioni"
+    ],
+    "prezzo": [
+      "{categoria} a {citta} con prezzi contenuti",
+      "{categoria} a {citta} in convenzione o con tariffe agevolate",
+      "quanto costa una visita da {un categoria} a {citta}? consigliami dove andare",
+      "{categoria} a {citta} con tariffe chiare pubblicate",
+      "{categoria} a {citta} a buon prezzo e con buone recensioni",
+      "{categoria} a {citta} con pagamento a rate"
     ],
     "occasione": [
       {
@@ -65,12 +77,26 @@
         "etichetta": "lavoro"
       }
     ],
+    "recensioni": [
+      "{categoria} a {citta} con le recensioni migliori",
+      "{categoria} affidabile a {citta}",
+      "{categoria} a {citta} con più di 4 stelle su Google",
+      "{categoria} a {citta} che i pazienti consigliano",
+      "{categoria} a {citta} affidabile e che spieghi bene",
+      "{categoria} a {citta} con recensioni recenti positive"
+    ],
     "vicino": [
-      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "{categoria} vicino a me a {citta}",
       "qual è {il categoria} migliore qui vicino, a {citta}?",
       "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
       "{categoria} aperta adesso vicino a me, a {citta}",
       "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
+    ],
+    "informativa": [
+      "come scegliere {un categoria} a {citta}?",
+      "quanto costa in media una visita da {un categoria} a {citta}?",
+      "quando bisogna andare da {un categoria}?",
+      "cosa chiedere a {un categoria} alla prima visita?"
     ]
   },
   "fonti": [

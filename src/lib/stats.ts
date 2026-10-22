@@ -1,6 +1,6 @@
 import { engine } from "./engines";
 import { pesoPosizione } from "./score";
-import type { Concorrente, EngineId, Formulazioni, ProfiloAttivita, RigaDomanda, RisultatoOccasione, RisultatoPunto, RisultatoZoom, TipoDomanda, Zoom } from "./types";
+import type { Concorrente, EngineId, ProfiloAttivita, RigaDomanda, RisultatoInformativa, RisultatoOccasione, RisultatoPunto, RisultatoZoom, SensibilitaForma, TipoDomanda, Zoom } from "./types";
 
 /**
  * Statistiche del report. Tutte derivate dalle celle domanda × assistente,
@@ -8,16 +8,28 @@ import type { Concorrente, EngineId, Formulazioni, ProfiloAttivita, RigaDomanda,
  *
  * Punteggio e numeri chiave usano solo le domande «spontanee», quelle in cui
  * il cliente non fa il nome dell'attività (generiche, per bisogno, per
- * specialità, per requisito): misurano se gli assistenti ti consigliano da
- * soli. Le domande sul nome e di confronto, in cui compari quasi per forza,
- * sono riportate a parte (nella mappa, per tipo, in «cosa dicono di te»).
+ * specialità, per requisito, per prezzo, per occasione, per recensioni,
+ * vicino a te): misurano se gli assistenti ti consigliano da soli. Le domande
+ * sul nome e di confronto, in cui compari quasi per forza, e quelle
+ * informative, che spesso non fanno nomi, sono riportate a parte.
  * È la distinzione tra ricordo spontaneo e sollecitato delle ricerche di marca.
+ *
+ * Gli intervalli sono due: quello di Wilson sulle risposte messe insieme, che
+ * vale per «queste domande, questi assistenti, questi giorni», e quello «tra
+ * domande» (bootstrap a grappoli per domanda), che vale per «questo tipo di
+ * domande» ed è più largo, perché le risposte della stessa domanda sono
+ * correlate (studio «Domande e statistiche», 2026).
  */
 
-export const TIPI_SPONTANEI: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "occasione", "vicino"];
+export const TIPI_SPONTANEI: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "prezzo", "occasione", "recensioni", "vicino"];
 
-/** Gli assistenti a cui si può impostare una posizione con le coordinate (gli altri ricevono solo la città). */
-export const MOTORI_CON_COORDINATE: EngineId[] = ["gemini", "google-ai", "perplexity"];
+/**
+ * Gli assistenti a cui si può impostare una posizione con le coordinate per
+ * una domanda in italiano: Google AI (DataForSEO, location_coordinate) e
+ * Perplexity (user_location). Gemini le accetta solo con il grounding Maps,
+ * documentato per il solo inglese; ChatGPT e Claude ricevono la città; Grok nulla.
+ */
+export const MOTORI_CON_COORDINATE: EngineId[] = ["google-ai", "perplexity"];
 
 export const spontanee = (righe: RigaDomanda[]) => righe.filter((r) => TIPI_SPONTANEI.includes(r.domanda.tipo));
 
@@ -34,12 +46,119 @@ export function wilson(k: number, n: number, z = 1.96): { basso: number; alto: n
   return { basso: Math.max(0, centro - semi), alto: Math.min(1, centro + semi) };
 }
 
-/** Risposte in cui compari, sul totale delle domande spontanee, con intervallo al 95%. */
+/** Generatore pseudo-casuale deterministico (mulberry32): lo stesso intervallo a ogni calcolo. */
+function casuale(seme: number) {
+  return () => {
+    seme |= 0;
+    seme = (seme + 0x6d2b79f5) | 0;
+    let t = Math.imul(seme ^ (seme >>> 15), 1 | seme);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Intervallo «tra domande» al 95%: bootstrap a grappoli che ricampiona le
+ * domande intere (con tutte le loro risposte) e ricalcola la statistica;
+ * percentili 2,5 e 97,5 di mille campioni. Vale per «questo tipo di domande»,
+ * non solo per le domande fatte; con meno di due domande coincide con il valore.
+ */
+export function intervalloTraDomande<T>(gruppi: T[], statistica: (campione: T[]) => number, campioni = 1000, seme = 7): { basso: number; alto: number } {
+  if (gruppi.length < 2) {
+    const v = statistica(gruppi);
+    return { basso: v, alto: v };
+  }
+  const r = casuale(seme);
+  const valori: number[] = [];
+  for (let b = 0; b < campioni; b++) {
+    const campione = Array.from({ length: gruppi.length }, () => gruppi[Math.floor(r() * gruppi.length)]);
+    valori.push(statistica(campione));
+  }
+  valori.sort((a, b) => a - b);
+  const q = (p: number) => valori[Math.min(valori.length - 1, Math.max(0, Math.floor(p * valori.length)))];
+  return { basso: q(0.025), alto: q(0.975) };
+}
+
+/**
+ * Priori beta per la stima ridotta (metodo dei momenti sui gruppi stessi):
+ * media delle quote e varianza tra gruppi al netto di quella binomiale.
+ * κ dice quante risposte «vale» la media del report: un gruppo con n risposte
+ * pesa n/(n+κ), la media κ/(n+κ). κ tra 4 e 200: mai nessuna riduzione, mai
+ * solo la media.
+ */
+export function prioriBeta(gruppi: { k: number; n: number }[]): { media: number; kappa: number } {
+  const validi = gruppi.filter((g) => g.n > 0);
+  if (validi.length === 0) return { media: 0, kappa: 20 };
+  const N = validi.reduce((a, g) => a + g.n, 0);
+  const media = validi.reduce((a, g) => a + g.k, 0) / N;
+  const quote = validi.map((g) => g.k / g.n);
+  const m = quote.length;
+  const mediaQuote = quote.reduce((a, b) => a + b, 0) / m;
+  const varOsservata = m > 1 ? quote.reduce((a, q) => a + (q - mediaQuote) ** 2, 0) / (m - 1) : 0;
+  const varBinomiale = (media * (1 - media)) / (N / m);
+  const varTra = Math.max(varOsservata - varBinomiale, 1e-4);
+  const kappa = Math.min(200, Math.max(4, (media * (1 - media)) / varTra - 1));
+  return { media, kappa };
+}
+
+/** La stima ridotta di k/n verso la media del report, con il peso che la media ha avuto. */
+export function ridotta(k: number, n: number, priori: { media: number; kappa: number }): { quota: number; peso: number } {
+  const peso = priori.kappa / (n + priori.kappa);
+  return { quota: (k + priori.media * priori.kappa) / (n + priori.kappa), peso };
+}
+
+/** L'intervallo tra domande non può essere più stretto di quello di Wilson: con poche domande il bootstrap sottostima, e si allarga a Wilson. */
+function nonPiuStretto(traDomande: { basso: number; alto: number }, w: { basso: number; alto: number }) {
+  return { basso: Math.min(traDomande.basso, w.basso), alto: Math.max(traDomande.alto, w.alto) };
+}
+
+/** Quota di risposte in cui compari su un insieme di righe (per il bootstrap). */
+const quotaRighe = (righe: RigaDomanda[], ripetizioni: number) => {
+  let k = 0;
+  let n = 0;
+  for (const r of righe) for (const c of r.celle) {
+    n += ripetizioni;
+    k += volteDi(c);
+  }
+  return n ? k / n : 0;
+};
+
+/** Risposte in cui compari, sul totale delle domande spontanee: intervallo di Wilson e intervallo tra domande. */
 export function tassoCitazione(tutte: RigaDomanda[], ripetizioni: number) {
   const righe = spontanee(tutte);
   const n = righe.length * (righe[0]?.celle.length ?? 0) * ripetizioni;
   const k = righe.reduce((acc, r) => acc + r.celle.reduce((a, c) => a + volteDi(c), 0), 0);
-  return { k, n, quota: n ? k / n : 0, ic: wilson(k, n) };
+  const ic = wilson(k, n);
+  return { k, n, quota: n ? k / n : 0, ic, icDomande: nonPiuStretto(intervalloTraDomande(righe, (c) => quotaRighe(c, ripetizioni)), ic) };
+}
+
+/** Il punteggio ricalcolato dalle righe (posizione media per cella): serve al bootstrap tra domande. */
+export function punteggioDaRighe(tutte: RigaDomanda[], ripetizioni: number): number {
+  const righe = spontanee(tutte);
+  const motori = righe[0]?.celle.map((c) => c.motore) ?? [];
+  let somma = 0;
+  let pesi = 0;
+  for (const m of motori) {
+    let s = 0;
+    let n = 0;
+    for (const r of righe) {
+      const c = r.celle.find((x) => x.motore === m);
+      if (!c) continue;
+      s += (volteDi(c) / ripetizioni) * pesoPosizione(c.posizione);
+      n++;
+    }
+    if (!n) continue;
+    const peso = engine(m).peso;
+    somma += (s / n) * peso;
+    pesi += peso;
+  }
+  return pesi ? (somma / pesi) * 100 : 0;
+}
+
+/** L'intervallo tra domande del punteggio, in punti. */
+export function punteggioIntervallo(tutte: RigaDomanda[], ripetizioni: number): { basso: number; alto: number } {
+  const ic = intervalloTraDomande(spontanee(tutte), (c) => punteggioDaRighe(c, ripetizioni));
+  return { basso: Math.round(ic.basso), alto: Math.round(ic.alto) };
 }
 
 /** Domande spontanee in cui compari almeno una volta, sul totale. */
@@ -140,17 +259,22 @@ export function quotaVoce(concorrenti: Concorrente[], citazioniTotali?: number):
  * La posizione esatta oscilla tra una risposta e l'altra; «primi tre o oltre» è stabile.
  */
 export function primiTre(tutte: RigaDomanda[]) {
-  let k = 0;
-  let n = 0;
-  for (const r of spontanee(tutte)) {
-    for (const c of r.celle) {
-      const v = volteDi(c);
-      if (!v || c.posizione === null) continue;
-      n += v;
-      if (c.posizione <= 3) k += v;
+  const conta = (righe: RigaDomanda[]) => {
+    let k = 0;
+    let n = 0;
+    for (const r of righe) {
+      for (const c of r.celle) {
+        const v = volteDi(c);
+        if (!v || c.posizione === null) continue;
+        n += v;
+        if (c.posizione <= 3) k += v;
+      }
     }
-  }
-  return { k, n, quota: n ? k / n : 0 };
+    return { k, n, quota: n ? k / n : 0 };
+  };
+  const righe = spontanee(tutte);
+  const tot = conta(righe);
+  return { ...tot, icDomande: nonPiuStretto(intervalloTraDomande(righe, (c) => conta(c).quota), wilson(tot.k, tot.n)) };
 }
 
 /**
@@ -217,24 +341,32 @@ export function datiCorretti(descrizioni: { datiCorretti?: boolean }[]) {
 
 export const percentuale = (x: number) => `${Math.round(x * 100)}%`;
 
-/* ---------- Il telescopio: zoom, punti intorno a te, occasioni, formulazioni ---------- */
+/* ---------- Il telescopio: zoom, punti intorno a te, occasioni, forme, informative ---------- */
 
 const ORDINE_ZOOM: Zoom[] = ["citta", "zona", "vicino", "provincia", "regione", "nazionale"];
 
-/** Risposte in cui compari per livello di zoom (domande spontanee). */
-export function perZoom(tutte: RigaDomanda[], ripetizioni: number): RisultatoZoom[] {
+/**
+ * Risposte in cui compari per livello di zoom (domande spontanee). Una domanda
+ * «vicino a te» posta a un assistente che non accetta le coordinate è, di
+ * fatto, una domanda in città: le sue risposte contano lì.
+ */
+export function perZoom(tutte: RigaDomanda[], ripetizioni: number, motoriConCoordinate: EngineId[] = MOTORI_CON_COORDINATE): RisultatoZoom[] {
   const out = new Map<Zoom, RisultatoZoom>();
+  const prendi = (z: Zoom) => {
+    const v = out.get(z) ?? { zoom: z, comparse: 0, totale: 0, domande: 0 };
+    out.set(z, v);
+    return v;
+  };
   for (const r of spontanee(tutte)) {
     const z = r.domanda.zoom ?? "citta";
-    const v = out.get(z) ?? { zoom: z, comparse: 0, totale: 0, domande: 0 };
-    v.domande++;
+    prendi(z).domande++;
     for (const c of r.celle) {
+      const v = prendi(z === "vicino" && !motoriConCoordinate.includes(c.motore) ? "citta" : z);
       v.totale += ripetizioni;
       v.comparse += volteDi(c);
     }
-    out.set(z, v);
   }
-  return ORDINE_ZOOM.filter((z) => out.has(z)).map((z) => out.get(z)!);
+  return ORDINE_ZOOM.filter((z) => out.has(z) && out.get(z)!.totale > 0).map((z) => out.get(z)!);
 }
 
 /** Risposte in cui compari per occasione (domande per occasione). */
@@ -270,47 +402,98 @@ export function intornoATe(tutte: RigaDomanda[], ripetizioni: number, motori: En
     }
     out.set(k, v);
   }
-  return [...out.values()];
+  // Un punto ha poche risposte: la stima ridotta lo tira verso la media dei punti, con il peso dichiarato.
+  const punti = [...out.values()];
+  const priori = prioriBeta(punti.map((p) => ({ k: p.comparse, n: p.totale })));
+  priori.kappa = Math.min(100, Math.max(8, priori.kappa));
+  return punti.map((p) => {
+    const r = ridotta(p.comparse, p.totale, priori);
+    return { ...p, ridotta: r.quota, peso: r.peso };
+  });
+}
+
+/** In quanti punti compari almeno una volta: la lettura aggregata della griglia (alla Local Falcon). */
+export function quotaPunti(punti: RisultatoPunto[]) {
+  const k = punti.filter((p) => p.comparse > 0).length;
+  return { k, n: punti.length, quota: punti.length ? k / punti.length : 0 };
 }
 
 /**
- * Quanto conta la formulazione: per ogni gruppo di intento chiesto in più
- * modi, assistente per assistente, le formulazioni danno lo stesso esito se
- * le volte in cui compari differiscono al più di una risposta.
+ * Quanto conta la forma della domanda, a livello di report: sulle domande
+ * chieste in forma breve e a lista, la differenza di quota appaiata per
+ * domanda e il suo errore standard. Sotto due errori è rumore: le due forme
+ * sono scambiabili e si sommano.
  */
-export function formulazioni(tutte: RigaDomanda[]): Formulazioni {
-  const gruppi = new Map<string, RigaDomanda[]>();
+export function sensibilitaForma(tutte: RigaDomanda[]): SensibilitaForma {
+  const breve = { comparse: 0, totale: 0 };
+  const lista = { comparse: 0, totale: 0 };
+  const differenze: number[] = [];
   for (const r of spontanee(tutte)) {
-    if (!r.domanda.gruppo || !r.domanda.formulazione) continue;
-    gruppi.set(r.domanda.gruppo, [...(gruppi.get(r.domanda.gruppo) ?? []), r]);
+    let kb = 0;
+    let nb = 0;
+    let kl = 0;
+    let nl = 0;
+    for (const c of r.celle) {
+      const f = c.perForma;
+      if (!f?.breve || !f?.lista) continue;
+      kb += f.breve.volte;
+      nb += f.breve.totale;
+      kl += f.lista.volte;
+      nl += f.lista.totale;
+    }
+    if (!nb || !nl) continue;
+    breve.comparse += kb;
+    breve.totale += nb;
+    lista.comparse += kl;
+    lista.totale += nl;
+    differenze.push(kl / nl - kb / nb);
   }
-  let n = 0;
-  let concordi = 0;
-  for (const righe of gruppi.values()) {
-    const forme = new Set(righe.map((r) => r.domanda.formulazione));
-    if (forme.size < 2) continue;
-    n++;
-    const motori = righe[0].celle.map((c) => c.motore);
-    const concorde = motori.every((m) => {
-      const volte = righe.map((r) => volteDi(r.celle.find((c) => c.motore === m) ?? { posizione: null, frequenza: "0 su 0" }));
-      return Math.max(...volte) - Math.min(...volte) <= 1;
-    });
-    if (concorde) concordi++;
-  }
-  return { gruppi: n, concordi };
+  const n = differenze.length;
+  const media = n ? differenze.reduce((a, b) => a + b, 0) / n : 0;
+  const sd = n > 1 ? Math.sqrt(differenze.reduce((a, d) => a + (d - media) ** 2, 0) / (n - 1)) : 0;
+  return { domande: n, breve, lista, differenza: media * 100, errore: (n ? sd / Math.sqrt(n) : 0) * 100 };
 }
 
-/** Risposte in cui compari per famiglia di domanda, con intervallo al 95%: la granularità del report. */
+/** Le domande informative: quante risposte fanno almeno un nome e in quante ci sei tu. */
+export function informativa(tutte: RigaDomanda[], ripetizioni: number): RisultatoInformativa | undefined {
+  const righe = tutte.filter((r) => r.domanda.tipo === "informativa");
+  if (righe.length === 0) return undefined;
+  let risposte = 0;
+  let conNomi = 0;
+  let comparse = 0;
+  for (const r of righe) {
+    for (const c of r.celle) {
+      risposte += ripetizioni;
+      conNomi += c.conNomi ?? 0;
+      comparse += volteDi(c);
+    }
+  }
+  return { domande: righe.length, risposte, conNomi, comparse };
+}
+
+/**
+ * Risposte in cui compari per famiglia di domanda: Wilson sulle risposte,
+ * intervallo tra domande, e stima ridotta verso la media delle famiglie
+ * spontanee con il peso che la media ha avuto (una famiglia da 4 domande
+ * prende in prestito forza dal resto del report).
+ */
 export function perFamiglia(tutte: RigaDomanda[], ripetizioni: number) {
-  const out = new Map<TipoDomanda, { tipo: TipoDomanda; k: number; n: number; domande: number }>();
+  const out = new Map<TipoDomanda, { tipo: TipoDomanda; k: number; n: number; domande: number; righe: RigaDomanda[] }>();
   for (const r of tutte) {
-    const v = out.get(r.domanda.tipo) ?? { tipo: r.domanda.tipo, k: 0, n: 0, domande: 0 };
+    const v = out.get(r.domanda.tipo) ?? { tipo: r.domanda.tipo, k: 0, n: 0, domande: 0, righe: [] };
     v.domande++;
+    v.righe.push(r);
     for (const c of r.celle) {
       v.n += ripetizioni;
       v.k += volteDi(c);
     }
     out.set(r.domanda.tipo, v);
   }
-  return [...out.values()].map((v) => ({ ...v, quota: v.n ? v.k / v.n : 0, ic: wilson(v.k, v.n) }));
+  const famiglie = [...out.values()];
+  const priori = prioriBeta(famiglie.filter((f) => TIPI_SPONTANEI.includes(f.tipo)).map((f) => ({ k: f.k, n: f.n })));
+  return famiglie.map(({ righe, ...v }) => {
+    const r = TIPI_SPONTANEI.includes(v.tipo) ? ridotta(v.k, v.n, priori) : { quota: v.n ? v.k / v.n : 0, peso: 0 };
+    const ic = wilson(v.k, v.n);
+    return { ...v, quota: v.n ? v.k / v.n : 0, ic, icDomande: nonPiuStretto(intervalloTraDomande(righe, (c) => quotaRighe(c, ripetizioni)), ic), ridotta: r.quota, peso: r.peso };
+  });
 }

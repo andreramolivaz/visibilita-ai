@@ -59,24 +59,34 @@ export type Portale =
   | "Portale turistico del Comune";
 
 /**
- * Le famiglie di domanda, dallo studio dei prompt reali (Semrush 2025-26,
- * Otterly, Citations.press, BrightLocal) e dal telescopio delle domande:
- * generica (categoria + luogo), per bisogno (urgenza, orario, prezzo),
- * per specialità (la prestazione), per requisito (certificazione, convenzione,
- * servizio accessorio), per occasione (chi chiede e perché: famiglia, lavoro,
- * turisti, urgenza), vicino a te (posizione impostata in punti diversi intorno
- * all'attività), di confronto («meglio X o Y?»), sul nome (verifica dell'attività),
- * in inglese (per chi riceve stranieri o esporta).
+ * Le famiglie di domanda, dallo studio dei prompt reali e dallo studio
+ * «Domande e statistiche» (docs/studio-domande-statistiche.md):
+ * generica (categoria + luogo), per bisogno (la prestazione cercata), per
+ * specialità (il prodotto o la specialità dell'attività), per requisito
+ * (servizio accessorio, orari, urgenza), per prezzo (convenienza, tariffe
+ * chiare: il compito più frequente di chi decide con l'AI in Italia), per
+ * occasione (chi chiede e perché: famiglia, lavoro, turisti), per recensioni
+ * (affidabilità, voto, reputazione), vicino a te (zona nel testo o posizione
+ * impostata in punti intorno all'attività), informativa (come scegliere,
+ * quanto costa: spesso senza nomi, riportata a parte), di confronto («meglio X
+ * o Y?»), sul nome (verifica dei dati), in inglese (per chi riceve stranieri).
  */
-export type TipoDomanda = "generica" | "bisogno" | "specialita" | "requisito" | "occasione" | "vicino" | "confronto" | "nome" | "inglese";
+export type TipoDomanda = "generica" | "bisogno" | "specialita" | "requisito" | "prezzo" | "occasione" | "recensioni" | "vicino" | "informativa" | "confronto" | "nome" | "inglese";
 
-export const TIPI_DOMANDA: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "occasione", "vicino", "confronto", "nome", "inglese"];
+export const TIPI_DOMANDA: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "prezzo", "occasione", "recensioni", "vicino", "informativa", "confronto", "nome", "inglese"];
 
 /** Il livello di zoom geografico della domanda: il telescopio. */
 export type Zoom = "citta" | "zona" | "vicino" | "provincia" | "regione" | "nazionale";
 
-/** Come è formulata la domanda: lo stesso intento in tre modi, per misurare quanto conta la formulazione. */
-export type Formulazione = "diretta" | "colloquiale" | "imperativa";
+/**
+ * Le due forme di ogni intento: breve, come si scrive davvero («pizzeria aperta
+ * la domenica a Bergamo»), e a lista, con la richiesta esplicita di più
+ * opzioni. Sono le ripetizioni della domanda, non domande diverse: il registro
+ * non cambia i nomi, la richiesta di una lista sì (Peec 2026). Nei confronti
+ * «meglio X o Y» la seconda forma è quella con i nomi invertiti, perché gli
+ * assistenti preferiscono il primo nome che leggono.
+ */
+export type Formulazione = "breve" | "lista" | "invertita";
 
 /** Un punto intorno all'attività in cui viene impostata la posizione: spostamento in metri verso nord ed est. */
 export interface PuntoVicino {
@@ -94,9 +104,9 @@ export interface Domanda {
   tipo: TipoDomanda;
   /** Livello di zoom geografico. */
   zoom?: Zoom;
-  /** Formulazione dello stesso intento. */
-  formulazione?: Formulazione;
-  /** Gruppo di intento: le domande con lo stesso gruppo chiedono la stessa cosa in modi o zoom diversi. */
+  /** La seconda forma dello stesso intento, chiesta come seconda ripetizione: a lista («…: consigliami 5 opzioni»), o con i nomi invertiti nei confronti. */
+  secondaForma?: string;
+  /** Gruppo di intento: le domande con lo stesso gruppo chiedono la stessa cosa a zoom diversi. */
   gruppo?: string;
   /** Per le domande per occasione: chi chiede e perché («famiglia», «lavoro», «turisti»…). */
   occasione?: string;
@@ -216,6 +226,10 @@ export interface CellaDomanda {
   frequenza: string;
   /** Quante volte compari, su `ripetizioni`. */
   volte?: number;
+  /** Le stesse volte divise per forma della domanda (breve, a lista), per la sensibilità alla forma. */
+  perForma?: Partial<Record<Formulazione, { volte: number; totale: number }>>;
+  /** Risposte della cella che fanno almeno un nome di attività (per le domande informative). */
+  conNomi?: number;
 }
 
 export interface RigaDomanda {
@@ -279,14 +293,35 @@ export interface RisultatoPunto {
   punto: PuntoVicino;
   comparse: number;
   totale: number;
+  /** Stima ridotta verso la media dei punti (un punto ha poche risposte) e peso della media. */
+  ridotta?: number;
+  peso?: number;
 }
 
-/** Quanto conta la formulazione: gruppi di intento chiesti in più modi e in quanti il risultato non cambia. */
-export interface Formulazioni {
-  /** Gruppi con almeno due formulazioni. */
-  gruppi: number;
-  /** Gruppi in cui, assistente per assistente, le formulazioni danno lo stesso esito (al più una risposta di differenza). */
-  concordi: number;
+/**
+ * Quanto conta la forma della domanda, a livello di report: sulle domande
+ * chieste sia in forma breve sia a lista, la quota di risposte in cui compari
+ * con l'una e con l'altra, la differenza media per domanda e il suo errore.
+ */
+export interface SensibilitaForma {
+  /** Domande chieste in entrambe le forme. */
+  domande: number;
+  breve: { comparse: number; totale: number };
+  lista: { comparse: number; totale: number };
+  /** Differenza media (lista meno breve) in punti percentuali, appaiata per domanda. */
+  differenza: number;
+  /** Errore standard della differenza, in punti: sotto due errori la differenza è rumore. */
+  errore: number;
+}
+
+/** Le domande informative («come scegliere…»): spesso senza nomi; si contano sulle risposte che ne fanno almeno uno. */
+export interface RisultatoInformativa {
+  domande: number;
+  risposte: number;
+  /** Risposte che fanno almeno un nome di attività. */
+  conNomi: number;
+  /** Risposte in cui compari. */
+  comparse: number;
 }
 
 /** Confronto diretto con un concorrente, in numero di domande. */
@@ -373,7 +408,8 @@ export interface Report {
   /** Intorno a te: i punti in cui è stata impostata la posizione, sugli assistenti che la accettano. */
   intorno?: { punti: RisultatoPunto[]; motori: EngineId[] };
   perOccasione?: RisultatoOccasione[];
-  formulazioni?: Formulazioni;
+  sensibilitaForma?: SensibilitaForma;
+  informativa?: RisultatoInformativa;
   concorrenti: Concorrente[];
   /** Citazioni di tutte le attività nelle risposte (anche fuori dai primi cinque): base della quota di voce. */
   citazioniTotali?: number;
