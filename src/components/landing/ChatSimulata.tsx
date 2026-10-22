@@ -76,7 +76,7 @@ function StaScrivendo({ aDestra = false, etichetta }: { aDestra?: boolean; etich
     <div className={`flex ${aDestra ? "justify-end" : "justify-start"}`} aria-label={etichetta}>
       <span className={`inline-flex items-center gap-1 rounded-2xl px-3.5 py-2.5 ${aDestra ? "rounded-br-md bg-soft" : "rounded-bl-md bg-soft/70"}`}>
         {[0, 1, 2].map((k) => (
-          <span key={k} className="h-2 w-2 animate-bounce rounded-full bg-faint" style={{ animationDelay: `${k * 150}ms` }} />
+          <span key={k} className="punto-onda h-2 w-2 rounded-full bg-faint" style={{ animationDelay: `${k * 150}ms` }} />
         ))}
       </span>
     </div>
@@ -107,10 +107,11 @@ export function ChatSimulata() {
     const dopo = (ms: number, fn: () => void) => {
       timer.current = window.setTimeout(fn, ms);
     };
+    // I puntini fanno due onde intere (1,1 s l'una, più lo scarto tra i puntini) prima che il messaggio arrivi.
     if (fase === "scrivo") {
-      dopo(1500, () => setFase("penso"));
+      dopo(2500, () => setFase("penso"));
     } else if (fase === "penso") {
-      dopo(1300, () => setFase("rispondo"));
+      dopo(2500, () => setFase("rispondo"));
     } else if (fase === "rispondo") {
       if (righe < scena.nomi.length + 1) dopo(righe === 0 ? 350 : 650, () => setRighe((r) => r + 1));
       else dopo(700, () => setFase("verdetto"));

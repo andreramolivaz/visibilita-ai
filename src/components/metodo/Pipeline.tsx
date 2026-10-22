@@ -6,7 +6,7 @@
 const PASSI = [
   { titolo: "Scheda e sito", sotto: "nome, indirizzo, orari, categoria, menu o servizi" },
   { titolo: "Profilo", sotto: "categoria, specialità, zona, portali" },
-  { titolo: "Domande", sotto: "8–30, generate dal profilo" },
+  { titolo: "Domande", sotto: "36–72 intenti, generati dal profilo" },
   { titolo: "Sei assistenti", sotto: "API ufficiali, posizione impostata" },
   { titolo: "Risposte", sotto: "ogni domanda 2–3 volte" },
   { titolo: "Riconoscimento", sotto: "nome + indirizzo + telefono" },

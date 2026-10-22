@@ -105,3 +105,7 @@ Una risposta di un assistente (la bolla con l'elenco) la cui coda è un segnapos
 4. **Consigli**: oggi a regole; un passaggio con Claude può riscrivere il «dato» delle azioni e il tono delle descrizioni, con JSON in ingresso e in uscita e azioni solo dal profilo della categoria.
 5. **Abbonamento**: Stripe Checkout, link magico via Resend, area personale minima.
 6. **Database**: Supabase; tabella motori/pesi e profili di categoria caricati da `src/data`.
+
+## White paper
+
+Il white paper (metodo, prodotto e strategia) è `public/white-paper-visibilita-ai.pdf`, linkato dalla pagina Metodo. Sorgente in `docs/white-paper/white-paper.html` (con il font Instrument Sans accanto); si rigenera con Chromium via Playwright: `CHROMIUM_PATH=<chromium> node docs/white-paper/genera.mjs` (serve il pacchetto `playwright`).

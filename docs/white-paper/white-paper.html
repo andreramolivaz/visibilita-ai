@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<title>Visibilità AI – white paper</title>
+<style>
+  @font-face {
+    font-family: "Instrument Sans";
+    src: url("InstrumentSans.woff2") format("woff2");
+    font-weight: 100 900;
+    font-stretch: 75% 125%;
+    font-display: block;
+  }
+  :root {
+    --ink: #14201c;
+    --muted: #5b6b65;
+    --faint: #8a9793;
+    --line: #d9dedc;
+    --soft: #f3f5f4;
+    --accent: #0e5a47;
+    --accent-soft: #e7f1ed;
+    --mint: #9fe8c6;
+  }
+  @page { size: A4; margin: 20mm 18mm 20mm 18mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Instrument Sans", system-ui, sans-serif; font-size: 10.6pt; line-height: 1.5; color: var(--ink); }
+  h1, h2, h3 { font-stretch: 94%; letter-spacing: -0.01em; margin: 0; }
+  h1 { font-size: 26pt; line-height: 1.1; font-weight: 700; }
+  h2 { font-size: 14.5pt; font-weight: 700; margin: 18pt 0 6pt; break-after: avoid; }
+  h3 { font-size: 11.5pt; font-weight: 600; margin: 10pt 0 3pt; break-after: avoid; }
+  p { margin: 0 0 7pt; }
+  p.lead { font-size: 12pt; color: var(--muted); }
+  ul { margin: 0 0 7pt 0; padding-left: 15pt; }
+  li { margin: 0 0 3pt; }
+  strong { font-weight: 600; }
+  .cover { display: flex; align-items: center; gap: 10pt; margin-bottom: 22pt; }
+  .cover .nome { font-size: 15pt; font-weight: 600; letter-spacing: -0.01em; }
+  .cover .tipo { font-size: 9.5pt; color: var(--muted); }
+  .sotto { font-size: 10pt; color: var(--muted); margin: 8pt 0 0; }
+  .regola { border: 0; border-top: 1px solid var(--line); margin: 16pt 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.6pt; margin: 4pt 0 8pt; break-inside: avoid; }
+  th { text-align: left; font-weight: 600; color: var(--muted); font-size: 8.8pt; padding: 4pt 6pt 4pt 0; border-bottom: 1px solid var(--ink); }
+  td { padding: 4.5pt 6pt 4.5pt 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:last-child, th:last-child { padding-right: 0; }
+  .num { font-variant-numeric: tabular-nums; }
+  figure { margin: 8pt 0 10pt; break-inside: avoid; }
+  figcaption { font-size: 9pt; color: var(--muted); margin-top: 4pt; }
+  .due { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18pt; }
+  .scheda { background: var(--soft); border-radius: 8pt; padding: 10pt 12pt; margin: 6pt 0 10pt; break-inside: avoid; }
+  .scheda p:last-child { margin-bottom: 0; }
+  .fonti { font-size: 8.8pt; color: var(--muted); }
+  .fonti li { margin-bottom: 1.5pt; }
+  .salto { break-before: page; }
+  .evita { break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true">
+    <path d="M14 6h36a10 10 0 0 1 10 10v26a10 10 0 0 1-10 10H40l-8 9-8-9H14A10 10 0 0 1 4 42V16A10 10 0 0 1 14 6z" fill="#0e5a47"/>
+    <circle cx="17" cy="19" r="3" fill="#fff" opacity=".4"/><rect x="24" y="16.5" width="18" height="5" rx="2.5" fill="#fff" opacity=".4"/>
+    <circle cx="17" cy="29" r="3.5" fill="#9fe8c6"/><rect x="24" y="26" width="26" height="6" rx="3" fill="#fff"/>
+    <circle cx="17" cy="39" r="3" fill="#fff" opacity=".4"/><rect x="24" y="36.5" width="14" height="5" rx="2.5" fill="#fff" opacity=".4"/>
+  </svg>
+  <div>
+    <div class="nome">Visibilità AI</div>
+    <div class="tipo">White paper · metodo, prodotto e strategia · ottobre 2026</div>
+  </div>
+</div>
+
+<h1>Quando un cliente chiede a ChatGPT, fa il tuo nome?</h1>
+<p class="sotto">Come si misura, con un metodo dichiarato, se gli assistenti AI consigliano un'attività locale italiana: cosa chiediamo, come contiamo, cosa consegniamo e dove vogliamo arrivare.</p>
+
+<hr class="regola" />
+
+<h2>1. Il problema</h2>
+<p>Una sera di ottobre una coppia a Bergamo apre ChatGPT e scrive «pizzeria con forno a legna, aperta la domenica». La risposta fa tre nomi. Chi non è tra quei tre, quella sera, non esiste: non è in seconda pagina, non è «più in basso», non c'è. In Italia un adulto online su tre decide così cosa comprare, e due su tre poi entrano in un negozio o in un locale (IAB Italia, Osservatorio Search 2026). Nessun titolare può saperlo da solo: la risposta cambia con la domanda, con l'assistente e da una volta all'altra.</p>
+<p>Visibilità AI risponde a quella domanda con un metodo. Pone a sei assistenti (ChatGPT, Gemini, Google AI, Claude, Perplexity, Grok) le domande che i clienti fanno davvero, con la località dell'attività impostata nelle loro interfacce ufficiali, legge chi viene nominato e in che ordine, e restituisce un punteggio con il suo intervallo, i concorrenti che prendono il posto, le fonti da cui gli assistenti attingono e tre cose da sistemare.</p>
+
+<h2>2. Come funziona</h2>
+<figure>
+  <svg viewBox="0 0 760 392" width="640" height="330" role="img" aria-label="Dal profilo al report: ogni domanda a sei assistenti, due o tre volte" font-family="Instrument Sans, system-ui, sans-serif" font-size="13">
+    <defs><marker id="freccia" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8a9793"/></marker></defs>
+    <text x="24" y="34" font-size="15" font-weight="600" fill="#14201c">Dal profilo al report: ogni domanda a sei assistenti, due o tre volte</text>
+    <g fill="none" stroke="#8a9793" stroke-width="1.25">
+      <path d="M184 108H208" marker-end="url(#freccia)"/><path d="M368 108H392" marker-end="url(#freccia)"/><path d="M552 108H576" marker-end="url(#freccia)"/>
+      <path d="M656 152V176H104V200" marker-end="url(#freccia)"/>
+      <path d="M184 244H208" marker-end="url(#freccia)"/><path d="M368 244H392" marker-end="url(#freccia)"/><path d="M552 244H576" marker-end="url(#freccia)"/>
+    </g>
+    <text x="380" y="170" text-anchor="middle" font-size="11.5" fill="#5b6b65">risposte, fonti citate, ricerche fatte</text>
+    <g>
+      <rect x="24" y="64" width="160" height="88" rx="8" fill="none" stroke="#8a9793" stroke-width="1.25"/>
+      <text x="104" y="88" text-anchor="middle" font-weight="600" fill="#14201c">Profilo</text>
+      <text x="104" y="104" text-anchor="middle" font-size="11.5" fill="#5b6b65">scheda Google Places</text>
+      <text x="104" y="120" text-anchor="middle" font-size="11.5" fill="#5b6b65">sito e suggerimenti</text>
+      <text x="104" y="136" text-anchor="middle" font-size="11.5" fill="#5b6b65">concorrenti vicini</text>
+    </g>
+    <g>
+      <rect x="208" y="64" width="160" height="88" rx="8" fill="none" stroke="#8a9793" stroke-width="1.25"/>
+      <text x="288" y="88" text-anchor="middle" font-weight="600" fill="#14201c">Domande</text>
+      <text x="288" y="104" text-anchor="middle" font-size="11.5" fill="#5b6b65">12 famiglie × zoom</text>
+      <text x="288" y="120" text-anchor="middle" font-size="11.5" fill="#5b6b65">2 forme per intento</text>
+      <text x="288" y="136" text-anchor="middle" font-size="11.5" fill="#5b6b65">36 / 48 / 72 intenti</text>
+    </g>
+    <g>
+      <rect x="392" y="64" width="160" height="88" rx="8" fill="none" stroke="#8a9793" stroke-width="1.25"/>
+      <text x="472" y="88" text-anchor="middle" font-weight="600" fill="#14201c">Coda di scansione</text>
+      <text x="472" y="104" text-anchor="middle" font-size="11.5" fill="#5b6b65">domanda × assistente</text>
+      <text x="472" y="120" text-anchor="middle" font-size="11.5" fill="#5b6b65">× ripetizione (2–3)</text>
+      <text x="472" y="136" text-anchor="middle" font-size="11.5" fill="#5b6b65">posizione nelle API</text>
+    </g>
+    <g>
+      <rect x="576" y="64" width="160" height="88" rx="8" fill="none" stroke="#8a9793" stroke-width="1.25"/>
+      <text x="656" y="88" text-anchor="middle" font-weight="600" fill="#14201c">Sei assistenti</text>
+      <text x="656" y="104" text-anchor="middle" font-size="11.5" fill="#5b6b65">ChatGPT, Gemini,</text>
+      <text x="656" y="120" text-anchor="middle" font-size="11.5" fill="#5b6b65">Google AI, Claude,</text>
+      <text x="656" y="136" text-anchor="middle" font-size="11.5" fill="#5b6b65">Perplexity, Grok</text>
+    </g>
+    <g>
+      <rect x="24" y="200" width="160" height="88" rx="8" fill="none" stroke="#8a9793" stroke-width="1.25"/>
+      <text x="104" y="224" text-anchor="middle" font-weight="600" fill="#14201c">Riconoscimento</text>
+      <text x="104" y="240" text-anchor="middle" font-size="11.5" fill="#5b6b65">nome, via, telefono</text>
+      <text x="104" y="256" text-anchor="middle" font-size="11.5" fill="#5b6b65">posizione in elenco</text>
+      <text x="104" y="272" text-anchor="middle" font-size="11.5" fill="#5b6b65">concorrenti e fonti</text>
+    </g>
+    <g>
+      <rect x="208" y="200" width="160" height="88" rx="8" fill="none" stroke="#8a9793" stroke-width="1.25"/>
+      <text x="288" y="224" text-anchor="middle" font-weight="600" fill="#14201c">Statistiche</text>
+      <text x="288" y="240" text-anchor="middle" font-size="11.5" fill="#5b6b65">punteggio 0–100</text>
+      <text x="288" y="256" text-anchor="middle" font-size="11.5" fill="#5b6b65">due intervalli al 95%</text>
+      <text x="288" y="272" text-anchor="middle" font-size="11.5" fill="#5b6b65">famiglie, zoom, mappa</text>
+    </g>
+    <g>
+      <rect x="392" y="200" width="160" height="88" rx="8" fill="#0e5a47" fill-opacity="0.1" stroke="#0e5a47" stroke-width="2"/>
+      <text x="472" y="224" text-anchor="middle" font-weight="600" fill="#14201c">Report</text>
+      <text x="472" y="240" text-anchor="middle" font-size="11.5" fill="#14201c">web e PDF (7 pagine)</text>
+      <text x="472" y="256" text-anchor="middle" font-size="11.5" fill="#14201c">sintesi e tre azioni</text>
+      <text x="472" y="272" text-anchor="middle" font-size="11.5" fill="#14201c">concorrenti, mappa</text>
+    </g>
+    <g>
+      <rect x="576" y="200" width="160" height="88" rx="8" fill="none" stroke="#8a9793" stroke-width="1.25"/>
+      <text x="656" y="224" text-anchor="middle" font-weight="600" fill="#14201c">Area e abbonamento</text>
+      <text x="656" y="240" text-anchor="middle" font-size="11.5" fill="#5b6b65">report per email</text>
+      <text x="656" y="256" text-anchor="middle" font-size="11.5" fill="#5b6b65">storico e andamento</text>
+      <text x="656" y="272" text-anchor="middle" font-size="11.5" fill="#5b6b65">scansione ogni mese</text>
+    </g>
+    <g>
+      <rect x="24" y="312" width="712" height="56" rx="8" fill="#f3f5f4" stroke="#8a9793" stroke-width="1.25"/>
+      <text x="380" y="334" text-anchor="middle" fill="#14201c">Base: Next.js 16 su Vercel, cron giornaliero, Supabase per dati e accesso</text>
+      <text x="380" y="354" text-anchor="middle" fill="#14201c">Stripe per il report singolo (49 €) e gli abbonamenti; Claude per riscrivere le domande</text>
+    </g>
+  </svg>
+  <figcaption>Il profilo decide le domande, la coda le pone agli assistenti con la località impostata, il riconoscimento legge chi compare e dove, le statistiche fanno i conti con i loro intervalli, il report li spiega. Con l'abbonamento la coda riparte ogni mese con lo stesso set.</figcaption>
+</figure>
+
+<h2>3. Domande, intenti e forme</h2>
+<p>La prima versione faceva otto domande. Erano poche, ma la risposta non è «farne cento». Un cliente può scrivere «pizzeria aperta la domenica a Bergamo», «cerco una pizzeria a Bergamo aperta di domenica, cosa mi consigli?» o «consigliami una pizzeria domenicale a Bergamo»: tre frasi, un solo bisogno. Le misure più ampie sulla sensibilità alle parole (Peec 2026, 37.804 risposte) dicono che gli assistenti rispondono al bisogno, non alle parole: cambiare il registro non cambia i nomi. I nomi cambiano quando cambia il bisogno (il prezzo invece dell'orario, la zona invece della città, una cena con bambini invece di una a due) e quando si chiede esplicitamente una lista.</p>
+<p>Un <strong>intento</strong> è questo: un bisogno preciso, in un luogo preciso, con un vincolo preciso. Il set conta intenti distinti, non frasi: 36 nel report singolo, 48 nel Base, 72 nel Pro, in dodici famiglie (generiche, per bisogno, per specialità, per requisito e orari, per prezzo, per occasione, per recensioni, vicino a te, informative, di confronto, sul nome, in inglese) e a più livelli di zoom (città, zona, vicino a te). Ogni intento è posto in due forme, breve e con la richiesta esplicita di più opzioni: non due domande ma due ripetizioni, perché la seconda forma è quella che smuove la risposta, e il confronto tra le due dice quanto il risultato dipende da come si chiede.</p>
+<table>
+  <thead><tr><th style="width:26%">Intento</th><th style="width:37%">Forma breve</th><th>Seconda forma</th></tr></thead>
+  <tbody>
+    <tr><td>Pizzeria aperta la domenica, in città</td><td>Pizzeria aperta la domenica sera a Bergamo</td><td>Pizzeria aperta la domenica sera a Bergamo: consigliami 5 opzioni.</td></tr>
+    <tr><td>Mangiare bene spendendo poco</td><td>Dove mangiare bene a Bergamo spendendo poco</td><td>Dove mangiare bene a Bergamo spendendo poco: consigliami 5 opzioni.</td></tr>
+    <tr><td>Meglio tu o il concorrente</td><td>Meglio Pizzeria Da Gino o Pizzeria Fratelli Rossi a Bergamo per la pizza?</td><td>Meglio Pizzeria Fratelli Rossi o Pizzeria Da Gino a Bergamo per la pizza? (nomi invertiti)</td></tr>
+  </tbody>
+</table>
+<p>Il set è il metodo: il titolare non lo vede prima e non lo cambia, e resta uguale da una scansione all'altra, così due report a un mese di distanza misurano la stessa cosa. Il punteggio usa solo gli intenti spontanei, quelli in cui il cliente non fa il nome dell'attività: con il nome nel testo si compare quasi per forza, e non è quello che si vuole sapere.</p>
+
+<h2>4. Perché ogni numero ha un intervallo</h2>
+<p>La stessa domanda, fatta due volte allo stesso assistente, dà due liste diverse: la stessa lista nello stesso ordine ricompare meno di una volta su mille (SparkToro 2026). Un report che fa una domanda una volta sola misura un lancio di dadi. Per questo ogni intento è ripetuto, e nessun numero è nudo: accanto a «compari nel 17% delle risposte» c'è l'intervallo che vale per le domande fatte (Wilson, 14–21%) e quello che vale per domande di quel tipo (tra domande, 11–23%), più largo perché le risposte alla stessa domanda si somigliano. La varianza sta tra le domande e non tra le ripetizioni: due o tre ripetizioni bastano, il budget va speso in intenti diversi. Le famiglie con poche domande e i punti della mappa non si leggono da soli: la loro stima è tirata verso la media del report, con il peso dichiarato. Tra due report, una variazione sotto gli 8–13 punti non è rilevabile, e il report lo dice.</p>
+
+<h2>5. Cosa c'è nel report</h2>
+<div class="due">
+  <ul>
+    <li><strong>Dove sei</strong>: punteggio 0–100 con intervallo, verdetto, mediana della categoria in città.</li>
+    <li><strong>Chi ti passa davanti</strong>: concorrenti con citazioni, quota di voce, nei primi tre, domande in cui c'è lui e non tu; confronto diretto.</li>
+    <li><strong>Dove ti trovano</strong>: per assistente, per famiglia (con intervallo tra domande e stima ridotta), territorio (tue, contese, libere).</li>
+    <li><strong>Da lontano a vicino</strong>: zoom, mappa a cinque punti, occasioni, forma della domanda, informative.</li>
+  </ul>
+  <ul>
+    <li><strong>Domanda per domanda</strong>: la mappa domanda × assistente con posizione e frequenza.</li>
+    <li><strong>Fonti e parole</strong>: i portali e i siti citati, se ci sei, le parole che gli assistenti usano e se sono nelle tue recensioni.</li>
+    <li><strong>Cosa dicono di te</strong>: la descrizione di ogni assistente, tono, errori di scheda.</li>
+    <li><strong>Tre azioni</strong> con il dato che le motiva; note tecniche e glossario; PDF di sette pagine.</li>
+  </ul>
+</div>
+
+<h2>6. Tecnologie</h2>
+<table>
+  <thead><tr><th style="width:22%">Pezzo</th><th>Tecnologia</th><th style="width:22%">Stato</th></tr></thead>
+  <tbody>
+    <tr><td>Applicazione e coda</td><td>Next.js 16 (TypeScript) su Vercel; funzioni fino a 300 s e cron giornaliero; deposito in memoria o Supabase</td><td>Fatto</td></tr>
+    <tr><td>Profilo dell'attività</td><td>Google Places API (New): scheda, recensioni, concorrenti vicini; lettura del sito; suggerimenti di ricerca Google</td><td>Pronto, servono le chiavi</td></tr>
+    <tr><td>Generatore delle domande</td><td>Template per 37 categorie, 12 famiglie, zoom, due forme per intento, quote 36 / 48 / 72</td><td>Fatto</td></tr>
+    <tr><td>Sei assistenti</td><td>OpenAI Responses API (web_search), Gemini API (grounding), DataForSEO (AI Mode e AI Overviews), Anthropic (web search), Perplexity Agent API, xAI (web_search); località impostata nell'API, coordinate dove accettate</td><td>Pronto, servono le chiavi</td></tr>
+    <tr><td>Riconoscimento e analisi</td><td>Regole: nome, via, telefono; ordine dei nomi in elenco; fonti dalle URL; termini ricorrenti; tono ed errori di scheda</td><td>Fatto</td></tr>
+    <tr><td>Statistiche</td><td>Punteggio pesato per posizione e quota d'uso; Wilson e bootstrap per domanda; stima ridotta beta-binomiale; sensibilità alla forma</td><td>Fatto</td></tr>
+    <tr><td>Report</td><td>React (web) e @react-pdf (PDF); report di esempio deterministico</td><td>Fatto</td></tr>
+    <tr><td>Pagamenti e accesso</td><td>Stripe Checkout (pagamento e abbonamento) con webhook; Supabase Auth con link magico; tabelle scansioni, celle, report, abbonamenti</td><td>Pronto, servono le chiavi</td></tr>
+    <tr><td>Riscrittura ed email</td><td>Claude Haiku per domande corte come le scrive un cliente; Resend per l'invio del report</td><td>Riscrittura pronta; email da fare</td></tr>
+  </tbody>
+</table>
+
+<h2>7. Strategia</h2>
+<h3>Per chi, e perché adesso</h3>
+<p>Le attività locali italiane sono 4,6 milioni di imprese attive (ISTAT-ASIA), e il 35,3% degli adulti online decide gli acquisti con la ricerca generativa, contro il 19,6% dell'anno prima (IAB Italia 2026). Gli strumenti di misura esistenti sono pensati per marchi nazionali, in inglese, da 100 € al mese in su, e nessuno pubblica il proprio metodo. Il titolare di una pizzeria, di uno studio dentistico o di una carpenteria non ha oggi un modo semplice per sapere se gli assistenti lo consigliano, né per capire cosa fare.</p>
+<h3>Posizionamento: la misura onesta, non la promessa</h3>
+<p>Visibilità AI non vende «primi su ChatGPT». Vende una misura che regge: set di domande segreto e fisso, intenti e non parafrasi, due intervalli al 95%, canale dichiarato, pesi stampati, azioni solo dove c'è evidenza (recensioni, scheda Google, sito citabile, coerenza dei dati, directory citate dagli assistenti) e mai dove non c'è (schema, llms.txt, velocità, backlink). Il vantaggio che cresce con i clienti è il dataset italiano: fonti citate per categoria e città, variabilità delle risposte, parità tra API e app, precisione del riconoscimento. Nessuno lo ha, e si pubblica nel Metodo con campioni e date.</p>
+<h3>Modello</h3>
+<div class="scheda">
+  <p><strong>Report singolo 49 € una tantum</strong> (36 intenti, due forme, sei assistenti, PDF; scalato dal primo mese se poi ci si abbona) · <strong>Base 29 €/mese</strong> (48 intenti, tre ripetizioni in tre giorni, ogni mese, andamento) · <strong>Pro 59 €/mese</strong> (72 intenti, griglia, ogni due settimane) · <strong>Agenzia 179 €/mese</strong> per dieci attività. Costo API stimato: circa 8 € per report singolo, 16 € al mese per il Base, 32 € per il Pro, da misurare con le chiavi vere.</p>
+</div>
+<h3>Canali</h3>
+<ul>
+  <li>Categorie dove si sceglie spesso e con l'AI: ristorazione, sanità privata, casa e artigiani, ricettivo; il report singolo è la prova a pagamento che fa da ingresso.</li>
+  <li>Agenzie e consulenti locali con il piano Agenzia: dieci attività, un report con il loro logo, le stesse statistiche.</li>
+  <li>Contenuti dal Metodo: benchmark per categoria e città («quante pizzerie di Bergamo compaiono su ChatGPT»), che nessun altro può pubblicare con un campione.</li>
+</ul>
+<h3>Roadmap</h3>
+<ol>
+  <li><strong>Accensione</strong>: chiavi degli assistenti, Stripe e Supabase in test; pilota su 5–10 attività vere con 10 ripetizioni per stimare variabilità, costi, tempi e precisione del riconoscimento; pubblicazione dei valori misurati nel Metodo.</li>
+  <li><strong>Le modifiche 4–17 dello studio</strong>: confronto tra periodi appaiato per domanda con variazione minima dichiarata; etichetta di canale e modello; fan-out e fonti consultate nel report («non recuperato» contro «recuperato ma non scelto»); blocco di accuratezza dei dati prima delle azioni; audit del riconoscimento con alias versionati; domande di controllo; Bradley–Terry per i confronti; secondo turno nel Pro.</li>
+  <li><strong>Ampiezza</strong>: Copilot quando misurabile, Grok opzionale; verifica della presenza sui portali; email del report; pannello trimestrale e benchmark pubblici per categoria e città.</li>
+</ol>
+<h3>Rischi e contromisure</h3>
+<table>
+  <thead><tr><th style="width:38%">Rischio</th><th>Contromisura</th></tr></thead>
+  <tbody>
+    <tr><td>Le risposte cambiano da una volta all'altra: il titolare prova dall'app e trova altro</td><td>Ripetizioni, due forme, intervalli dichiarati, data e ora della scansione, canale dichiarato, audit trimestrale API contro app</td></tr>
+    <tr><td>Quasi tutti risultano invisibili e il report sembra sempre uguale</td><td>Il valore sta nei concorrenti che compaiono, nelle fonti che li citano e nelle tre azioni; il confronto con la mediana della categoria</td></tr>
+    <tr><td>Nomi ambigui e omonimi</td><td>Aggancio alla scheda Google, riconoscimento su nome, via e telefono, alias versionati, audit del riconoscimento con precisione pubblicata</td></tr>
+    <tr><td>Costi API fuori controllo</td><td>Cadenze per piano, cache delle risposte, Grok opzionale, limite giornaliero</td></tr>
+  </tbody>
+</table>
+
+<h2>8. Fonti principali</h2>
+<ul class="fonti">
+  <li>IAB Italia, Osservatorio Search in Italy 2026 (n = 1.000 adulti online, marzo 2026): 35,3% decide gli acquisti con la ricerca generativa; 64,4% visita poi un negozio fisico.</li>
+  <li>Audicom, Osservatorio IA (luglio 2026): utenti mensili in Italia di ChatGPT, Gemini, Copilot, Claude, Perplexity, Grok.</li>
+  <li>Peec, studi su formulazione e stile dei prompt (2026, 37.804 risposte): le menzioni restano stabili al cambiare del registro; cambia con formato e vincoli.</li>
+  <li>The Dice Roll Method (arXiv 2609.04047, v2 2026); Where Does the Noise Come From? (arXiv 2607.13304); finite-sample audit (arXiv 2609.05059): varianza tra domande, ripetizioni, convergenza.</li>
+  <li>SparkToro (2026): la stessa lista nello stesso ordine meno di una volta su mille.</li>
+  <li>Insites (2026, 10.000 attività): cosa correla con la presenza nelle risposte AI e cosa no; accuratezza dei dati riportati.</li>
+  <li>Brown, Cai e DasGupta (2001); Efron e Morris (1975): intervalli per proporzioni, stima ridotta.</li>
+  <li>Documentazione ufficiale delle API: OpenAI, Google Gemini, Anthropic, Perplexity, xAI, DataForSEO (ottobre 2026).</li>
+</ul>
+
+</body>
+</html>

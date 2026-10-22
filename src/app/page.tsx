@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CercaAttivita } from "@/components/CercaAttivita";
 import { ChatSimulata } from "@/components/landing/ChatSimulata";
+import { Apertura } from "@/components/landing/Apertura";
 import { AnteprimaReport } from "@/components/landing/AnteprimaReport";
 import { Passi } from "@/components/landing/Passi";
 import { Impatto } from "@/components/landing/Impatto";
@@ -26,6 +27,7 @@ export default function Landing() {
   const base = PIANI[0];
   return (
     <>
+      <Apertura />
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="relative mx-auto max-w-6xl px-4 pt-12 pb-14 sm:px-6 sm:pt-20 sm:pb-20 lg:pt-24">

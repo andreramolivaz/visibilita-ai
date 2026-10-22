@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Pagina, Titolo } from "@/components/ui";
+import { Simbolo } from "@/components/Marchio";
 import { Pipeline } from "@/components/metodo/Pipeline";
 import { StrisciaMotori } from "@/components/landing/StrisciaMotori";
 import { Categorie } from "@/components/landing/Categorie";
@@ -68,6 +69,20 @@ export default function Metodo() {
           come riconosciamo la tua attività nelle risposte, come calcoliamo il punteggio e dove il metodo ha dei limiti.
         </p>
       </div>
+
+      <a
+        href="/white-paper-visibilita-ai.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-8 flex max-w-2xl items-center gap-4 rounded-2xl border border-line bg-soft/60 p-4 transition-colors hover:border-ink sm:p-5"
+      >
+        <Simbolo size={44} className="shrink-0" />
+        <span className="min-w-0">
+          <span className="block font-semibold">Il white paper: metodo, prodotto e strategia</span>
+          <span className="block text-[15px] text-muted">Cinque pagine in PDF: perché gli intenti e non le frasi, perché ogni numero ha un intervallo, cosa c&apos;è nel report e dove vogliamo arrivare.</span>
+        </span>
+        <span className="ml-auto shrink-0 text-sm font-semibold text-accent">Scarica</span>
+      </a>
 
       <section className="mt-12">
         <h2 className="text-2xl font-bold">Il percorso dei dati</h2>
