@@ -8,15 +8,9 @@ const COLONNE = [
       { href: "/#come-funziona", testo: "Come funziona" },
       { href: "/report/esempio", testo: "Report di esempio" },
       { href: "/prezzi", testo: "Prezzi" },
-      { href: "/#domande", testo: "Domande frequenti" },
+      { href: "/prezzi#domande", testo: "Domande frequenti" },
       { href: "/metodo", testo: "Metodo: come raccogliamo i dati" },
-    ],
-  },
-  {
-    titolo: "Per chi lo rivende",
-    voci: [
-      { href: "/agenzie", testo: "Agenzie e freelance" },
-      { href: "/prezzi#agenzia", testo: "Piano Agenzia" },
+      { href: "/metodo#per-chi", testo: "Per quali attività" },
     ],
   },
   {
@@ -34,7 +28,7 @@ export function Footer() {
   return (
     <footer className="no-print mt-16 border-t border-line">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <div className="grid gap-8 sm:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-8 sm:grid-cols-[1.4fr_1fr_1fr]">
           <div>
             <Marchio />
             <p className="mt-3 max-w-xs text-sm text-muted">

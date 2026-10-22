@@ -59,15 +59,31 @@ export type Portale =
   | "Portale turistico del Comune";
 
 /**
- * Sei tipi di domanda, dallo studio dei prompt reali (Semrush 2025-26,
- * Otterly, Citations.press, BrightLocal): generica (categoria + luogo),
- * per bisogno (urgenza, orario, prezzo), per specialità (la prestazione),
- * per requisito (certificazione, convenzione, servizio accessorio),
- * di confronto («meglio X o Y?»), sul nome (verifica dell'attività).
+ * Le famiglie di domanda, dallo studio dei prompt reali (Semrush 2025-26,
+ * Otterly, Citations.press, BrightLocal) e dal telescopio delle domande:
+ * generica (categoria + luogo), per bisogno (urgenza, orario, prezzo),
+ * per specialità (la prestazione), per requisito (certificazione, convenzione,
+ * servizio accessorio), per occasione (chi chiede e perché: famiglia, lavoro,
+ * turisti, urgenza), vicino a te (posizione impostata in punti diversi intorno
+ * all'attività), di confronto («meglio X o Y?»), sul nome (verifica dell'attività),
+ * in inglese (per chi riceve stranieri o esporta).
  */
-export type TipoDomanda = "generica" | "bisogno" | "specialita" | "requisito" | "confronto" | "nome";
+export type TipoDomanda = "generica" | "bisogno" | "specialita" | "requisito" | "occasione" | "vicino" | "confronto" | "nome" | "inglese";
 
-export const TIPI_DOMANDA: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "confronto", "nome"];
+export const TIPI_DOMANDA: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "occasione", "vicino", "confronto", "nome", "inglese"];
+
+/** Il livello di zoom geografico della domanda: il telescopio. */
+export type Zoom = "citta" | "zona" | "vicino" | "provincia" | "regione" | "nazionale";
+
+/** Come è formulata la domanda: lo stesso intento in tre modi, per misurare quanto conta la formulazione. */
+export type Formulazione = "diretta" | "colloquiale" | "imperativa";
+
+/** Un punto intorno all'attività in cui viene impostata la posizione: spostamento in metri verso nord ed est. */
+export interface PuntoVicino {
+  etichetta: "centro" | "nord" | "sud" | "est" | "ovest" | "nord-est" | "nord-ovest" | "sud-est" | "sud-ovest";
+  nordM: number;
+  estM: number;
+}
 
 /** Da dove viene una domanda: dal modello di categoria, da un segnale dell'attività (scheda Google, recensioni, sito, ricerche), dal titolare. */
 export type OrigineDomanda = "modello" | "scheda" | "recensioni" | "sito" | "ricerche" | "titolare";
@@ -76,6 +92,16 @@ export interface Domanda {
   id: string;
   testo: string;
   tipo: TipoDomanda;
+  /** Livello di zoom geografico. */
+  zoom?: Zoom;
+  /** Formulazione dello stesso intento. */
+  formulazione?: Formulazione;
+  /** Gruppo di intento: le domande con lo stesso gruppo chiedono la stessa cosa in modi o zoom diversi. */
+  gruppo?: string;
+  /** Per le domande per occasione: chi chiede e perché («famiglia», «lavoro», «turisti»…). */
+  occasione?: string;
+  /** Per le domande vicino a te: il punto in cui è impostata la posizione. */
+  punto?: PuntoVicino;
   /** Il titolare può cambiare una sola domanda. */
   modificabile?: boolean;
   /** Per le domande di confronto: il concorrente nominato. */
@@ -232,6 +258,37 @@ export interface RisultatoTipo {
   domande: number;
 }
 
+/** Visibilità per livello di zoom: città, zona, vicino a te, provincia… */
+export interface RisultatoZoom {
+  zoom: Zoom;
+  comparse: number;
+  totale: number;
+  domande: number;
+}
+
+/** Visibilità per occasione: chi chiede e perché. */
+export interface RisultatoOccasione {
+  occasione: string;
+  comparse: number;
+  totale: number;
+  domande: number;
+}
+
+/** Un punto intorno all'attività: quante risposte ti citano quando la posizione è impostata lì. */
+export interface RisultatoPunto {
+  punto: PuntoVicino;
+  comparse: number;
+  totale: number;
+}
+
+/** Quanto conta la formulazione: gruppi di intento chiesti in più modi e in quanti il risultato non cambia. */
+export interface Formulazioni {
+  /** Gruppi con almeno due formulazioni. */
+  gruppi: number;
+  /** Gruppi in cui, assistente per assistente, le formulazioni danno lo stesso esito (al più una risposta di differenza). */
+  concordi: number;
+}
+
 /** Confronto diretto con un concorrente, in numero di domande. */
 export interface TestaATesta {
   nome: string;
@@ -311,6 +368,12 @@ export interface Report {
   sintesi: string;
   perMotore: RisultatoMotore[];
   perTipo: RisultatoTipo[];
+  /** Il telescopio: per livello di zoom geografico. */
+  perZoom?: RisultatoZoom[];
+  /** Intorno a te: i punti in cui è stata impostata la posizione, sugli assistenti che la accettano. */
+  intorno?: { punti: RisultatoPunto[]; motori: EngineId[] };
+  perOccasione?: RisultatoOccasione[];
+  formulazioni?: Formulazioni;
   concorrenti: Concorrente[];
   /** Citazioni di tutte le attività nelle risposte (anche fuori dai primi cinque): base della quota di voce. */
   citazioniTotali?: number;
@@ -329,4 +392,5 @@ export interface Report {
   andamento?: { mese: string; punteggio: number }[];
 }
 
-export type Piano = "gratuito" | "base" | "pro" | "agenzia";
+/** «singolo» è il report una tantum, a pagamento; «gratuito» resta per i report vecchi. */
+export type Piano = "singolo" | "gratuito" | "base" | "pro" | "agenzia";

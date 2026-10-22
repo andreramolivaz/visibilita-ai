@@ -2,6 +2,11 @@
  * Listino. Unico posto dove vivono i prezzi: li leggono la pagina prezzi,
  * l'invito nel report e il checkout Stripe.
  * Prezzi in euro, IVA esclusa. Annuale = due mesi gratis.
+ *
+ * Il set di domande è il «telescopio» (docs/studio-domande-telescopio.md):
+ * famiglie di domande con almeno sei domande ciascuna, così ogni famiglia ha
+ * abbastanza risposte per un intervallo stretto, e paraphrasi e zoom come
+ * repliche dello stesso intento. Il numero esatto non si mostra sul sito.
  */
 
 export type PianoId = "base" | "pro" | "agenzia";
@@ -15,6 +20,10 @@ export interface Piano {
   annuale: number;
   /** Domande per scansione. */
   domande: number;
+  /** Ripetizioni di ogni domanda, in giorni diversi. */
+  ripetizioni: number;
+  /** Ogni quanto si ripete la scansione. */
+  cadenza: string;
   include: string[];
   /** Nome prodotto su Stripe e in fattura. */
   stripeNome: string;
@@ -28,10 +37,12 @@ export const PIANI: Piano[] = [
     perChi: "Per una sola attività che vuole sapere ogni mese dove sta.",
     mensile: 29,
     annuale: 290,
-    domande: 15,
+    domande: 48,
+    ripetizioni: 3,
+    cadenza: "ogni mese",
     include: [
       "1 attività",
-      "15 domande su 6 assistenti AI, 3 ripetizioni ciascuna",
+      "Set completo di domande su 6 assistenti AI, ogni domanda ripetuta in tre giorni diversi",
       "Scansione ogni mese",
       "Email mensile con punteggio e variazione",
       "Storico dei report",
@@ -45,13 +56,15 @@ export const PIANI: Piano[] = [
     perChi: "Per chi vuole muoversi in fretta e tenere d'occhio i concorrenti.",
     mensile: 59,
     annuale: 590,
-    domande: 30,
+    domande: 72,
+    ripetizioni: 2,
+    cadenza: "ogni due settimane",
     include: [
       "1 attività",
-      "30 domande su 6 assistenti AI, 3 ripetizioni ciascuna",
-      "Scansione ogni settimana",
+      "Set esteso di domande: più occasioni, più zoom, nove punti intorno a te",
+      "Scansione ogni due settimane",
       "5 concorrenti seguiti, avviso se ne entra uno nuovo",
-      "Azioni spuntate e verificate il mese dopo",
+      "Azioni spuntate e verificate alla scansione dopo",
       "PDF del report",
     ],
     stripeNome: "Visibilità AI · Pro",
@@ -60,33 +73,33 @@ export const PIANI: Piano[] = [
   {
     id: "agenzia",
     nome: "Agenzia",
-    perChi: "Per web agency e freelance che lo rivendono con il proprio logo.",
+    perChi: "Per chi segue più attività e consegna il report con il proprio logo.",
     mensile: 179,
     annuale: 1790,
-    domande: 30,
-    include: [
-      "10 attività con report Pro",
-      "PDF con il tuo logo",
-      "Un link cliente per ogni attività",
-      "Export CSV",
-      "Attività in più: 15 € al mese ciascuna",
-    ],
+    domande: 72,
+    ripetizioni: 2,
+    cadenza: "ogni due settimane",
+    include: ["10 attività con report Pro", "PDF con il tuo logo", "Un link cliente per ogni attività", "Export CSV", "Attività in più: 15 € al mese ciascuna"],
     stripeNome: "Visibilità AI · Agenzia",
   },
 ];
 
+/** Il primo report: una tantum, a pagamento, stessa scansione del piano Base in un giorno solo. */
+export const REPORT_SINGOLO = {
+  id: "singolo" as const,
+  nome: "Report singolo",
+  prezzo: 49,
+  domande: 36,
+  motori: 6,
+  ripetizioni: 2,
+  stripeNome: "Visibilità AI · Report singolo",
+  include: ["Set completo di domande su 6 assistenti AI, ogni domanda ripetuta", "Punteggio, concorrenti, fonti, parole, cosa dicono di te", "Tre azioni in ordine di impatto", "PDF del report", "Scalato dal primo mese se poi ti abboni"],
+};
+
 export const SISTEMAZIONE = {
   nome: "Sistemazione",
   prezzo: 490,
-  testo:
-    "Le tre azioni del report le facciamo noi: schede sui portali, categorie, descrizioni, foto. Verifica dopo 30 giorni.",
-};
-
-export const TEST_GRATUITO = {
-  domande: 8,
-  motori: 6,
-  ripetizioni: 2,
-  ogniGiorni: 30,
+  testo: "Le tre azioni del report le facciamo noi: schede sui portali, categorie, descrizioni, foto. Verifica dopo 30 giorni.",
 };
 
 export function piano(id: PianoId): Piano {

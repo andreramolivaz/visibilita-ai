@@ -1,5 +1,6 @@
-import { REPORT_ESEMPIO, DOMANDE_ESEMPIO } from "./mock-report";
+import { REPORT_ESEMPIO } from "./mock-report";
 import type { DatiArea } from "@/components/area/AreaPersonale";
+import { famiglieDi } from "./area";
 
 /** Area personale di esempio: sei mesi di report della pizzeria di prova. */
 export function datiAreaEsempio(email: string, demo = false): DatiArea {
@@ -20,8 +21,11 @@ export function datiAreaEsempio(email: string, demo = false): DatiArea {
       data,
       punteggio: andamento[i]?.punteggio ?? REPORT_ESEMPIO.punteggio,
       href: "/report/esempio?abbonato=1",
+      domande: REPORT_ESEMPIO.domande,
+      motori: REPORT_ESEMPIO.motori.length,
+      ripetizioni: REPORT_ESEMPIO.ripetizioni,
     })),
-    domande: DOMANDE_ESEMPIO.map((d) => ({ testo: d.testo, modificabile: d.modificabile })),
+    famiglie: famiglieDi(REPORT_ESEMPIO),
     concorrentiSeguiti: REPORT_ESEMPIO.concorrenti.filter((c) => !c.seiTu).map((c) => c.nome),
   };
 }

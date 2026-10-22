@@ -40,6 +40,39 @@
     ],
     "nome": [
       "{nome} estetica {citta} com'è? recensioni"
+    ],
+    "occasione": [
+      {
+        "testo": "{categoria} a {citta} per un'occasione importante, matrimonio o cerimonia",
+        "etichetta": "cerimonia"
+      },
+      {
+        "testo": "{categoria} a {citta} per la prima volta, che metta a proprio agio",
+        "etichetta": "prima volta"
+      },
+      {
+        "testo": "{categoria} a {citta} per bambini e ragazzi",
+        "etichetta": "famiglia"
+      },
+      {
+        "testo": "{categoria} a {citta} economico ma serio",
+        "etichetta": "budget"
+      },
+      {
+        "testo": "{categoria} a {citta} con disponibilità oggi o domani",
+        "etichetta": "subito"
+      },
+      {
+        "testo": "{categoria} a {citta} aperto in pausa pranzo o dopo le 19",
+        "etichetta": "lavoro"
+      }
+    ],
+    "vicino": [
+      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "qual è {il categoria} migliore qui vicino, a {citta}?",
+      "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
+      "{categoria} aperta adesso vicino a me, a {citta}",
+      "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
     ]
   },
   "fonti": [

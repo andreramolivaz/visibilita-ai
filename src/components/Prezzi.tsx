@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PIANI, SISTEMAZIONE, TEST_GRATUITO, euro, type Periodo } from "@/lib/prezzi";
+import { PIANI, REPORT_SINGOLO, SISTEMAZIONE, euro, type Periodo } from "@/lib/prezzi";
 import { Checkout } from "@/components/Checkout";
 import { Bottone } from "@/components/ui";
 
@@ -73,23 +73,33 @@ export function Prezzi({ pagamentiAttivi }: { pagamentiAttivi: boolean }) {
               <Checkout piano={p.id} periodo={periodo} secondario={!p.evidenza} suScuro={p.evidenza} attivo={pagamentiAttivi} className="mt-7">
                 Attiva {p.nome}
               </Checkout>
-              <p className={`mt-2 text-center text-xs ${p.evidenza ? "text-white/50" : "text-faint"}`}>Parti dal test gratuito, poi scegli il piano dal report.</p>
+              <p className={`mt-2 text-center text-xs ${p.evidenza ? "text-white/50" : "text-faint"}`}>Il primo report arriva in pochi minuti; i successivi {p.cadenza}.</p>
             </section>
           );
         })}
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <section className="rounded-2xl border border-line p-6 sm:p-7">
-          <h2 className="text-lg font-semibold">Test gratuito</h2>
-          <p className="mt-1 text-sm text-muted">
-            {TEST_GRATUITO.domande} domande su {TEST_GRATUITO.motori} motori, {TEST_GRATUITO.ripetizioni} ripetizioni.
-            Un test per attività ogni {TEST_GRATUITO.ogniGiorni} giorni, senza registrazione.
-          </p>
-          <div className="mt-4">
-            <Bottone href="/#test" secondario>
-              Fai il test
-            </Bottone>
+        <section id="singolo" className="rounded-2xl border border-line p-6 sm:p-7">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="text-lg font-semibold">{REPORT_SINGOLO.nome}</h2>
+            <p>
+              <span className="tabular text-3xl font-bold tracking-tight">{euro(REPORT_SINGOLO.prezzo)}</span> <span className="text-sm text-muted">una tantum</span>
+            </p>
+          </div>
+          <p className="mt-1 text-sm text-muted">Una scansione completa oggi, senza abbonamento. Se poi ti abboni entro 30 giorni, viene scalato dal primo mese.</p>
+          <ul className="mt-4 space-y-1.5 text-[15px]">
+            {REPORT_SINGOLO.include.map((i) => (
+              <li key={i} className="flex gap-2.5">
+                <span className="mt-0.5 text-accent" aria-hidden="true">
+                  ✓
+                </span>
+                <span>{i}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-5">
+            <Bottone href="/#test">Avvia il report</Bottone>
           </div>
         </section>
         <section className="rounded-2xl bg-soft p-6 sm:p-7">

@@ -22,7 +22,7 @@ export const perplexity: Motore = {
             { role: "system", content: ISTRUZIONE },
             { role: "user", content: q.domanda },
           ],
-          web_search_options: { user_location: { country: "IT", region: q.regione, city: q.citta } },
+          web_search_options: { user_location: { country: "IT", region: q.regione, city: q.citta, ...(q.coordinate ? { latitude: q.coordinate.lat, longitude: q.coordinate.lng } : {}) } },
         }),
       });
       if (!res.ok) throw new Error(`Perplexity ${res.status}: ${(await res.text()).slice(0, 200)}`);

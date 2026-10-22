@@ -1,6 +1,6 @@
 import { engine } from "./engines";
 import { pesoPosizione } from "./score";
-import type { Concorrente, EngineId, ProfiloAttivita, RigaDomanda, TipoDomanda } from "./types";
+import type { Concorrente, EngineId, Formulazioni, ProfiloAttivita, RigaDomanda, RisultatoOccasione, RisultatoPunto, RisultatoZoom, TipoDomanda, Zoom } from "./types";
 
 /**
  * Statistiche del report. Tutte derivate dalle celle domanda × assistente,
@@ -14,7 +14,10 @@ import type { Concorrente, EngineId, ProfiloAttivita, RigaDomanda, TipoDomanda }
  * È la distinzione tra ricordo spontaneo e sollecitato delle ricerche di marca.
  */
 
-export const TIPI_SPONTANEI: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito"];
+export const TIPI_SPONTANEI: TipoDomanda[] = ["generica", "bisogno", "specialita", "requisito", "occasione", "vicino"];
+
+/** Gli assistenti a cui si può impostare una posizione con le coordinate (gli altri ricevono solo la città). */
+export const MOTORI_CON_COORDINATE: EngineId[] = ["gemini", "google-ai", "perplexity"];
 
 export const spontanee = (righe: RigaDomanda[]) => righe.filter((r) => TIPI_SPONTANEI.includes(r.domanda.tipo));
 
@@ -182,6 +185,30 @@ export function confrontoDiretto(righe: RigaDomanda[]) {
     });
 }
 
+/**
+ * Il confronto diretto per concorrente: tutte le domande «meglio tu o X?» su X
+ * messe insieme. Celle in cui sei il primo nome, su tutte le celle, e gli
+ * assistenti che ti preferiscono almeno una volta.
+ */
+export function confrontoPerConcorrente(righe: RigaDomanda[]) {
+  const per = new Map<string, { concorrente: string; domande: number; primo: number; celle: number; motoriPrimo: Set<EngineId> }>();
+  for (const r of righe) {
+    if (r.domanda.tipo !== "confronto") continue;
+    const k = r.domanda.concorrente ?? "";
+    const v = per.get(k) ?? { concorrente: k, domande: 0, primo: 0, celle: 0, motoriPrimo: new Set<EngineId>() };
+    v.domande++;
+    for (const c of r.celle) {
+      v.celle++;
+      if (c.posizione === 1) {
+        v.primo++;
+        v.motoriPrimo.add(c.motore);
+      }
+    }
+    per.set(k, v);
+  }
+  return [...per.values()].map((v) => ({ ...v, motoriPrimo: [...v.motoriPrimo] }));
+}
+
 /** Assistenti che riportano i tuoi dati senza errori, sul totale. */
 export function datiCorretti(descrizioni: { datiCorretti?: boolean }[]) {
   const noti = descrizioni.filter((d) => d.datiCorretti !== undefined);
@@ -189,3 +216,101 @@ export function datiCorretti(descrizioni: { datiCorretti?: boolean }[]) {
 }
 
 export const percentuale = (x: number) => `${Math.round(x * 100)}%`;
+
+/* ---------- Il telescopio: zoom, punti intorno a te, occasioni, formulazioni ---------- */
+
+const ORDINE_ZOOM: Zoom[] = ["citta", "zona", "vicino", "provincia", "regione", "nazionale"];
+
+/** Risposte in cui compari per livello di zoom (domande spontanee). */
+export function perZoom(tutte: RigaDomanda[], ripetizioni: number): RisultatoZoom[] {
+  const out = new Map<Zoom, RisultatoZoom>();
+  for (const r of spontanee(tutte)) {
+    const z = r.domanda.zoom ?? "citta";
+    const v = out.get(z) ?? { zoom: z, comparse: 0, totale: 0, domande: 0 };
+    v.domande++;
+    for (const c of r.celle) {
+      v.totale += ripetizioni;
+      v.comparse += volteDi(c);
+    }
+    out.set(z, v);
+  }
+  return ORDINE_ZOOM.filter((z) => out.has(z)).map((z) => out.get(z)!);
+}
+
+/** Risposte in cui compari per occasione (domande per occasione). */
+export function perOccasione(tutte: RigaDomanda[], ripetizioni: number): RisultatoOccasione[] {
+  const out = new Map<string, RisultatoOccasione>();
+  for (const r of tutte) {
+    if (r.domanda.tipo !== "occasione" || !r.domanda.occasione) continue;
+    const v = out.get(r.domanda.occasione) ?? { occasione: r.domanda.occasione, comparse: 0, totale: 0, domande: 0 };
+    v.domande++;
+    for (const c of r.celle) {
+      v.totale += ripetizioni;
+      v.comparse += volteDi(c);
+    }
+    out.set(r.domanda.occasione, v);
+  }
+  return [...out.values()].sort((a, b) => b.comparse / Math.max(1, b.totale) - a.comparse / Math.max(1, a.totale));
+}
+
+/**
+ * Intorno a te: per ogni punto in cui è stata impostata la posizione, le
+ * risposte che ti citano, contate solo sugli assistenti che accettano le coordinate.
+ */
+export function intornoATe(tutte: RigaDomanda[], ripetizioni: number, motori: EngineId[] = MOTORI_CON_COORDINATE): RisultatoPunto[] {
+  const out = new Map<string, RisultatoPunto>();
+  for (const r of tutte) {
+    if (r.domanda.tipo !== "vicino" || !r.domanda.punto) continue;
+    const k = r.domanda.punto.etichetta;
+    const v = out.get(k) ?? { punto: r.domanda.punto, comparse: 0, totale: 0 };
+    for (const c of r.celle) {
+      if (!motori.includes(c.motore)) continue;
+      v.totale += ripetizioni;
+      v.comparse += volteDi(c);
+    }
+    out.set(k, v);
+  }
+  return [...out.values()];
+}
+
+/**
+ * Quanto conta la formulazione: per ogni gruppo di intento chiesto in più
+ * modi, assistente per assistente, le formulazioni danno lo stesso esito se
+ * le volte in cui compari differiscono al più di una risposta.
+ */
+export function formulazioni(tutte: RigaDomanda[]): Formulazioni {
+  const gruppi = new Map<string, RigaDomanda[]>();
+  for (const r of spontanee(tutte)) {
+    if (!r.domanda.gruppo || !r.domanda.formulazione) continue;
+    gruppi.set(r.domanda.gruppo, [...(gruppi.get(r.domanda.gruppo) ?? []), r]);
+  }
+  let n = 0;
+  let concordi = 0;
+  for (const righe of gruppi.values()) {
+    const forme = new Set(righe.map((r) => r.domanda.formulazione));
+    if (forme.size < 2) continue;
+    n++;
+    const motori = righe[0].celle.map((c) => c.motore);
+    const concorde = motori.every((m) => {
+      const volte = righe.map((r) => volteDi(r.celle.find((c) => c.motore === m) ?? { posizione: null, frequenza: "0 su 0" }));
+      return Math.max(...volte) - Math.min(...volte) <= 1;
+    });
+    if (concorde) concordi++;
+  }
+  return { gruppi: n, concordi };
+}
+
+/** Risposte in cui compari per famiglia di domanda, con intervallo al 95%: la granularità del report. */
+export function perFamiglia(tutte: RigaDomanda[], ripetizioni: number) {
+  const out = new Map<TipoDomanda, { tipo: TipoDomanda; k: number; n: number; domande: number }>();
+  for (const r of tutte) {
+    const v = out.get(r.domanda.tipo) ?? { tipo: r.domanda.tipo, k: 0, n: 0, domande: 0 };
+    v.domande++;
+    for (const c of r.celle) {
+      v.n += ripetizioni;
+      v.k += volteDi(c);
+    }
+    out.set(r.domanda.tipo, v);
+  }
+  return [...out.values()].map((v) => ({ ...v, quota: v.n ? v.k / v.n : 0, ic: wilson(v.k, v.n) }));
+}

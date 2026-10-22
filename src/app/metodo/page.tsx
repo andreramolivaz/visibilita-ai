@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Pagina, Titolo } from "@/components/ui";
 import { Pipeline } from "@/components/metodo/Pipeline";
+import { StrisciaMotori } from "@/components/landing/StrisciaMotori";
+import { Categorie } from "@/components/landing/Categorie";
 import { ENGINES, motoriAttivi, motoriInArrivo, elencoMotori } from "@/lib/engines";
 import { GLOSSARIO } from "@/lib/glossario";
 import { PROFILI } from "@/lib/profiles";
@@ -74,6 +76,13 @@ export default function Metodo() {
         </div>
       </section>
 
+      <section className="mt-12 rounded-2xl border border-line p-5 sm:p-7">
+        <h2 className="text-2xl font-bold">Sei assistenti, pesati per quanti italiani li usano</h2>
+        <div className="mt-6">
+          <StrisciaMotori />
+        </div>
+      </section>
+
       <section className="mt-14 grid gap-10 lg:grid-cols-2 lg:gap-16">
         <div>
           <h2 className="text-2xl font-bold">1. Il profilo e le domande</h2>
@@ -87,15 +96,23 @@ export default function Metodo() {
             </p>
             <p>
               Le domande sono quelle che un cliente fa davvero. Le abbiamo studiate sui prompt reali: sono frasi di 8–25 parole con un luogo e
-              almeno un vincolo (Semrush 2025–26), e circa una su quattro è un confronto tra due nomi (Citations.press 2026). Sei tipi: generiche
-              («miglior pizzeria a Bergamo»), per bisogno («aperta la domenica sera»), per specialità («con forno a legna»), per requisito («con
-              dehors», «certificata EN 1090»), di confronto («meglio X o Y?»), sul nome («com&apos;è la Pizzeria Da Gino?»). I modelli sono
+              almeno un vincolo (Semrush 2025–26), e circa una su quattro è un confronto tra due nomi (Citations.press 2026). I modelli sono
               scritti per {PROFILI.filter((p) => p.imprese > 0).length} categorie, in ordine di numerosità, e riempiti con città, zona o
               provincia, con le specialità che emergono dalle tue recensioni e dal tuo sito e con i requisiti della scheda e delle ricerche; per chi
-              esporta o riceve stranieri ci sono anche domande in inglese. Un modello linguistico riscrive le domande spontanee come le scriverebbe
-              un cliente, con lo stesso luogo e gli stessi vincoli: contano intento e vincoli, non la frase (SparkToro 2026). 8 nel test gratuito,
-              15 nel Base, 30 nel Pro; nel Pro tre domande possono ruotare ogni mese per esplorare, le altre restano fisse per il confronto. Una la
-              scegli tu, o scrivi cosa ti chiedono al telefono.
+              esporta o riceve stranieri ci sono anche domande in inglese. Il set non si vede prima della scansione e non si cambia: è il metodo, e
+              resta uguale da una scansione all&apos;altra perché il confronto nel tempo regga.
+            </p>
+            <p>
+              <strong>Il telescopio.</strong> Il set è una struttura, non una lista. Nove famiglie: generiche («miglior pizzeria a Bergamo»), per
+              bisogno («aperta la domenica sera»), per specialità («con forno a legna»), per requisito («con dehors», «certificata EN 1090»), per
+              occasione («con bambini piccoli», «pranzo di lavoro», «per un prototipo»), vicino a te («vicino a me», con la posizione impostata in
+              punti diversi intorno all&apos;attività), di confronto («meglio X o Y?», una per concorrente), sul nome, in inglese. Ogni famiglia ha
+              almeno sei domande, così ha abbastanza risposte per un intervallo proprio; lo stesso intento è chiesto a tre livelli di zoom (città,
+              zona, vicino a te; provincia, regione e Italia per le aziende) e in tre formulazioni (diretta, colloquiale, imperativa). Zoom e
+              formulazioni sono repliche dello stesso intento: la ricerca sulla variabilità delle risposte dice che la varianza tra domande è più
+              grande di quella tra ripetizioni, e che le parafrasi sono il modo più efficiente di aggiungere campione dopo lingue e modelli (Dice
+              Roll Method 2026; variance components 2026; cloro.dev 2026). Il report singolo e il piano Base hanno il set completo; il Pro quello
+              esteso, con più occasioni, più zoom e nove punti intorno a te.
             </p>
           </div>
         </div>
@@ -107,8 +124,12 @@ export default function Metodo() {
               italiana: {elencoMotori(attivi)}. In arrivo: {elencoMotori(motoriInArrivo())}.
             </p>
             <p>
-              Ogni domanda viene posta 2 volte nel test gratuito e 3 nell&apos;abbonamento, in tre giorni diversi della stessa settimana, perché le
-              risposte cambiano più tra un giorno e l&apos;altro che tra un minuto e l&apos;altro. Per ogni risposta salviamo assistente, modello,
+              Ogni domanda viene posta 2 volte nel report singolo, nella stessa giornata, e 3 nel piano Base, in tre giorni diversi della stessa
+              settimana, perché le risposte cambiano più tra un giorno e l&apos;altro che tra un minuto e l&apos;altro. Oltre cinque ripetizioni
+              il guadagno è minimo: conviene spendere in domande, formulazioni e assistenti (variance components 2026). Gli assistenti con ricerca
+              web convergono in pochi passaggi: con cinque ripetizioni la lista dei nomi è completa (finite-sample audit 2026). Nelle domande
+              vicino a te la posizione è impostata con le coordinate su Gemini, Google AI e Perplexity; ChatGPT e Claude accettano solo la città,
+              Grok nessuna posizione. Per ogni risposta salviamo assistente, modello,
               canale, località impostata, data e ora, testo della domanda, testo della risposta, ordine dei nomi citati e fonti consultate (URL
               restituiti dalle interfacce): senza questi campi un dato non è ricostruibile.
             </p>
@@ -245,10 +266,10 @@ export default function Metodo() {
             </thead>
             <tbody>
               {[
-                ["18 (una domanda, 6 assistenti × 3)", "3–31%", "8–43%", "29–71%"],
-                ["96 (test gratuito)", "5–18%", "13–29%", "40–60%"],
-                ["270 (piano Base)", "7–14%", "16–25%", "44–56%"],
-                ["540 (piano Pro)", "8–13%", "17–24%", "46–54%"],
+                ["12 (una domanda, 6 assistenti × 2)", "1–35%", "5–45%", "25–75%"],
+                ["72 (una famiglia nel report singolo)", "5–19%", "12–30%", "39–61%"],
+                ["432 (report singolo)", "7–13%", "16–24%", "45–55%"],
+                ["864 (piano Base)", "8–12%", "17–23%", "47–53%"],
               ].map(([n, a, b, c]) => (
                 <tr key={n} className="border-t border-line">
                   <td className="py-2 pr-3">{n}</td>
@@ -292,6 +313,23 @@ export default function Metodo() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      <section id="per-chi" className="mt-16 scroll-mt-20 border-t border-line pt-12">
+        <div className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:gap-16">
+          <h2 className="text-3xl font-bold sm:text-4xl">Per quali attività</h2>
+          <div>
+            <p className="text-lg text-muted">
+              {PROFILI.filter((p) => p.imprese > 0).length} categorie con domande, fonti e azioni proprie, dalla più numerosa alla più piccola: un ristorante si gioca su piatti e orari, un dentista
+              sulle prestazioni, una carpenteria su lavorazioni, certificazioni, provincia e domande in inglese. Per i mestieri non previsti il profilo lo costruiamo dal
+              sito e dalla scheda Google.
+            </p>
+            <p className="mt-3 text-[13px] text-faint">Imprese attive per categoria: ISTAT, registro ASIA 2023 (via Eurostat).</p>
+          </div>
+        </div>
+        <div className="mt-10">
+          <Categorie />
         </div>
       </section>
     </Pagina>

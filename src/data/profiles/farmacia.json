@@ -38,6 +38,39 @@
     ],
     "nome": [
       "{nome} {citta} recensioni, orari"
+    ],
+    "occasione": [
+      {
+        "testo": "{categoria} a {citta} dove fare un regalo all'ultimo minuto",
+        "etichetta": "regalo"
+      },
+      {
+        "testo": "{categoria} a {citta} con personale che consiglia, per chi non se ne intende",
+        "etichetta": "consiglio"
+      },
+      {
+        "testo": "{categoria} a {citta} con prezzi bassi, per una famiglia",
+        "etichetta": "budget"
+      },
+      {
+        "testo": "{categoria} a {citta} di fascia alta, prodotti di qualità",
+        "etichetta": "premium"
+      },
+      {
+        "testo": "{categoria} a {citta} aperto adesso, mi serve oggi",
+        "etichetta": "subito"
+      },
+      {
+        "testo": "{categoria} a {citta} comodo per chi arriva in auto, con parcheggio",
+        "etichetta": "in auto"
+      }
+    ],
+    "vicino": [
+      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "qual è {il categoria} migliore qui vicino, a {citta}?",
+      "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
+      "{categoria} aperta adesso vicino a me, a {citta}",
+      "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
     ]
   },
   "fonti": [

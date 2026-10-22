@@ -44,6 +44,39 @@
     ],
     "inglese": [
       "best museums in {citta}, Italy, for first-time visitors, skip the line"
+    ],
+    "occasione": [
+      {
+        "testo": "{categoria} a {citta} da visitare con bambini",
+        "etichetta": "famiglia"
+      },
+      {
+        "testo": "{categoria} a {citta} per una scolaresca, con visita guidata",
+        "etichetta": "scuole"
+      },
+      {
+        "testo": "{categoria} a {citta} da fare quando piove",
+        "etichetta": "pioggia"
+      },
+      {
+        "testo": "{categoria} a {citta} gratis o con biglietto ridotto",
+        "etichetta": "budget"
+      },
+      {
+        "testo": "{categoria} a {citta} per turisti con due ore libere",
+        "etichetta": "turisti"
+      },
+      {
+        "testo": "{categoria} a {citta} accessibile in sedia a rotelle",
+        "etichetta": "accessibilità"
+      }
+    ],
+    "vicino": [
+      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "qual è {il categoria} migliore qui vicino, a {citta}?",
+      "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
+      "{categoria} aperta adesso vicino a me, a {citta}",
+      "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
     ]
   },
   "fonti": [

@@ -41,7 +41,8 @@ async function leggi(endpoint: string, q: Interrogazione): Promise<{ testo: stri
     body: JSON.stringify([
       {
         keyword: q.domanda,
-        location_name: `${q.citta},${q.regione ? `${q.regione},` : ""}Italy`,
+        // Con le coordinate la posizione è il punto esatto (zoom 14 ≈ quartiere); altrimenti la città.
+        ...(q.coordinate ? { location_coordinate: `${q.coordinate.lat},${q.coordinate.lng},14` } : { location_name: `${q.citta},${q.regione ? `${q.regione},` : ""}Italy` }),
         language_code: "it",
         device: "desktop",
         os: "windows",

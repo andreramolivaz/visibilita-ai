@@ -1,7 +1,7 @@
 import type { CitaChi, Concorrente, DescrizioneMotore, ErroreScheda, Fonte, Posizione, Report, RigaDomanda, Risposta, RisultatoMotore, RisultatoTipo, Termine, TestaATesta, Tono } from "../types";
 import { TIPI_DOMANDA } from "../types";
 import { punteggio as calcolaPunteggio, verdetto as calcolaVerdetto } from "../score";
-import { TIPI_SPONTANEI } from "../stats";
+import { MOTORI_CON_COORDINATE, TIPI_SPONTANEI, formulazioni, intornoATe, perOccasione, perZoom } from "../stats";
 import { estraiTermini } from "../profilo/termini";
 import { ePortale } from "./fonti";
 import { azioniDaRegole } from "./azioni";
@@ -195,6 +195,9 @@ export function costruisciReport(s: Scansione, id = s.id): Report {
   });
   const guadagno = azioni.reduce((acc, x) => acc + (x.impattoStimato ?? 0), 0);
   const fallite = s.celle.filter((c) => c.stato === "errore").length;
+  // Intorno a te: solo con le coordinate della scheda e sugli assistenti che le accettano.
+  const motoriConCoordinate = a.coordinate ? s.motori.filter((m) => MOTORI_CON_COORDINATE.includes(m)) : [];
+  const punti = s.domande.filter((d) => d.punto).length;
   const primo = concorrenti.find((c) => !c.seiTu);
   const pct = totaleSpontanee ? Math.round((tueCitazioni / totaleSpontanee) * 100) : 0;
   const qv = citazioniTotali ? Math.round((tueCitazioni / citazioniTotali) * 100) : 0;
@@ -213,6 +216,10 @@ export function costruisciReport(s: Scansione, id = s.id): Report {
     sintesi: `Compari in ${tueCitazioni} risposte su ${totaleSpontanee} alle ${nSpont} domande in cui il cliente non fa il tuo nome (${pct}%). Quota di voce ${qv}%${primo ? `, contro il ${citazioniTotali ? Math.round((primo.citazioni / citazioniTotali) * 100) : 0}% di ${primo.nome}` : ""}.${guadagno ? ` Con le tre azioni, stima da ${punteggio} a ${Math.min(100, punteggio + guadagno)}.` : ""}`,
     perMotore,
     perTipo,
+    perZoom: perZoom(righe, s.ripetizioni),
+    intorno: motoriConCoordinate.length ? { punti: intornoATe(righe, s.ripetizioni, motoriConCoordinate), motori: motoriConCoordinate } : undefined,
+    perOccasione: perOccasione(righe, s.ripetizioni),
+    formulazioni: formulazioni(righe),
     concorrenti,
     citazioniTotali,
     testaATesta,
@@ -234,6 +241,7 @@ export function costruisciReport(s: Scansione, id = s.id): Report {
         `Ogni domanda è stata posta ${s.ripetizioni} ${s.ripetizioni === 1 ? "volta" : "volte"} a ogni assistente${s.ripetizioni > 1 && inizio.slice(0, 10) !== fine.slice(0, 10) ? ", in giorni diversi" : ""}.`,
         "Compari quando il nome, l'indirizzo o il telefono coincidono con la tua scheda Google; i concorrenti sono le attività vicine della tua categoria e i nomi che le risposte mettono in elenco.",
         "La presenza sui portali è quella dichiarata dalla scheda: la verifica portale per portale arriva con la scansione successiva.",
+        ...(punti ? [motoriConCoordinate.length ? `Nelle domande vicino a te la posizione è stata impostata in ${punti} punti intorno all'attività sugli assistenti che accettano le coordinate (${motoriConCoordinate.join(", ")}); gli altri hanno ricevuto la città.` : "Nelle domande vicino a te la posizione è la città: la scheda non ha coordinate."] : []),
         ...(fallite ? [`${fallite} ${fallite === 1 ? "risposta non è arrivata" : "risposte non sono arrivate"} (errore dell'interfaccia): non ${fallite === 1 ? "entra" : "entrano"} nei conteggi.`] : []),
         "Le risposte degli assistenti cambiano nel tempo: i numeri sono quelli dei giorni della scansione.",
       ],

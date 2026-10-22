@@ -42,6 +42,39 @@
     ],
     "inglese": [
       "best boutique hotel in {citta}, Italy, under 200 euro"
+    ],
+    "occasione": [
+      {
+        "testo": "{categoria} a {citta} per una famiglia con bambini, camere comunicanti",
+        "etichetta": "famiglia"
+      },
+      {
+        "testo": "{categoria} a {citta} per una coppia, un weekend romantico",
+        "etichetta": "coppia"
+      },
+      {
+        "testo": "{categoria} a {citta} per una trasferta di lavoro, con wifi e fattura",
+        "etichetta": "lavoro"
+      },
+      {
+        "testo": "{categoria} a {citta} che accetti cani",
+        "etichetta": "animali"
+      },
+      {
+        "testo": "{categoria} a {citta} economico ma pulito, per una notte",
+        "etichetta": "budget"
+      },
+      {
+        "testo": "{categoria} a {citta} per un gruppo di otto persone",
+        "etichetta": "gruppo"
+      }
+    ],
+    "vicino": [
+      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "qual è {il categoria} migliore qui vicino, a {citta}?",
+      "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
+      "{categoria} aperta adesso vicino a me, a {citta}",
+      "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
     ]
   },
   "fonti": [

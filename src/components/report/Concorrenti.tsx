@@ -1,18 +1,18 @@
 import { engine } from "@/lib/engines";
 import type { Report } from "@/lib/types";
-import { confrontoDiretto, percentuale, quotaVoce } from "@/lib/stats";
+import { confrontoPerConcorrente, percentuale, quotaVoce } from "@/lib/stats";
 
 /** Alle domande «meglio tu o X?»: in quanti assistenti sei il primo nome. */
 export function ConfrontoDiretto({ report: r }: { report: Report }) {
-  const confronti = confrontoDiretto(r.righe);
+  const confronti = confrontoPerConcorrente(r.righe);
   if (confronti.length === 0) return null;
   return (
     <ul className="mt-4 space-y-1.5 text-[15px]">
       {confronti.map((c) => (
-        <li key={c.domanda.id} className="tabular">
-          <span className="font-semibold">Confronto diretto{c.concorrente ? ` con ${c.concorrente}` : ""}:</span> ti mettono per primo{" "}
-          {c.preferito.length} {c.preferito.length === 1 ? "assistente" : "assistenti"} su {c.assistenti}
-          {c.preferito.length > 0 ? ` (${c.preferito.map((m) => engine(m).nome).join(", ")})` : ""}.
+        <li key={c.concorrente} className="tabular">
+          <span className="font-semibold">Confronto diretto{c.concorrente ? ` con ${c.concorrente}` : ""}:</span> sei il primo nome in {c.primo} {c.primo === 1 ? "risposta" : "risposte"} su{" "}
+          {c.celle}
+          {c.motoriPrimo.length > 0 ? ` (${c.motoriPrimo.map((m) => engine(m).nome).join(", ")})` : ""}.
         </li>
       ))}
     </ul>

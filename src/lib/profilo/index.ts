@@ -95,29 +95,31 @@ const maiuscole = (s: string) =>
     .map((p) => (p.length > 1 && p === p.toLowerCase() ? p[0].toUpperCase() + p.slice(1) : p))
     .join(" ");
 
-function esempio(query: string, n: number): ProfiloCostruito {
+function esempio(query: string, piano: PianoDomande): ProfiloCostruito {
   const [nome, citta] = query.split(",").map((s) => s.trim());
   const attivita: ProfiloAttivita = { ...ATTIVITA_ESEMPIO, nome: nome ? maiuscole(nome) : ATTIVITA_ESEMPIO.nome, citta: citta ? maiuscole(citta) : ATTIVITA_ESEMPIO.citta };
   const s = SEGNALI_ESEMPIO;
   const { specialita, requisiti, origini } = segnaposto(s, attivita.servizi);
   const domande = generaDomande(
     profilo(attivita.categoria),
-    { nome: attivita.nome, categoria: attivita.categoriaGoogle, citta: attivita.citta, zona: attivita.zona, provincia: attivita.provincia, regione: attivita.regione, specialita, requisiti, origini, concorrente: s.concorrenti[0]?.nome },
-    n,
+    { nome: attivita.nome, categoria: attivita.categoriaGoogle, citta: attivita.citta, zona: attivita.zona, provincia: attivita.provincia, regione: attivita.regione, specialita, requisiti, origini, concorrenti: s.concorrenti.map((c) => c.nome) },
+    piano,
   );
   return { attivita: { ...attivita, specialita }, domande: conEsplora(conOrigine(domande)), segnali: s, recensioni: [] };
 }
 
-export async function costruisciProfilo(query: string, n: number): Promise<ProfiloCostruito> {
-  if (!placesAttivo()) return esempio(query, n);
+/** Il piano decide quante domande e in quali famiglie (QUOTE in profiles.ts). */
+export type PianoDomande = "singolo" | "base" | "pro";
+
+export async function costruisciProfilo(query: string, piano: PianoDomande): Promise<ProfiloCostruito> {
+  if (!placesAttivo()) return esempio(query, piano);
   const posto = await cercaScheda(query);
   if (!posto) {
-    const e = esempio(query, n);
+    const e = esempio(query, piano);
     return { ...e, segnali: { ...e.segnali, note: ["Non ho trovato una scheda Google per questo nome: controlla nome e città, o incolla il link di Google Maps.", ...e.segnali.note] } };
   }
 
   const base = profiloDaScheda(posto);
-  const cat = profilo(base.categoria);
   const [sito, concorrenti, ricerche] = await Promise.all([leggiSito(base.sito), concorrentiVicini(posto), modificatoriPer(base.categoriaGoogle, base.citta)]);
 
   const escludi = [base.nome, base.categoriaGoogle, base.citta];
@@ -125,15 +127,40 @@ export async function costruisciProfilo(query: string, n: number): Promise<Profi
   const terminiSito = terminiDaSito(sito.pagine, escludi, 10);
 
   const segnali: SegnaliProfilo = { recensioni, sito: terminiSito, ricerche, concorrenti, note: sito.note, fonte: "google" };
-  const { specialita, requisiti, origini } = segnaposto(segnali, base.servizi);
+  const { specialita } = segnaposto(segnali, base.servizi);
   const attivita: ProfiloAttivita = { ...base, specialita };
+  const domande = await domandePer(attivita, segnali, piano);
+  return { attivita, domande, segnali, recensioni: testiRecensioni(posto) };
+}
 
+/**
+ * Le domande di un piano per un'attività, dal profilo e dai segnali: è quello
+ * che fa il server quando parte la scansione, così il titolare non le vede
+ * prima (sono il metodo) e non può cambiarle.
+ */
+export async function domandePer(attivita: ProfiloAttivita, segnali: SegnaliProfilo, piano: PianoDomande): Promise<Domanda[]> {
+  const cat = profilo(attivita.categoria);
+  const { specialita, requisiti, origini } = segnaposto(segnali, attivita.servizi);
   let domande = generaDomande(
     cat,
-    { nome: attivita.nome, categoria: attivita.categoriaGoogle, citta: attivita.citta, zona: attivita.zona, provincia: attivita.provincia, regione: attivita.regione, specialita, requisiti, origini, concorrente: concorrenti[0]?.nome, inglese: cat.inglese },
-    n,
+    {
+      nome: attivita.nome,
+      categoria: attivita.categoriaGoogle,
+      citta: attivita.citta,
+      zona: attivita.zona,
+      provincia: attivita.provincia,
+      regione: attivita.regione,
+      specialita: specialita.length ? specialita : attivita.specialita,
+      requisiti,
+      origini,
+      concorrenti: segnali.concorrenti.map((c) => c.nome),
+      inglese: cat.inglese,
+    },
+    piano,
   );
   domande = conOrigine(domande);
-  domande = await variantiClaude(domande, { nome: attivita.nome, categoria: attivita.categoriaGoogle, citta: attivita.citta, provincia: attivita.provincia, b2b: cat.b2b });
-  return { attivita, domande: conEsplora(domande), segnali, recensioni: testiRecensioni(posto) };
+  if (segnali.fonte === "google") {
+    domande = await variantiClaude(domande, { nome: attivita.nome, categoria: attivita.categoriaGoogle, citta: attivita.citta, provincia: attivita.provincia, b2b: cat.b2b });
+  }
+  return conEsplora(domande);
 }

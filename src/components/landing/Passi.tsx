@@ -53,7 +53,7 @@ const DOMANDE = [
 function MiniDomande() {
   return (
     <Riquadro>
-      <p className="text-[11px] text-faint">Tre delle otto domande</p>
+      <p className="text-[11px] text-faint">Tre domande del set, su decine</p>
       <ul className="mt-1.5 space-y-1.5">
         {DOMANDE.map(([d, t]) => (
           <li key={d} className="flex items-baseline justify-between gap-3">
@@ -62,7 +62,7 @@ function MiniDomande() {
           </li>
         ))}
       </ul>
-      <p className="tabular mt-3 border-t border-line pt-2 text-[12px] text-muted">× 6 assistenti × 2 volte = 96 risposte</p>
+      <p className="mt-3 border-t border-line pt-2 text-[12px] text-muted">Per famiglia, per zoom, in più formulazioni · 6 assistenti · ogni domanda ripetuta</p>
     </Riquadro>
   );
 }
@@ -92,7 +92,7 @@ const PASSI = [
   },
   {
     titolo: "Facciamo le domande che fanno i tuoi clienti",
-    testo: "Otto domande, nella tua città, a sei assistenti AI. Ogni domanda due volte, perché le risposte cambiano.",
+    testo: "Decine di domande come le fanno i clienti: per bisogno, specialità, occasione, zona, vicino a te. A sei assistenti AI, ogni domanda ripetuta, perché le risposte cambiano.",
     figura: <MiniDomande />,
   },
   {

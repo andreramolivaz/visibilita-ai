@@ -1,7 +1,7 @@
 // Genera i profili di categoria (src/data/profiles/*.json) dallo studio
 // "Visibilità AI per tutte le attività italiane" (21 ottobre 2026).
 // Un profilo per settore, in ordine di numerosità (ISTAT-ASIA 2023 via Eurostat).
-// Tipi: generica, bisogno, specialita, requisito, confronto, nome (+ inglese per chi esporta).
+// Famiglie: generica, bisogno, specialita, requisito, occasione, vicino, confronto, nome (+ inglese per chi esporta).
 import { writeFileSync, mkdirSync } from "node:fs";
 
 const OUT = process.argv[2];
@@ -53,6 +53,115 @@ const AZIONI = {
     { codice: "tripadvisor", titolo: "Aggiorna la scheda TripAdvisor e rispondi alle recensioni", quando: "TripAdvisor tra le fonti citate" },
     { codice: "inglese", titolo: "Versione inglese delle pagine chiave del sito", quando: "domande in inglese senza citazioni" },
   ],
+};
+
+// Le occasioni: chi chiede e perché. Template per gruppo di settori, con
+// l'occasione già dentro e la sua etichetta per il report («per occasione»).
+// Le domande vicino a te: la posizione viene impostata in punti diversi
+// intorno all'attività (centro, nord, est, sud, ovest); {un categoria} e
+// {il categoria} mettono l'articolo giusto.
+const OCCASIONI = {
+  ristorazione: [
+    { testo: "{categoria} a {citta} per una cena con bambini piccoli, con seggiolone", etichetta: "famiglia" },
+    { testo: "{categoria} a {citta} per una cena a due, tranquilla", etichetta: "coppia" },
+    { testo: "{categoria} a {citta} per un pranzo di lavoro veloce, vicino al centro", etichetta: "lavoro" },
+    { testo: "{categoria} a {citta} per un gruppo di dieci amici, sabato sera", etichetta: "gruppo" },
+    { testo: "{categoria} a {citta} consigliata ai turisti, non il solito posto per turisti", etichetta: "turisti" },
+    { testo: "{categoria} a {citta} dove si mangia bene con 20 euro a testa", etichetta: "budget" },
+    { testo: "{categoria} a {citta} per stasera, senza prenotazione", etichetta: "subito" },
+  ],
+  commercio: [
+    { testo: "{categoria} a {citta} dove fare un regalo all'ultimo minuto", etichetta: "regalo" },
+    { testo: "{categoria} a {citta} con personale che consiglia, per chi non se ne intende", etichetta: "consiglio" },
+    { testo: "{categoria} a {citta} con prezzi bassi, per una famiglia", etichetta: "budget" },
+    { testo: "{categoria} a {citta} di fascia alta, prodotti di qualità", etichetta: "premium" },
+    { testo: "{categoria} a {citta} aperto adesso, mi serve oggi", etichetta: "subito" },
+    { testo: "{categoria} a {citta} comodo per chi arriva in auto, con parcheggio", etichetta: "in auto" },
+  ],
+  persona: [
+    { testo: "{categoria} a {citta} per un'occasione importante, matrimonio o cerimonia", etichetta: "cerimonia" },
+    { testo: "{categoria} a {citta} per la prima volta, che metta a proprio agio", etichetta: "prima volta" },
+    { testo: "{categoria} a {citta} per bambini e ragazzi", etichetta: "famiglia" },
+    { testo: "{categoria} a {citta} economico ma serio", etichetta: "budget" },
+    { testo: "{categoria} a {citta} con disponibilità oggi o domani", etichetta: "subito" },
+    { testo: "{categoria} a {citta} aperto in pausa pranzo o dopo le 19", etichetta: "lavoro" },
+  ],
+  casa: [
+    { testo: "{categoria} a {citta} per un intervento urgente, oggi", etichetta: "urgenza" },
+    { testo: "{categoria} a {citta} per una casa appena comprata da ristrutturare", etichetta: "casa nuova" },
+    { testo: "{categoria} a {citta} per un condominio, con fattura e garanzia", etichetta: "condominio" },
+    { testo: "{categoria} a {citta} per un piccolo lavoro, senza spendere una fortuna", etichetta: "budget" },
+    { testo: "{categoria} a {citta} affidabile per una persona anziana che vive sola", etichetta: "anziani" },
+    { testo: "{categoria} a {citta} per un'attività commerciale, con lavori fuori orario", etichetta: "negozio" },
+  ],
+  sanita: [
+    { testo: "{categoria} a {citta} per un'urgenza, visita entro oggi", etichetta: "urgenza" },
+    { testo: "{categoria} a {citta} adatto ai bambini", etichetta: "bambini" },
+    { testo: "{categoria} a {citta} per una persona anziana, con accesso facile", etichetta: "anziani" },
+    { testo: "{categoria} a {citta} convenzionato o con prezzi contenuti", etichetta: "budget" },
+    { testo: "{categoria} a {citta} per una prima visita, che spieghi bene", etichetta: "prima visita" },
+    { testo: "{categoria} a {citta} con orari serali o il sabato, per chi lavora", etichetta: "lavoro" },
+  ],
+  professionista: [
+    { testo: "{categoria} a {citta} per una questione urgente, da sentire entro domani", etichetta: "urgenza" },
+    { testo: "{categoria} a {citta} per una piccola impresa, tariffe chiare", etichetta: "piccola impresa" },
+    { testo: "{categoria} a {citta} per un privato, primo incontro senza impegno", etichetta: "privato" },
+    { testo: "{categoria} a {citta} con esperienza, per una pratica complessa", etichetta: "pratica complessa" },
+    { testo: "{categoria} a {citta} che lavori anche a distanza, in videochiamata", etichetta: "a distanza" },
+    { testo: "{categoria} a {citta} economico ma affidabile", etichetta: "budget" },
+  ],
+  b2b: [
+    { testo: "{categoria} in provincia di {provincia} per un prototipo o piccole serie", etichetta: "piccole serie" },
+    { testo: "{categoria} in provincia di {provincia} per grandi volumi con consegne programmate", etichetta: "grandi volumi" },
+    { testo: "{categoria} in {regione} con tempi rapidi, consegna in una settimana", etichetta: "urgenza" },
+    { testo: "{categoria} in {regione} con certificazioni, per una fornitura a un cliente esigente", etichetta: "certificazioni" },
+    { testo: "{categoria} in provincia di {provincia} per una startup, con preventivo rapido", etichetta: "startup" },
+    { testo: "{categoria} in {regione} che lavori con l'estero, documentazione in inglese", etichetta: "estero" },
+  ],
+  ricettivo: [
+    { testo: "{categoria} a {citta} per una famiglia con bambini, camere comunicanti", etichetta: "famiglia" },
+    { testo: "{categoria} a {citta} per una coppia, un weekend romantico", etichetta: "coppia" },
+    { testo: "{categoria} a {citta} per una trasferta di lavoro, con wifi e fattura", etichetta: "lavoro" },
+    { testo: "{categoria} a {citta} che accetti cani", etichetta: "animali" },
+    { testo: "{categoria} a {citta} economico ma pulito, per una notte", etichetta: "budget" },
+    { testo: "{categoria} a {citta} per un gruppo di otto persone", etichetta: "gruppo" },
+  ],
+  cultura: [
+    { testo: "{categoria} a {citta} da visitare con bambini", etichetta: "famiglia" },
+    { testo: "{categoria} a {citta} per una scolaresca, con visita guidata", etichetta: "scuole" },
+    { testo: "{categoria} a {citta} da fare quando piove", etichetta: "pioggia" },
+    { testo: "{categoria} a {citta} gratis o con biglietto ridotto", etichetta: "budget" },
+    { testo: "{categoria} a {citta} per turisti con due ore libere", etichetta: "turisti" },
+    { testo: "{categoria} a {citta} accessibile in sedia a rotelle", etichetta: "accessibilità" },
+  ],
+};
+
+const VICINO = {
+  locale: [
+    "{categoria} vicino a me a {citta}: quale mi consigli?",
+    "qual è {il categoria} migliore qui vicino, a {citta}?",
+    "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
+    "{categoria} aperta adesso vicino a me, a {citta}",
+    "{categoria} a pochi minuti a piedi da dove sono, a {citta}",
+  ],
+  b2b: [
+    "{categoria} in provincia di {provincia}, il più vicino a {citta}",
+    "{categoria} nei dintorni di {citta} che venga a fare un sopralluogo",
+    "{categoria} in {regione} vicino a {citta} con consegna a breve",
+  ],
+};
+
+// Gruppo di occasioni per profilo.
+const GRUPPO = {
+  ristorante: "ristorazione", bar: "ristorazione",
+  negozio: "commercio", farmacia: "commercio", concessionaria: "commercio",
+  parrucchiere: "persona", estetica: "persona", palestra: "persona", formazione: "persona", fotografo: "persona", viaggi: "persona", altro: "persona",
+  edile: "casa", idraulico: "casa", elettricista: "casa", finiture: "casa", pulizie: "casa", immobiliare: "casa", autofficina: "casa",
+  medico: "sanita", dentista: "sanita", fisioterapista: "sanita", veterinario: "sanita",
+  avvocato: "professionista", commercialista: "professionista", "studio-tecnico": "professionista", assicurazioni: "professionista", professionista: "professionista",
+  ingrosso: "b2b", metalmeccanica: "b2b", manifattura: "b2b", logistica: "b2b", "consulenza-it": "b2b", comunicazione: "b2b",
+  hotel: "ricettivo", bnb: "ricettivo",
+  museo: "cultura",
 };
 
 // I profili. Le domande sono i template dello studio (§3), con i segnaposto
@@ -638,7 +747,11 @@ for (const p of PROFILI) {
     b2b: p.famiglia === "b2b",
     inglese: Boolean(p.inglese),
     generatoDaAI: Boolean(p.generatoDaAI),
-    domande: p.domande,
+    domande: {
+      ...p.domande,
+      occasione: OCCASIONI[GRUPPO[p.id] ?? (p.famiglia === "b2b" ? "b2b" : "persona")],
+      vicino: p.famiglia === "b2b" ? VICINO.b2b : VICINO.locale,
+    },
     fonti: p.fonti,
     metriche: p.metriche,
     azioni,

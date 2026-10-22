@@ -9,13 +9,6 @@ export async function GET(_req: Request, ctx: RouteContext<"/report/[id]/pdf">) 
   const { id } = await ctx.params;
   const report = await caricaReport(id);
   if (!report) return new Response("Report non trovato", { status: 404 });
-  if (report.piano === "gratuito") {
-    return new Response("Il PDF del report è nel piano Base. Attivalo dalla pagina del report.", {
-      status: 403,
-      headers: { "content-type": "text/plain; charset=utf-8" },
-    });
-  }
-
   const documento = createElement(ReportPdf, { report }) as unknown as ReactElement<DocumentProps>;
   const pdf = await renderToBuffer(documento);
   const nome = `visibilita-ai-${report.attivita.nome}-${report.data}.pdf`

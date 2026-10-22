@@ -12,6 +12,10 @@ export interface VoceStorico {
   data: string;
   punteggio: number;
   href: string;
+  /** Com'era fatta la scansione. */
+  domande?: number;
+  motori?: number;
+  ripetizioni?: number;
 }
 
 export interface DatiArea {
@@ -25,7 +29,8 @@ export interface DatiArea {
   prossimaScansione?: string;
   scansioniExtra: number;
   storico: VoceStorico[];
-  domande: { testo: string; modificabile?: boolean }[];
+  /** Le famiglie del set di domande, con quante domande ciascuna: il testo resta nel metodo. */
+  famiglie: { nome: string; domande: number }[];
   concorrentiSeguiti: string[];
 }
 
@@ -119,8 +124,8 @@ export function AreaPersonale({ dati, esci = true }: { dati: DatiArea; esci?: bo
                       <Link href={v.href} className="font-medium hover:underline">
                         Report del {dataIt(v.data)}
                       </Link>
-                      <p className="text-sm text-muted">
-                        {p.domande} domande · 6 assistenti · 3 ripetizioni
+                      <p className="tabular text-sm text-muted">
+                        {v.domande ?? p.domande} domande · {v.motori ?? 6} assistenti · {v.ripetizioni ?? p.ripetizioni} ripetizioni
                       </p>
                     </div>
                     <div className="flex items-center gap-4">
@@ -144,20 +149,16 @@ export function AreaPersonale({ dati, esci = true }: { dati: DatiArea; esci?: bo
           {/* Domande e concorrenti */}
           <div className="grid gap-6 md:grid-cols-2">
             <Scheda>
-              <h2 className="font-semibold">Le domande del tuo set</h2>
-              <p className="mt-1 text-sm text-muted">{dati.domande.length} domande; una la scegli tu.</p>
-              <ol className="mt-3 space-y-1.5 text-sm">
-                {dati.domande.slice(0, 6).map((d, i) => (
-                  <li key={d.testo} className="flex gap-2">
-                    <span className="tabular text-faint">{i + 1}.</span>
-                    <span className={d.modificabile ? "font-medium" : ""}>
-                      {d.testo}
-                      {d.modificabile && <span className="ml-2 text-xs text-accent">la tua</span>}
-                    </span>
+              <h2 className="font-semibold">Il tuo set di domande</h2>
+              <p className="mt-1 text-sm text-muted">Per famiglia. Le domande restano le stesse da una scansione all&apos;altra, così il confronto nel tempo regge; il testo è nel report, domanda per domanda.</p>
+              <ul className="mt-3 space-y-1.5 text-sm">
+                {dati.famiglie.map((f) => (
+                  <li key={f.nome} className="flex items-baseline justify-between gap-3">
+                    <span>{f.nome}</span>
+                    <span className="tabular text-muted">{f.domande}</span>
                   </li>
                 ))}
-                {dati.domande.length > 6 && <li className="text-xs text-muted">… e altre {dati.domande.length - 6}.</li>}
-              </ol>
+              </ul>
             </Scheda>
             <Scheda>
               <h2 className="font-semibold">Concorrenti seguiti</h2>

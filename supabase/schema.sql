@@ -89,7 +89,7 @@ create index if not exists test_gratuiti_place_idx on test_gratuiti (google_plac
 -- `dati` è la Scansione senza le celle (profilo, domande, segnali, recensioni).
 create table if not exists scansioni (
   id text primary key,
-  stato text not null check (stato in ('in corso', 'in attesa', 'completata')),
+  stato text not null check (stato in ('in attesa di pagamento', 'in corso', 'in attesa', 'completata')),
   email text,
   dati jsonb not null,
   creata_il timestamptz not null default now(),

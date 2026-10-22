@@ -41,6 +41,39 @@
     ],
     "nome": [
       "{nome} architetto {citta} recensioni"
+    ],
+    "occasione": [
+      {
+        "testo": "{categoria} a {citta} per una questione urgente, da sentire entro domani",
+        "etichetta": "urgenza"
+      },
+      {
+        "testo": "{categoria} a {citta} per una piccola impresa, tariffe chiare",
+        "etichetta": "piccola impresa"
+      },
+      {
+        "testo": "{categoria} a {citta} per un privato, primo incontro senza impegno",
+        "etichetta": "privato"
+      },
+      {
+        "testo": "{categoria} a {citta} con esperienza, per una pratica complessa",
+        "etichetta": "pratica complessa"
+      },
+      {
+        "testo": "{categoria} a {citta} che lavori anche a distanza, in videochiamata",
+        "etichetta": "a distanza"
+      },
+      {
+        "testo": "{categoria} a {citta} economico ma affidabile",
+        "etichetta": "budget"
+      }
+    ],
+    "vicino": [
+      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "qual è {il categoria} migliore qui vicino, a {citta}?",
+      "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
+      "{categoria} aperta adesso vicino a me, a {citta}",
+      "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
     ]
   },
   "fonti": [

@@ -34,8 +34,8 @@ async function Contenuto({ params, searchParams }: PageProps<"/report/[id]">) {
     <>
       {nuovo && (
         <p className="no-print mb-6 rounded-lg bg-accent-soft px-4 py-3 text-sm text-accent-ink">
-          Il tuo test gratuito è pronto: {report.domande} domande, {report.motori.length} assistenti, {report.ripetizioni} ripetizioni.
-          {vero ? " Salva il link: è il tuo report." : " In questa anteprima i dati sono di esempio: la scansione vera arriva con il collegamento ai motori."}
+          Il tuo report è pronto: {report.domande} domande, {report.motori.length} assistenti, {report.ripetizioni} ripetizioni.
+          {vero ? " Salva il link: è il tuo report, e lo ritrovi nella tua area con la stessa email." : " In questa dimostrazione i dati sono di esempio: la scansione vera arriva con il collegamento agli assistenti."}
         </p>
       )}
       <Report report={report} abbonato={abbonato === "1"} />

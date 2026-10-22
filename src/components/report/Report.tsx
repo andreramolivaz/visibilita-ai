@@ -10,16 +10,20 @@ import { InTrentaSecondi } from "./InTrentaSecondi";
 import { Concorrenti } from "./Concorrenti";
 import { Territorio } from "./Territorio";
 import { NoteTecniche, periodoScansione } from "./NoteTecniche";
-import { letturaAssistenti, letturaAzioni, letturaConcorrenti, letturaDicono, letturaFonti, letturaParole, letturaTerritorio, letturaTipi } from "@/lib/letture";
+import { Telescopio } from "./Telescopio";
+import { letturaAssistenti, letturaAzioni, letturaConcorrenti, letturaDicono, letturaFonti, letturaParole, letturaTelescopio, letturaTerritorio, letturaTipi } from "@/lib/letture";
 import { punteggioPerMotore } from "@/lib/stats";
 
-const NOME_TIPO: Record<TipoDomanda, { titolo: string; esempio: string }> = {
+export const NOME_TIPO: Record<TipoDomanda, { titolo: string; esempio: string }> = {
   generica: { titolo: "Generiche", esempio: "«miglior pizzeria a Bergamo»" },
   bisogno: { titolo: "Per bisogno", esempio: "«aperta la domenica», «stasera»" },
   specialita: { titolo: "Per specialità", esempio: "«forno a legna», «napoletana»" },
   requisito: { titolo: "Per requisito", esempio: "«con dehors», «con parcheggio»" },
+  occasione: { titolo: "Per occasione", esempio: "«con bambini», «pranzo di lavoro»" },
+  vicino: { titolo: "Vicino a te", esempio: "«vicino a me», posizione impostata" },
   confronto: { titolo: "Di confronto", esempio: "«meglio X o Y?»" },
   nome: { titolo: "Sul nome", esempio: "«com'è la Pizzeria Da Gino?»" },
+  inglese: { titolo: "In inglese", esempio: "«best … in Bergamo»" },
 };
 
 const TONO: Record<string, { testo: string; tono: "accento" | "neutro" | "errore" }> = {
@@ -39,36 +43,8 @@ function Blocco({ titolo, lettura, children, id }: { titolo: string; lettura?: s
   );
 }
 
-/** Nel test gratuito, al posto delle parole: cosa arriva con il Base. */
-function NelBase() {
-  const voci = [
-    "Le parole che gli assistenti usano quando consigliano, e quali ti mancano",
-    "15 domande invece di 8, con quelle di confronto e sui requisiti; 3 ripetizioni in 3 giorni",
-    "Scansione ogni mese, andamento del punteggio, PDF da inviare",
-  ];
-  return (
-    <div className="rounded-2xl border border-accent bg-accent-soft/40 p-5 sm:p-6">
-      <p className="text-xs font-semibold text-accent-ink">Nel piano Base trovi anche</p>
-      <ul className="mt-2 space-y-1.5 text-[15px]">
-        {voci.map((v) => (
-          <li key={v} className="flex gap-2">
-            <span className="text-accent" aria-hidden="true">
-              ✓
-            </span>
-            {v}
-          </li>
-        ))}
-      </ul>
-      <a href="#abbonamento" className="mt-3 inline-block text-sm font-semibold text-accent underline underline-offset-2">
-        Attiva il piano Base, 29 € al mese
-      </a>
-    </div>
-  );
-}
-
 export function Report({ report, abbonato = false }: { report: ReportT; abbonato?: boolean }) {
   const r = report;
-  const gratuito = r.piano === "gratuito";
   const parziali = punteggioPerMotore(r.righe, r.ripetizioni);
   const guadagno = r.azioni.reduce((acc, a) => acc + (a.impattoStimato ?? 0), 0);
   const totaleRisposte = r.domande * r.motori.length * r.ripetizioni;
@@ -93,11 +69,9 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             </p>
           </div>
           <div className="no-print flex gap-2">
-            {!gratuito && (
-              <Bottone href={`/report/${r.id}/pdf`} secondario className="!w-auto !px-4 !py-2 !text-sm" target="_blank">
-                Scarica il PDF
-              </Bottone>
-            )}
+            <Bottone href={`/report/${r.id}/pdf`} secondario className="!w-auto !px-4 !py-2 !text-sm" target="_blank">
+              Scarica il PDF
+            </Bottone>
             <CopiaLink />
           </div>
         </div>
@@ -107,6 +81,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
             ["#azioni", "Cosa fare"],
             ["#concorrenti", "Concorrenti"],
             ["#dove", "Dove ti trovano"],
+            ["#telescopio", "Zoom e occasioni"],
             ["#fonti", "Fonti e parole"],
             ["#dicono", "Cosa dicono"],
             ["#note", "Note tecniche"],
@@ -201,12 +176,20 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
                 />
               ))}
             </div>
-            <p className="mt-2 text-xs text-muted">Risposte in cui compari, sul totale delle risposte di quel tipo. Nelle domande di confronto e sul nome compari quasi per forza: non entrano nel punteggio.</p>
+            <p className="mt-2 text-xs text-muted">Risposte in cui compari, sul totale delle risposte di quella famiglia. Nelle domande di confronto e sul nome compari quasi per forza: non entrano nel punteggio.</p>
           </div>
         </div>
-        <div className="mt-8">
-          <h3 className="font-semibold">Domanda per domanda</h3>
-          <p className="mt-1 text-sm text-muted">Una cella per ogni domanda e assistente: la posizione in cui ti mettono e quante volte su {r.ripetizioni}. Più scura, più in alto.</p>
+      </Blocco>
+
+      {/* Il telescopio: zoom, intorno a te, occasioni, formulazione */}
+      <Blocco id="telescopio" titolo="Da lontano a vicino, e per chi" lettura={letturaTelescopio(r)}>
+        <Telescopio report={r} />
+      </Blocco>
+
+      {/* Mappa */}
+      <Blocco id="mappa" titolo="Domanda per domanda">
+        <div>
+          <p className="text-sm text-muted">Una cella per ogni domanda e assistente: la posizione in cui ti mettono e quante volte su {r.ripetizioni}. Più scura, più in alto. Le domande sono raggruppate per famiglia.</p>
           <div className="mt-3">
             <Heatmap righe={r.righe} motori={r.motori} ripetizioni={r.ripetizioni} />
           </div>
@@ -237,30 +220,22 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
           </div>
           <div>
             <h2 className="text-xl font-semibold sm:text-2xl">Le parole che usano</h2>
-            {gratuito ? (
-              <div className="mt-4">
-                <NelBase />
-              </div>
-            ) : (
-              <>
-                <p className="tabular mt-1.5 text-[16px] leading-snug">{letturaParole(r)}</p>
-                <div className="mt-4">
-                  {r.termini.map((t) => (
-                    <Barra
-                      key={t.termine}
-                      etichetta={t.termine}
-                      valore={t.volte}
-                      massimo={r.termini[0]?.volte ?? 1}
-                      testo={`${t.volte}`}
-                      sotto={t.volteTue !== undefined ? `nelle tue recensioni: ${t.volteTue}` : undefined}
-                      accento={t.ceLHai}
-                      stato={t.ceLHai ? { testo: "ce l'hai", tono: "accento" } : { testo: "manca", tono: "errore" }}
-                    />
-                  ))}
-                </div>
-                <p className="mt-2 text-xs text-muted">Volte in cui il termine compare nelle {totaleRisposte} risposte della tua categoria, e quante nelle tue recensioni Google.</p>
-              </>
-            )}
+            <p className="tabular mt-1.5 text-[16px] leading-snug">{letturaParole(r)}</p>
+            <div className="mt-4">
+              {r.termini.map((t) => (
+                <Barra
+                  key={t.termine}
+                  etichetta={t.termine}
+                  valore={t.volte}
+                  massimo={r.termini[0]?.volte ?? 1}
+                  testo={`${t.volte}`}
+                  sotto={t.volteTue !== undefined ? `nelle tue recensioni: ${t.volteTue}` : undefined}
+                  accento={t.ceLHai}
+                  stato={t.ceLHai ? { testo: "ce l'hai", tono: "accento" } : { testo: "manca", tono: "errore" }}
+                />
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-muted">Volte in cui il termine compare nelle {totaleRisposte} risposte della tua categoria, e quante nelle tue recensioni Google.</p>
           </div>
         </div>
       </section>

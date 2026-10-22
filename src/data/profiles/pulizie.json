@@ -40,6 +40,39 @@
     ],
     "nome": [
       "{nome} pulizie {citta} recensioni"
+    ],
+    "occasione": [
+      {
+        "testo": "{categoria} a {citta} per un intervento urgente, oggi",
+        "etichetta": "urgenza"
+      },
+      {
+        "testo": "{categoria} a {citta} per una casa appena comprata da ristrutturare",
+        "etichetta": "casa nuova"
+      },
+      {
+        "testo": "{categoria} a {citta} per un condominio, con fattura e garanzia",
+        "etichetta": "condominio"
+      },
+      {
+        "testo": "{categoria} a {citta} per un piccolo lavoro, senza spendere una fortuna",
+        "etichetta": "budget"
+      },
+      {
+        "testo": "{categoria} a {citta} affidabile per una persona anziana che vive sola",
+        "etichetta": "anziani"
+      },
+      {
+        "testo": "{categoria} a {citta} per un'attività commerciale, con lavori fuori orario",
+        "etichetta": "negozio"
+      }
+    ],
+    "vicino": [
+      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "qual è {il categoria} migliore qui vicino, a {citta}?",
+      "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
+      "{categoria} aperta adesso vicino a me, a {citta}",
+      "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
     ]
   },
   "fonti": [

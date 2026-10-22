@@ -25,7 +25,16 @@ export interface Cella {
   analisi?: AnalisiCella;
 }
 
-export type StatoScansione = "in corso" | "in attesa" | "completata";
+/** «in attesa di pagamento»: creata, parte quando Stripe conferma; «in attesa»: aspetta il giorno della ripetizione successiva. */
+export type StatoScansione = "in attesa di pagamento" | "in corso" | "in attesa" | "completata";
+
+export interface PagamentoScansione {
+  /** Sessione Stripe Checkout. */
+  sessioneId?: string;
+  /** Importo in euro, IVA esclusa. */
+  importo: number;
+  pagatoIl?: string;
+}
 
 export interface Scansione {
   id: string;
@@ -47,6 +56,8 @@ export interface Scansione {
   /** Senza motori configurati la scansione è una dimostrazione con il report di esempio. */
   simulata?: boolean;
   reportId?: string;
+  /** Report singolo: il pagamento che sblocca la scansione. */
+  pagamento?: PagamentoScansione;
 }
 
 /** Una domanda, come la vede la pagina di scansione: il tipo, e il testo solo se l'ha scritta il titolare. */

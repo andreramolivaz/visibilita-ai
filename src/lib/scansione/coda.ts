@@ -1,5 +1,6 @@
 import type { Domanda, EngineId, Piano, ProfiloAttivita, SegnaliProfilo } from "../types";
 import { motoriAttivi } from "../engines";
+import { PIANI, REPORT_SINGOLO } from "../prezzi";
 import { interroga, motoriConfigurati } from "../motori";
 import { analizzaRisposta } from "../analisi/riconoscimento";
 import { costruisciReport } from "../analisi/costruisci";
@@ -21,8 +22,10 @@ export function nuovoId() {
   return `scan-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
+/** Ripetizioni di ogni domanda: report singolo 2 nella stessa giornata; abbonamenti dal listino, in giorni diversi. */
 export function ripetizioniPer(piano: Piano) {
-  return piano === "gratuito" ? 2 : 3;
+  if (piano === "singolo" || piano === "gratuito") return REPORT_SINGOLO.ripetizioni;
+  return PIANI.find((p) => p.id === piano)?.ripetizioni ?? 3;
 }
 
 export async function creaScansione(x: {
@@ -32,6 +35,8 @@ export async function creaScansione(x: {
   segnali?: SegnaliProfilo;
   recensioni?: string[];
   email?: string;
+  /** Parte solo dopo il pagamento (report singolo con Stripe attivo). */
+  attesaPagamento?: boolean;
 }): Promise<Scansione> {
   const configurati = motoriConfigurati();
   const simulata = configurati.length === 0;
@@ -39,10 +44,11 @@ export async function creaScansione(x: {
   const ripetizioni = ripetizioniPer(x.piano);
   const ora = new Date();
   const celle: Cella[] = [];
+  const subito = x.piano === "singolo" || x.piano === "gratuito";
   if (!simulata) {
     for (let r = 1; r <= ripetizioni; r++) {
-      // Test gratuito: tutto subito. Abbonamento: una ripetizione al giorno.
-      const scadenza = x.piano === "gratuito" ? ora : new Date(ora.getTime() + (r - 1) * GIORNO_MS);
+      // Report singolo: tutto subito. Abbonamento: una ripetizione al giorno.
+      const scadenza = subito ? ora : new Date(ora.getTime() + (r - 1) * GIORNO_MS);
       for (const d of x.domande) for (const m of motori) celle.push({ domandaId: d.id, motore: m, ripetizione: r, eseguiDopo: scadenza.toISOString(), stato: "da fare" });
     }
   }
@@ -58,12 +64,27 @@ export async function creaScansione(x: {
     recensioni: x.recensioni ?? [],
     concorrentiNoti: (x.segnali?.concorrenti ?? []).map((c) => c.nome),
     celle,
-    stato: simulata ? "completata" : "in corso",
+    stato: x.attesaPagamento ? "in attesa di pagamento" : simulata ? "completata" : "in corso",
     creataIl: ora.toISOString(),
     aggiornataIl: ora.toISOString(),
     simulata,
+    pagamento: x.attesaPagamento ? { importo: REPORT_SINGOLO.prezzo } : undefined,
   };
   await deposito().salvaScansione(s);
+  return s;
+}
+
+/** Il pagamento è arrivato: la scansione può partire (o, se dimostrativa, è già completa). */
+export async function segnaPagata(id: string, sessioneId?: string): Promise<Scansione | null> {
+  const dep = deposito();
+  const s = await dep.leggiScansione(id);
+  if (!s) return null;
+  if (s.stato !== "in attesa di pagamento") return s;
+  const ora = new Date().toISOString();
+  s.pagamento = { ...(s.pagamento ?? { importo: REPORT_SINGOLO.prezzo }), sessioneId: sessioneId ?? s.pagamento?.sessioneId, pagatoIl: ora };
+  s.stato = s.simulata ? "completata" : "in corso";
+  s.aggiornataIl = ora;
+  await dep.aggiornaStato(s);
   return s;
 }
 
@@ -108,7 +129,7 @@ export async function avanza(id: string, opzioni: { maxCelle?: number; budgetMs?
   const dep = deposito();
   const s = await dep.leggiScansione(id);
   if (!s) return null;
-  if (s.simulata || s.stato === "completata") return { ...avanzamentoDi(s), restano: 0 };
+  if (s.simulata || s.stato === "completata" || s.stato === "in attesa di pagamento") return { ...avanzamentoDi(s), restano: 0 };
 
   const partenza = Date.now();
   const ora = new Date().toISOString();
@@ -119,7 +140,7 @@ export async function avanza(id: string, opzioni: { maxCelle?: number; budgetMs?
 
   const q = (c: Cella) => {
     const d = s.domande.find((x) => x.id === c.domandaId)!;
-    return { domanda: d.testo, citta: s.attivita.citta, regione: s.attivita.regione, coordinate: s.attivita.coordinate, lingua: "it" as const };
+    return { domanda: d.testo, citta: s.attivita.citta, regione: s.attivita.regione, coordinate: coordinateDi(s.attivita.coordinate, d.punto), lingua: "it" as const };
   };
 
   await Promise.all(
@@ -154,6 +175,15 @@ export async function avanza(id: string, opzioni: { maxCelle?: number; budgetMs?
   }
   await dep.aggiornaStato(s);
   return { ...avanzamentoDi(s), restano: restanoScadute };
+}
+
+/** Le coordinate del punto in cui impostare la posizione: l'indirizzo spostato di `nordM` e `estM` metri. */
+export function coordinateDi(base: { lat: number; lng: number } | undefined, punto?: { nordM: number; estM: number }): { lat: number; lng: number } | undefined {
+  if (!base) return undefined;
+  if (!punto) return base;
+  const lat = base.lat + punto.nordM / 111_320;
+  const lng = base.lng + punto.estM / (111_320 * Math.cos((base.lat * Math.PI) / 180));
+  return { lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)) };
 }
 
 /** Le scansioni con celle scadute, per il passaggio giornaliero. */

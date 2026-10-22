@@ -13,9 +13,14 @@ const NOME_TIPO: Record<TipoDomanda, string> = {
   bisogno: "per bisogno",
   specialita: "per specialità",
   requisito: "per requisito",
+  occasione: "per occasione",
+  vicino: "vicino a te",
   confronto: "di confronto",
   nome: "sul nome",
+  inglese: "in inglese",
 };
+
+const NOME_ZOOM: Record<string, string> = { citta: "in città", zona: "in zona", vicino: "vicino a te", provincia: "in provincia", regione: "in regione", nazionale: "in Italia" };
 
 const mln = (x: number) => x.toLocaleString("it-IT", { maximumFractionDigits: 1 });
 
@@ -54,6 +59,21 @@ export function letturaTipi(r: Report): string {
   const min = conQuota.reduce((a, b) => (b.quota < a.quota ? b : a));
   if (max === min) return `Domande ${NOME_TIPO[max.tipo]}: compari nel ${percentuale(max.quota)} delle risposte.`;
   return `Domande ${NOME_TIPO[max.tipo]}: ${percentuale(max.quota)} delle risposte. Domande ${NOME_TIPO[min.tipo]}: ${percentuale(min.quota)}.`;
+}
+
+export function letturaTelescopio(r: Report): string {
+  const zoom = (r.perZoom ?? []).map((z) => ({ ...z, quota: z.totale ? z.comparse / z.totale : 0 }));
+  if (zoom.length === 0) return "";
+  const max = zoom.reduce((a, b) => (b.quota > a.quota ? b : a));
+  const min = zoom.reduce((a, b) => (b.quota < a.quota ? b : a));
+  const parti = [max === min ? `Compari nel ${percentuale(max.quota)} delle risposte ${NOME_ZOOM[max.zoom]}` : `Compari nel ${percentuale(max.quota)} delle risposte ${NOME_ZOOM[max.zoom]}, nel ${percentuale(min.quota)} ${NOME_ZOOM[min.zoom]}`];
+  const punti = r.intorno?.punti ?? [];
+  if (punti.length) {
+    const migliore = punti.reduce((a, b) => (b.comparse / Math.max(1, b.totale) > a.comparse / Math.max(1, a.totale) ? b : a));
+    const peggiore = punti.reduce((a, b) => (b.comparse / Math.max(1, b.totale) < a.comparse / Math.max(1, a.totale) ? b : a));
+    if (migliore !== peggiore) parti.push(`intorno a te, da ${migliore.comparse} su ${migliore.totale} a ${migliore.punto.etichetta === "centro" ? "casa tua" : migliore.punto.etichetta} a ${peggiore.comparse} su ${peggiore.totale} a ${peggiore.punto.etichetta}`);
+  }
+  return `${parti.join("; ")}.`;
 }
 
 export function letturaFonti(r: Report): string {

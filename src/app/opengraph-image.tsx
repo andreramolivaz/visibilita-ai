@@ -37,7 +37,7 @@ export default function Image() {
               Quando un cliente chiede a ChatGPT, fa il tuo nome?
             </div>
             <div style={{ fontSize: 28, color: "#5b6661", maxWidth: 760 }}>
-              In 60 secondi sai se gli assistenti AI consigliano te o i tuoi concorrenti. Test gratuito.
+              Scopri se gli assistenti AI consigliano te o i tuoi concorrenti, e cosa fare.
             </div>
           </div>
         </div>

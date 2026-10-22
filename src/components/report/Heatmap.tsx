@@ -1,5 +1,23 @@
 import { engine } from "@/lib/engines";
-import type { RigaDomanda, EngineId, Posizione } from "@/lib/types";
+import type { RigaDomanda, EngineId, Posizione, TipoDomanda } from "@/lib/types";
+import { TIPI_DOMANDA } from "@/lib/types";
+
+const NOME_FAMIGLIA: Record<TipoDomanda, string> = {
+  generica: "Generiche",
+  bisogno: "Per bisogno",
+  specialita: "Per specialità",
+  requisito: "Per requisito",
+  occasione: "Per occasione",
+  vicino: "Vicino a te",
+  confronto: "Di confronto",
+  nome: "Sul nome",
+  inglese: "In inglese",
+};
+
+/** Le righe raggruppate per famiglia, nell'ordine delle famiglie. */
+function perFamiglia(righe: RigaDomanda[]): { tipo: TipoDomanda; righe: RigaDomanda[] }[] {
+  return TIPI_DOMANDA.map((tipo) => ({ tipo, righe: righe.filter((r) => r.domanda.tipo === tipo) })).filter((g) => g.righe.length > 0);
+}
 
 /**
  * Mappa domanda × assistente: una cella per risposta, colore per posizione
@@ -35,9 +53,16 @@ export function Heatmap({ righe, motori, ripetizioni }: { righe: RigaDomanda[]; 
       </div>
 
       <ol className="space-y-2 md:space-y-1">
-        {righe.map((riga) => (
+        {perFamiglia(righe).flatMap((g) => [
+          <li key={`f-${g.tipo}`} className="pt-4 text-[13px] font-semibold text-muted first:pt-0" aria-label={`Famiglia: ${NOME_FAMIGLIA[g.tipo]}`}>
+            {NOME_FAMIGLIA[g.tipo]} <span className="tabular font-normal text-faint">· {g.righe.length}</span>
+          </li>,
+          ...g.righe.map((riga) => (
           <li key={riga.domanda.id} className="md:grid md:grid-cols-[minmax(0,1.6fr)_repeat(6,minmax(0,1fr))] md:items-center md:gap-1">
-            <span className="mb-1 block text-[15px] md:mb-0 md:pr-3 md:text-sm">{riga.domanda.testo}</span>
+            <span className="mb-1 block text-[15px] md:mb-0 md:pr-3 md:text-sm">
+              {riga.domanda.testo}
+              {riga.domanda.punto && <span className="ml-1.5 text-[11px] text-faint">· {riga.domanda.punto.etichetta === "centro" ? "da te" : riga.domanda.punto.etichetta}</span>}
+            </span>
             <div className="grid grid-cols-6 gap-1 md:contents">
               {riga.celle.map((c) => {
                 const volte = c.volte ?? Number(c.frequenza.split(" ")[0]);
@@ -77,7 +102,8 @@ export function Heatmap({ righe, motori, ripetizioni }: { righe: RigaDomanda[]; 
               ))}
             </div>
           </li>
-        ))}
+          )),
+        ])}
       </ol>
 
       <figcaption className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted">

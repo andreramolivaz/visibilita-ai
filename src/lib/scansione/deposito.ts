@@ -16,6 +16,8 @@ export interface Deposito {
   scansioniDaAvanzare(ora: string): Promise<string[]>;
   salvaReport(r: Report, email?: string): Promise<void>;
   leggiReport(id: string): Promise<Report | null>;
+  /** I report di un'email, dal più recente: l'area personale. */
+  reportPerEmail(email: string): Promise<Report[]>;
   testGratuitiOggi(): Promise<number>;
   ultimoTestGratuito(placeId: string): Promise<{ quando: string; scansioneId: string } | null>;
   registraTestGratuito(x: { placeId?: string; nome: string; citta: string; scansioneId: string }): Promise<void>;
@@ -33,10 +35,11 @@ interface TestGratuito {
 interface Memoria {
   scansioni: Map<string, Scansione>;
   report: Map<string, Report>;
+  emailReport: Map<string, string>;
   test: TestGratuito[];
 }
 const g = globalThis as unknown as { __vai?: Memoria };
-const mem: Memoria = (g.__vai ??= { scansioni: new Map<string, Scansione>(), report: new Map<string, Report>(), test: [] });
+const mem: Memoria = (g.__vai ??= { scansioni: new Map<string, Scansione>(), report: new Map<string, Report>(), emailReport: new Map<string, string>(), test: [] });
 
 const memoria: Deposito = {
   async salvaScansione(s) {
@@ -57,13 +60,20 @@ const memoria: Deposito = {
     return mem.scansioni.get(id) ?? null;
   },
   async scansioniDaAvanzare(ora) {
-    return [...mem.scansioni.values()].filter((s) => s.stato !== "completata" && s.celle.some((c) => c.stato === "da fare" && c.eseguiDopo <= ora)).map((s) => s.id);
+    return [...mem.scansioni.values()]
+      .filter((s) => s.stato !== "completata" && s.stato !== "in attesa di pagamento" && s.celle.some((c) => c.stato === "da fare" && c.eseguiDopo <= ora))
+      .map((s) => s.id);
   },
-  async salvaReport(r) {
+  async salvaReport(r, email) {
     mem.report.set(r.id, r);
+    if (email) mem.emailReport.set(r.id, email.toLowerCase());
   },
   async leggiReport(id) {
     return mem.report.get(id) ?? null;
+  },
+  async reportPerEmail(email) {
+    const e = email.toLowerCase();
+    return [...mem.report.values()].filter((r) => mem.emailReport.get(r.id) === e).sort((a, b) => (a.data < b.data ? 1 : -1));
   },
   async testGratuitiOggi() {
     const oggi = new Date().toISOString().slice(0, 10);
@@ -113,7 +123,10 @@ function supabase(): Deposito {
     },
     async scansioniDaAvanzare(ora) {
       const { data } = await db.from("celle").select("scansione_id").eq("stato", "da fare").lte("esegui_dopo", ora).returns<{ scansione_id: string }[]>();
-      return [...new Set((data ?? []).map((r) => r.scansione_id))];
+      const ids = [...new Set((data ?? []).map((r) => r.scansione_id))];
+      if (ids.length === 0) return [];
+      const { data: pronte } = await db.from("scansioni").select("id").in("id", ids).not("stato", "in", '("in attesa di pagamento","completata")').returns<{ id: string }[]>();
+      return (pronte ?? []).map((r) => r.id);
     },
     async salvaReport(r, email) {
       await db.from("report").upsert({ id: r.id, email: email ?? null, punteggio: r.punteggio, verdetto: r.verdetto, dati: r });
@@ -121,6 +134,10 @@ function supabase(): Deposito {
     async leggiReport(id) {
       const { data } = await db.from("report").select("dati").eq("id", id).maybeSingle<{ dati: Report }>();
       return data?.dati ?? null;
+    },
+    async reportPerEmail(email) {
+      const { data } = await db.from("report").select("dati").ilike("email", email).order("creato_il", { ascending: false }).returns<{ dati: Report }[]>();
+      return (data ?? []).map((r) => r.dati);
     },
     async testGratuitiOggi() {
       const inizio = new Date();

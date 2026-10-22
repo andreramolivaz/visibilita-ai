@@ -43,6 +43,37 @@
     ],
     "inglese": [
       "3PL logistics provider in {regione}, Italy, with bonded warehouse"
+    ],
+    "occasione": [
+      {
+        "testo": "{categoria} in provincia di {provincia} per un prototipo o piccole serie",
+        "etichetta": "piccole serie"
+      },
+      {
+        "testo": "{categoria} in provincia di {provincia} per grandi volumi con consegne programmate",
+        "etichetta": "grandi volumi"
+      },
+      {
+        "testo": "{categoria} in {regione} con tempi rapidi, consegna in una settimana",
+        "etichetta": "urgenza"
+      },
+      {
+        "testo": "{categoria} in {regione} con certificazioni, per una fornitura a un cliente esigente",
+        "etichetta": "certificazioni"
+      },
+      {
+        "testo": "{categoria} in provincia di {provincia} per una startup, con preventivo rapido",
+        "etichetta": "startup"
+      },
+      {
+        "testo": "{categoria} in {regione} che lavori con l'estero, documentazione in inglese",
+        "etichetta": "estero"
+      }
+    ],
+    "vicino": [
+      "{categoria} in provincia di {provincia}, il più vicino a {citta}",
+      "{categoria} nei dintorni di {citta} che venga a fare un sopralluogo",
+      "{categoria} in {regione} vicino a {citta} con consegna a breve"
     ]
   },
   "fonti": [

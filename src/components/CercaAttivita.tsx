@@ -35,7 +35,7 @@ export function CercaAttivita({ grande = false, id }: { grande?: boolean; id?: s
         className={grande ? "sm:py-3.5 sm:text-lg" : ""}
       />
       <Bottone type="submit" className={grande ? "sm:px-6 sm:py-3.5 sm:text-lg" : ""}>
-        Fai il test gratis
+        Avvia il report
       </Bottone>
     </form>
   );

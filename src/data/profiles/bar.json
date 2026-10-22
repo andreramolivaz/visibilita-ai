@@ -41,6 +41,43 @@
     ],
     "nome": [
       "{nome} {citta} recensioni, com'è?"
+    ],
+    "occasione": [
+      {
+        "testo": "{categoria} a {citta} per una cena con bambini piccoli, con seggiolone",
+        "etichetta": "famiglia"
+      },
+      {
+        "testo": "{categoria} a {citta} per una cena a due, tranquilla",
+        "etichetta": "coppia"
+      },
+      {
+        "testo": "{categoria} a {citta} per un pranzo di lavoro veloce, vicino al centro",
+        "etichetta": "lavoro"
+      },
+      {
+        "testo": "{categoria} a {citta} per un gruppo di dieci amici, sabato sera",
+        "etichetta": "gruppo"
+      },
+      {
+        "testo": "{categoria} a {citta} consigliata ai turisti, non il solito posto per turisti",
+        "etichetta": "turisti"
+      },
+      {
+        "testo": "{categoria} a {citta} dove si mangia bene con 20 euro a testa",
+        "etichetta": "budget"
+      },
+      {
+        "testo": "{categoria} a {citta} per stasera, senza prenotazione",
+        "etichetta": "subito"
+      }
+    ],
+    "vicino": [
+      "{categoria} vicino a me a {citta}: quale mi consigli?",
+      "qual è {il categoria} migliore qui vicino, a {citta}?",
+      "cerco {un categoria} nelle vicinanze, a {citta}, con buone recensioni",
+      "{categoria} aperta adesso vicino a me, a {citta}",
+      "{categoria} a pochi minuti a piedi da dove sono, a {citta}"
     ]
   },
   "fonti": [

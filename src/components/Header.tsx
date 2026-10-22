@@ -4,9 +4,8 @@ import { Bottone } from "./ui";
 
 const VOCI = [
   { href: "/report/esempio", testo: "Report di esempio" },
-  { href: "/metodo", testo: "Metodo" },
   { href: "/prezzi", testo: "Prezzi" },
-  { href: "/agenzie", testo: "Agenzie" },
+  { href: "/metodo", testo: "Metodo" },
 ];
 
 export function Header() {
@@ -24,7 +23,7 @@ export function Header() {
             Accedi
           </Link>
           <Bottone href="/#test" className="!w-auto !px-4 !py-2 !text-[15px]">
-            Fai il test gratis
+            Avvia il report
           </Bottone>
         </nav>
         <nav className="flex items-center gap-3.5 text-sm text-muted md:hidden" aria-label="Principale">
@@ -35,7 +34,7 @@ export function Header() {
             Accedi
           </Link>
           <Bottone href="/#test" className="!w-auto !px-3 !py-1.5 !text-[13px]">
-            Test gratis
+            Report
           </Bottone>
         </nav>
       </div>

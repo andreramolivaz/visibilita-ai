@@ -40,7 +40,11 @@ function accettabile(variante: string, originale: Domanda, c: Contesto): boolean
 export async function variantiClaude(domande: Domanda[], c: Contesto): Promise<Domanda[]> {
   const chiave = process.env.ANTHROPIC_API_KEY;
   if (!chiave) return domande;
-  const daVariare = domande.filter((d) => TIPI_SPONTANEI.includes(d.tipo) && d.origine !== "titolare");
+  // Le domande chieste in più formulazioni restano come sono: la differenza tra le formulazioni è una misura del report.
+  const gruppiConFormulazioni = new Set(
+    domande.filter((d) => d.gruppo && domande.some((x) => x.gruppo === d.gruppo && x.formulazione && x.formulazione !== d.formulazione)).map((d) => d.gruppo),
+  );
+  const daVariare = domande.filter((d) => TIPI_SPONTANEI.includes(d.tipo) && d.tipo !== "vicino" && d.origine !== "titolare" && !(d.gruppo && gruppiConFormulazioni.has(d.gruppo)));
   if (daVariare.length === 0) return domande;
 
   const istruzioni = `Riscrivi ogni domanda come la scriverebbe davvero un cliente a un assistente AI (ChatGPT, Gemini) in italiano colloquiale: una frase di 8-25 parole, con lo stesso luogo, lo stesso bisogno o vincolo e lo stesso significato. Non aggiungere vincoli nuovi, non togliere quelli presenti, non inventare nomi. ${c.b2b ? "È un acquisto tra aziende: tono da ufficio acquisti, provincia o regione come luogo." : "È una persona che cerca un'attività vicino a sé."} Niente virgolette. Rispondi solo con JSON: {"domande":[{"id":"...","testo":"..."}]}.`;

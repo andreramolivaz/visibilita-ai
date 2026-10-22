@@ -1,7 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { salvaAbbonamento, segnaAbbonamentoDisdetto } from "@/lib/supabase/abbonamenti";
+import { segnaPagata } from "@/lib/scansione/coda";
+import { avviaAvanzamento } from "@/lib/scansione/innesco";
 
 /**
  * Webhook Stripe. Da registrare su Stripe con l'URL
@@ -27,6 +29,14 @@ export async function POST(req: Request) {
     switch (evento.type) {
       case "checkout.session.completed": {
         const s = evento.data.object;
+        // Report singolo: il pagamento sblocca la scansione.
+        if (s.mode === "payment" && s.metadata?.scansioneId) {
+          if (s.payment_status === "paid") {
+            const scansione = await segnaPagata(s.metadata.scansioneId, s.id);
+            if (scansione && !scansione.simulata && scansione.stato === "in corso") after(() => avviaAvanzamento(scansione.id));
+          }
+          break;
+        }
         if (s.mode !== "subscription" || !s.subscription) break;
         const abb = await stripe().subscriptions.retrieve(String(s.subscription));
         await salvaAbbonamento({
