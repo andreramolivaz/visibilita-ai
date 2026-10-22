@@ -6,6 +6,21 @@ import { Passi } from "@/components/landing/Passi";
 import { Impatto } from "@/components/landing/Impatto";
 import { Bottone } from "@/components/ui";
 import { PIANI, REPORT_SINGOLO, euro } from "@/lib/prezzi";
+import { REPORT_SINGOLO as ESEMPIO } from "@/lib/mock-report";
+import { punteggioDelPrimo, stimaRichieste } from "@/lib/impatto";
+
+/** La simulazione dell'impatto usa l'attività di esempio: una pizzeria a Bergamo (120.000 abitanti), sei adulti su cento cercano una pizzeria in un mese. */
+const ABITANTI_BERGAMO = 120_000;
+const IMPATTO_ESEMPIO = {
+  oggi: ESEMPIO.punteggio,
+  primo: punteggioDelPrimo(ESEMPIO),
+  richiesteMese: stimaRichieste(ABITANTI_BERGAMO, 0.06),
+  ricavoCliente: 28,
+  cosa: "una pizzeria",
+  citta: ESEMPIO.attivita.citta,
+  abitanti: ABITANTI_BERGAMO,
+  quotaCerca: "sei adulti su cento",
+};
 
 export default function Landing() {
   const base = PIANI[0];
@@ -37,7 +52,7 @@ export default function Landing() {
       {/* Impatto */}
       <section className="border-t border-line bg-soft/50">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-          <Impatto />
+          <Impatto dati={IMPATTO_ESEMPIO} />
         </div>
       </section>
 
