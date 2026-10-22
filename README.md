@@ -2,7 +2,7 @@
 
 Un servizio self-service in italiano che dice a un'attività locale se ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok la consigliano o consigliano i concorrenti, e cosa fare per cambiare le cose.
 
-**Promessa:** in 60 secondi sai se ti consigliano, chi ti passa davanti e le tre cose da sistemare. Il test gratuito aggancia, l'abbonamento da 29 € al mese paga.
+**Promessa:** in pochi minuti sai se ti consigliano, chi ti passa davanti e le tre cose da sistemare. Il report singolo a 49 € apre, l'abbonamento da 29 € al mese tiene.
 
 **Cosa non è:** non una suite SEO, non una dashboard con 40 metriche. Un punteggio, un confronto, tre azioni.
 
@@ -18,7 +18,7 @@ Fase 0: interfaccia con dati di esempio. Le cinque schermate ci sono, i motori n
 | Conferma profilo e domande | `/conferma?q=…` | fatta, profilo finto |
 | Scansione con avanzamento | `/scansione?id=…` | simulata |
 | Report (7 sezioni + note tecniche) | `/report/esempio` | fatta; `?abbonato=1` mostra l'andamento |
-| Prezzi, Agenzie, Privacy | `/prezzi` `/agenzie` `/privacy` | fatte |
+| Prezzi, Privacy | `/prezzi` `/privacy` | fatte |
 
 ## Avvio
 
@@ -56,8 +56,7 @@ Riferimenti esterni (`src/lib/riferimenti.ts`): gli studi di settore (SOCi, Insi
 Definizioni (`src/lib/glossario.ts`): 18 voci, ognuna con cos'è, come si calcola, come si legge, cosa non è; nel report web (note tecniche) e nel PDF (Allegato C).
 Grafici ammessi: barre orizzontali, barre a segmenti, mappa a celle, una linea per l'andamento. Niente torte, radar, gauge, previsioni.
 Il PDF è un rapporto tecnico di 5 pagine: sintesi e azioni · concorrenti e dove ti trovano · mappa e fonti · cosa dicono di te e metodo · riferimenti esterni e definizioni. Marchio e identificativo documento (`VAI-AAAAMMGG-ID`) in testata; in white-label il nome dell'agenzia sostituisce il marchio (`logo` in `ReportPdf`).
-Test gratuito: 8 domande × 2 ripetizioni, senza "Le parole che usano" e PDF; al loro posto "Nel piano Base trovi anche".
-Domande per piano: 8 nel test gratuito, 15 nel Base, 30 nel Pro e Agenzia (`src/lib/prezzi.ts`). Nell'abbonamento le ripetizioni sono in giorni diversi.
+Report singolo (49 € una tantum): 36 domande × 2 ripetizioni nella stessa giornata, report completo con PDF. Piani: Base 48 domande × 3 ripetizioni in tre giorni, ogni mese; Pro 72 domande × 2, ogni due settimane (`src/lib/prezzi.ts`). Il pagamento del report singolo passa da Stripe Checkout (modalità pagamento): la scansione nasce «in attesa di pagamento» e parte dal webhook, o dalla verifica della sessione al ritorno; senza Stripe parte subito (dimostrazione se non ci sono assistenti, mai a pagamento).
 
 ## Il profilo e le domande (`src/lib/profilo/`)
 
@@ -76,13 +75,13 @@ Senza `GOOGLE_PLACES_API_KEY` il profilo è quello di esempio con il nome digita
 ## La scansione (`src/lib/motori/`, `src/lib/scansione/`, `src/lib/analisi/`)
 
 - **Assistenti** (`motori/`): un adattatore per ciascuno, stessa interfaccia (`interroga(domanda, città, regione, coordinate)` → testo, URL citate o consultate, modello, canale, orari). ChatGPT: Responses API con `web_search` e `user_location`; Gemini: grounding Google Search + Google Maps con `latLng`; Google AI: AI Mode e AI Overviews letti dalla pagina dei risultati con DataForSEO (località italiana); Claude: Messages API con `web_search` e `user_location`; Perplexity: Sonar con `user_location`; Grok: Responses API con `web_search`. Unica istruzione di sistema: «Rispondi in italiano». Un assistente è attivo solo con la sua chiave; con zero chiavi la scansione è una dimostrazione.
-- **Coda** (`scansione/`): una cella per domanda × assistente × ripetizione, con data di esecuzione (test gratuito: tutto subito; abbonamento: una ripetizione al giorno per tre giorni). `avanza()` esegue un lotto di celle scadute (un assistente alla volta per assistente, assistenti in parallelo, entro un tempo massimo), salva ogni cella e, se restano celle, si richiama (`/api/scansioni/[id]/avanza`, protetta da `CODA_SEGRETO`); a fine celle costruisce il report. Il passaggio giornaliero (`/api/cron/scansioni`, Vercel Cron alle 06:00 UTC, `CRON_SECRET`) riprende le celle dei giorni successivi. Deposito in memoria senza Supabase, tabelle `scansioni`, `celle`, `report`, `test_gratuiti` con Supabase. Limiti: un test gratuito per scheda Google ogni 30 giorni, `MAX_TEST_GRATUITI_AL_GIORNO`.
+- **Coda** (`scansione/`): una cella per domanda × assistente × ripetizione, con data di esecuzione (report singolo: tutto subito; abbonamento: una ripetizione al giorno). `avanza()` esegue un lotto di celle scadute (un assistente alla volta per assistente, assistenti in parallelo, entro un tempo massimo), salva ogni cella e, se restano celle, si richiama (`/api/scansioni/[id]/avanza`, protetta da `CODA_SEGRETO`); a fine celle costruisce il report. Il passaggio giornaliero (`/api/cron/scansioni`, Vercel Cron alle 06:00 UTC, `CRON_SECRET`) riprende le celle dei giorni successivi. Deposito in memoria senza Supabase, tabelle `scansioni`, `celle`, `report`, `test_gratuiti` con Supabase. Limite senza Stripe: `MAX_TEST_GRATUITI_AL_GIORNO` scansioni al giorno.
 - **Analisi** (`analisi/`): riconoscimento a regole dichiarate (nucleo del nome senza parole generiche, intero e vicino; telefono o indirizzo; nomi in elenco estratti da voci numerate, puntate e grassetti; concorrenti vicini dalla scheda come nomi canonici), posizione = ordine di prima comparsa tra i nomi riconosciuti (oltre il quinto non conta); fonti dalle URL (portali con nome, sito dell'attività come «Sito ufficiale», altrimenti dominio); termini ricorrenti nelle risposte spontanee confrontati con le recensioni; descrizioni dalla domanda sul nome con tono (segnalato solo se critico) ed errori (telefono diverso, giorno di chiusura che da te è aperto); tre azioni a regole con punti stimati (fonte più citata in cui non ci sei, dati sbagliati, sito povero, termini mancanti, domande per bisogno deboli, inglese). `costruisciReport()` applica le stesse formule del report di esempio ai dati veri.
 - **Pagina di scansione**: con i motori segue la coda (stato ogni 3 secondi) e apre il report quando è pronto; senza, mostra la dimostrazione e apre il report di esempio.
 
 ## Le domande e i settori
 
-Sei tipi di domanda, dallo studio dei prompt reali (Semrush 2025–26, Otterly, Citations.press, BrightLocal): generica, per bisogno, per specialità, per requisito, di confronto, sul nome; più l'inglese per chi esporta o riceve stranieri. I modelli sono scritti per 36 categorie in ordine di numerosità (ISTAT-ASIA 2023 via Eurostat), da «Negozi al dettaglio» (532 mila imprese) a «Musei» (1.282), in `src/data/profiles/`; ogni profilo ha anche fonti attese, metriche e azioni ammesse. Lo studio completo («Visibilità AI per tutte le attività italiane: settori, domande reali, fonti, metriche e metodo di raccolta») è in `docs/studio-settori-domande.md`; `docs/genera-profili.mjs` riscrive i profili da un'unica tabella (`node docs/genera-profili.mjs src/data/profiles`, poi rigenerare `index.ts`).
+Nove famiglie di domanda, dallo studio dei prompt reali e dal «telescopio» (`docs/studio-domande-telescopio.md`): generica, per bisogno, per specialità, per requisito, per occasione, vicino a te (posizione impostata in punti intorno all'attività), di confronto, sul nome, in inglese. Ogni famiglia ha almeno sei domande; lo stesso intento è chiesto a tre livelli di zoom (città, zona, vicino a te; provincia, regione, Italia per il B2B) e in tre formulazioni (diretta, colloquiale, imperativa). Quote per piano in `QUOTE` (`src/lib/profiles.ts`): report singolo 36, Base 48, Pro 72. Il set non si mostra al titolare prima della scansione. I modelli sono scritti per 36 categorie in ordine di numerosità (ISTAT-ASIA 2023 via Eurostat) in `src/data/profiles/`, con template per occasione e vicino a te per gruppo di settori; `docs/genera-profili.mjs` li rigenera da un'unica tabella (`node docs/genera-profili.mjs src/data/profiles`). Lo studio dei settori è in `docs/studio-settori-domande.md`.
 
 ## Marchio
 
@@ -90,7 +89,7 @@ Una risposta di un assistente (la bolla con l'elenco) la cui coda è un segnapos
 
 ## Regole di prodotto (dalla roadmap)
 
-- Italiano del tu, frasi corte, zero inglese nell'interfaccia. "GEO" solo nelle pagine per le agenzie.
+- Italiano del tu, frasi corte, zero inglese nell'interfaccia. Niente «gratis», niente conteggi di domande sul sito: il set è il metodo.
 - Un colore d'accento (verde scuro) per "tu"; rosso solo per "Invisibile" e per gli errori di scheda.
 - Un font per tutto (Instrument Sans, titoli leggermente condensati con l'asse `wdth`), punteggio a 64 px, testo a 16 px. Solo barre orizzontali, barre a segmenti, mappe a celle a un colore e una linea per l'andamento.
 - Mai corsivo. Le domande scritte dai clienti sono nello stesso font, in peso medio.
