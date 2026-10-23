@@ -3,7 +3,7 @@ import { GLOSSARIO } from "@/lib/glossario";
 /** Guida alla lettura: ogni metrica e ogni visual, cos'è, come si calcola, come si legge. */
 export function Guida() {
   return (
-    <div id="guida" className="scroll-mt-20">
+    <div id="guida" className="scroll-mt-32 md:scroll-mt-36">
       <h3 className="font-semibold">Definizioni</h3>
       <p className="mt-1 text-sm text-muted">Cosa misura ogni numero del report, come lo calcoliamo e come si legge. Tutto si ricava dalla mappa domanda × assistente.</p>
       <dl className="mt-3 divide-y divide-line border-y border-line">

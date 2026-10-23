@@ -6,10 +6,10 @@ import { verdetto } from "@/lib/score";
 
 /**
  * L'impatto: oggi il cliente chiede all'assistente prima di scegliere, e la
- * risposta fa tre o quattro nomi. Tre dati italiani con la fonte e una
+ * risposta fa tre o quattro nomi. Due dati italiani con la fonte e una
  * simulazione: il punteggio sale da solo da quello di oggi a quello del primo
  * in città, e clienti ed euro salgono con lui. L'unica cosa da scrivere è il
- * ricavo medio per cliente.
+ * ricavo medio per cliente; le assunzioni stanno chiuse sotto, per chi le vuole.
  */
 
 export interface DatiImpatto {
@@ -88,27 +88,24 @@ export function Impatto({ dati }: { dati: DatiImpatto }) {
       <div className="lg:self-center">
         <h2 className="text-3xl font-bold sm:text-4xl">Più ti consigliano, più clienti entrano.</h2>
         <p className="mt-4 text-lg text-muted">
-          Un cliente su tre chiede a un assistente prima di scegliere, e due su tre poi vanno di persona. La risposta fa tre o quattro nomi: quelli prendono il
-          cliente. Il report ti dà un punteggio da 0 a 100. Qui vedi cosa vale farlo salire, in clienti e in euro.
+          Chi chiede a un assistente AI riceve tre o quattro nomi e sceglie tra quelli. Se non ci sei, quel cliente va da un altro.
         </p>
-        <dl className="mt-8 grid gap-6 sm:grid-cols-3">
+        <dl className="mt-8 grid max-w-md grid-cols-2 gap-6">
           {[
-            ["35%", "degli adulti italiani online usa già un assistente AI per decidere cosa comprare: era il 20% un anno prima.", "IAB Italia, Osservatorio Search 2026 · 1.000 adulti, marzo 2026"],
-            ["64%", "di chi decide con l'AI va poi in un negozio o in un locale fisico: l'assistente sceglie, il cliente entra dalla porta.", "IAB Italia, Osservatorio Search 2026"],
-            ["4,4×", "il valore di un visitatore che arriva da una risposta AI rispetto a uno da Google: arriva già convinto.", "Semrush, AI search traffic study, 2025"],
-          ].map(([n, t, f]) => (
+            ["35%", "degli italiani online usa un assistente AI per decidere cosa comprare"],
+            ["64%", "di loro poi va di persona, in negozio o nel locale"],
+          ].map(([n, t]) => (
             <div key={n}>
               <dt className="tabular text-4xl font-bold tracking-tight">{n}</dt>
-              <dd className="mt-1.5 text-[15px]">{t}</dd>
-              <dd className="mt-1.5 text-[12px] text-faint">{f}</dd>
+              <dd className="mt-1 text-[15px] text-muted">{t}</dd>
             </div>
           ))}
         </dl>
+        <p className="mt-3 text-[12px] text-faint">IAB Italia, Osservatorio Search 2026.</p>
       </div>
 
       <div ref={scatola} className="rounded-2xl bg-ink p-6 text-white sm:p-7">
-        <p className="text-sm text-white/70">Una simulazione, con le sue assunzioni</p>
-        <h3 className="mt-1 text-xl font-semibold">Quanto vale salire di punteggio?</h3>
+        <h3 className="text-xl font-semibold">Quanto vale salire di punteggio?</h3>
 
         {/* Il punteggio: sale da solo, poi si trascina. */}
         <div className="mt-6">
@@ -191,12 +188,19 @@ export function Impatto({ dati }: { dati: DatiImpatto }) {
           </div>
         </dl>
 
-        <p className="mt-4 text-xs text-white/55">
-          Assunzioni: a {dati.citta} circa {numero(dati.richiesteMese)} persone al mese chiedono a un assistente {dati.cosa} ({numero(dati.abitanti)} abitanti; il{" "}
-          {Math.round(ASSUNZIONI.quotaAI * 100)}% di chi sceglie decide con l&apos;AI, IAB Italia 2026; {dati.quotaCerca} cercano {dati.cosa} in un mese). Il punteggio è la quota
-          di risposte in cui compari, pesata per la posizione. Chi ti vede ti sceglie una volta su quattro, quasi una su due se sei il primo nome. Il{" "}
-          {Math.round(ASSUNZIONI.visita * 100)}% poi va di persona (IAB Italia 2026). Non è una previsione: è l&apos;ordine di grandezza di quello che è in gioco.
-        </p>
+        <details className="group mt-4 text-xs text-white/55">
+          <summary className="flex cursor-pointer list-none items-center gap-1.5 hover:text-white/80 [&::-webkit-details-marker]:hidden">
+            Una simulazione per {dati.cosa} a {dati.citta}. Come la calcoliamo
+            <span className="transition-transform group-open:rotate-45" aria-hidden="true">
+              +
+            </span>
+          </summary>
+          <p className="mt-2">
+            Circa {numero(dati.richiesteMese)} persone al mese chiedono a un assistente {dati.cosa} a {dati.citta} ({numero(dati.abitanti)} abitanti: {dati.quotaCerca} ne
+            cercano una in un mese, il {Math.round(ASSUNZIONI.quotaAI * 100)}% sceglie con l&apos;AI). Chi ti vede nella risposta ti sceglie una volta su quattro, quasi una su
+            due se sei il primo nome; il {Math.round(ASSUNZIONI.visita * 100)}% poi va di persona. Non è una previsione: è l&apos;ordine di grandezza di quello che è in gioco.
+          </p>
+        </details>
       </div>
     </div>
   );

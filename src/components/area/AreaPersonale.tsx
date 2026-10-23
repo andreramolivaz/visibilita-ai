@@ -149,8 +149,8 @@ export function AreaPersonale({ dati, esci = true }: { dati: DatiArea; esci?: bo
           {/* Domande e concorrenti */}
           <div className="grid gap-6 md:grid-cols-2">
             <Scheda>
-              <h2 className="font-semibold">Il tuo set di domande</h2>
-              <p className="mt-1 text-sm text-muted">Per famiglia. Le domande restano le stesse da una scansione all&apos;altra, così il confronto nel tempo regge; il testo è nel report, domanda per domanda.</p>
+              <h2 className="font-semibold">Le tue domande</h2>
+              <p className="mt-1 text-sm text-muted">Restano le stesse da un report all&apos;altro, così vedi se sali davvero. Le trovi tutte nel report.</p>
               <ul className="mt-3 space-y-1.5 text-sm">
                 {dati.famiglie.map((f) => (
                   <li key={f.nome} className="flex items-baseline justify-between gap-3">
@@ -207,7 +207,7 @@ export function AreaPersonale({ dati, esci = true }: { dati: DatiArea; esci?: bo
                   )}
                   {dati.pianoId === "base" && (
                     <Link href="/prezzi#pro" className="block text-center text-sm font-semibold text-accent underline underline-offset-2">
-                      Passa a Pro: settimanale, 30 domande, concorrenti seguiti
+                      Passa a Pro: un report ogni due settimane e i concorrenti seguiti
                     </Link>
                   )}
                 </div>
@@ -234,10 +234,14 @@ export function AreaPersonale({ dati, esci = true }: { dati: DatiArea; esci?: bo
             <p className="mt-3 text-xs text-muted">Il profilo si rifà ogni tre mesi, o quando lo chiedi.</p>
           </Scheda>
           <p className="text-xs text-muted">
-            Come leggiamo i dati e calcoliamo i numeri:{" "}
-            <Link href="/metodo" className="underline underline-offset-2">
-              il metodo
-            </Link>
+            Come funziona:{" "}
+            <Link href="/come-funziona" className="underline underline-offset-2">
+              in breve
+            </Link>{" "}
+            o, con tutti i dettagli,{" "}
+            <a href="/white-paper-visibilita-ai.pdf" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+              nel white paper
+            </a>
             .
           </p>
         </aside>

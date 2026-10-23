@@ -53,7 +53,7 @@ const DOMANDE = [
 function MiniDomande() {
   return (
     <Riquadro>
-      <p className="text-[11px] text-faint">Tre domande del set, su decine</p>
+      <p className="text-[11px] text-faint">Domande come le scrive un cliente</p>
       <ul className="mt-1.5 space-y-1.5">
         {DOMANDE.map(([d, t]) => (
           <li key={d} className="flex items-baseline justify-between gap-3">
@@ -62,7 +62,7 @@ function MiniDomande() {
           </li>
         ))}
       </ul>
-      <p className="mt-3 border-t border-line pt-2 text-[12px] text-muted">Per famiglia e per zoom · 6 assistenti · ogni domanda in due forme</p>
+      <p className="mt-3 border-t border-line pt-2 text-[12px] text-muted">A sei assistenti AI, ognuna più volte</p>
     </Riquadro>
   );
 }
@@ -87,17 +87,17 @@ function MiniPunteggio() {
 const PASSI = [
   {
     titolo: "Scrivi il nome della tua attività",
-    testo: "Troviamo noi categoria, specialità, orari e portali dalla scheda Google e dal tuo sito. Tu confermi con un tocco.",
+    testo: "La troviamo su Google, con categoria, orari e specialità. Tu confermi con un tocco.",
     figura: <MiniScheda />,
   },
   {
-    titolo: "Facciamo le domande che fanno i tuoi clienti",
-    testo: "Decine di domande come le fanno i clienti: per bisogno, specialità, occasione, zona, vicino a te. A sei assistenti AI, ogni domanda ripetuta, perché le risposte cambiano.",
+    titolo: "Facciamo le domande dei tuoi clienti",
+    testo: "A ChatGPT, Gemini e agli altri assistenti, come le scriverebbe un cliente. Ognuna più volte, perché le risposte cambiano.",
     figura: <MiniDomande />,
   },
   {
-    titolo: "Leggi dove sei, chi ti passa davanti, cosa fare",
-    testo: "Punteggio con il suo campione, i concorrenti citati al posto tuo, le fonti da cui gli assistenti prendono le informazioni e tre azioni in ordine di impatto.",
+    titolo: "Leggi dove sei e cosa fare",
+    testo: "Il punteggio, chi consigliano al posto tuo, da dove prendono le informazioni e tre azioni in ordine di impatto.",
     figura: <MiniPunteggio />,
   },
 ];

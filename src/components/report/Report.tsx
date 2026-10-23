@@ -11,8 +11,9 @@ import { Concorrenti } from "./Concorrenti";
 import { Territorio } from "./Territorio";
 import { NoteTecniche, periodoScansione } from "./NoteTecniche";
 import { Telescopio } from "./Telescopio";
-import { letturaAssistenti, letturaAzioni, letturaConcorrenti, letturaDicono, letturaFonti, letturaParole, letturaTelescopio, letturaTerritorio, letturaTipi } from "@/lib/letture";
-import { TIPI_SPONTANEI, perFamiglia, percentuale, punteggioPerMotore } from "@/lib/stats";
+import { SchedeReport } from "./SchedeReport";
+import { letturaAssistenti, letturaConcorrenti, letturaDicono, letturaFonti, letturaParole, letturaTelescopio, letturaTerritorio, letturaTipi } from "@/lib/letture";
+import { punteggioPerMotore } from "@/lib/stats";
 
 export const NOME_TIPO: Record<TipoDomanda, { titolo: string; esempio: string }> = {
   generica: { titolo: "Generiche", esempio: "«miglior pizzeria a Bergamo»" },
@@ -38,7 +39,7 @@ const TONO: Record<string, { testo: string; tono: "accento" | "neutro" | "errore
 /** Una sezione: titolo, la riga di lettura (il fatto con i numeri), il contenuto. */
 function Blocco({ titolo, lettura, children, id }: { titolo: string; lettura?: string; children: React.ReactNode; id?: string }) {
   return (
-    <section id={id} className="scroll-mt-20 py-7 sm:py-9">
+    <section id={id} className="scroll-mt-32 py-8 md:scroll-mt-36">
       <h2 className="text-xl font-semibold sm:text-2xl">{titolo}</h2>
       {lettura && <p className="tabular mt-1.5 max-w-prose text-[16px] leading-snug">{lettura}</p>}
       <div className="mt-5">{children}</div>
@@ -46,69 +47,29 @@ function Blocco({ titolo, lettura, children, id }: { titolo: string; lettura?: s
   );
 }
 
+/**
+ * Il report, in cinque tab: Riepilogo (dove sei, chi ti passa davanti, cosa
+ * fare), Concorrenti, Domande (dove ti trovano, domanda per domanda), Fonti
+ * (da dove prendono le informazioni, cosa dicono di te) e Dettagli (campione,
+ * intervalli, definizioni). Chi legge solo il primo tab ha già tutto quello
+ * che gli serve.
+ */
 export function Report({ report, abbonato = false }: { report: ReportT; abbonato?: boolean }) {
   const r = report;
   const parziali = punteggioPerMotore(r.righe, r.ripetizioni);
-  const famiglie = perFamiglia(r.righe, r.ripetizioni);
   const guadagno = r.azioni.reduce((acc, a) => acc + (a.impattoStimato ?? 0), 0);
   const totaleRisposte = r.domande * r.motori.length * r.ripetizioni;
   const mostraAndamento = abbonato && !!r.andamento && r.andamento.length >= 2;
 
-  return (
-    <article className="divide-y divide-line">
-      {/* Intestazione */}
-      <header className="pb-7 sm:pb-9">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-sm text-muted">Report di visibilità AI · {periodoScansione(r.metodo.inizio, r.metodo.fine)}</p>
-            <h1 className="mt-1 text-3xl font-bold sm:text-4xl">
-              {r.attivita.nome}, {r.attivita.citta}
-            </h1>
-            <p className="mt-2 text-[15px] text-muted">
-              {r.attivita.categoriaGoogle} · {r.attivita.indirizzo}
-            </p>
-            <p className="tabular mt-1 text-[15px] text-muted">
-              {r.domande} domande × {r.motori.length} assistenti × {r.ripetizioni} ripetizioni = {totaleRisposte} risposte. Punteggio e numeri chiave sulle{" "}
-              {r.domandeSpontanee} domande in cui il cliente non fa il tuo nome.
-            </p>
-          </div>
-          <div className="no-print flex gap-2">
-            <Bottone href={`/report/${r.id}/pdf`} secondario className="!w-auto !px-4 !py-2 !text-sm" target="_blank">
-              Scarica il PDF
-            </Bottone>
-            <CopiaLink />
-          </div>
-        </div>
-        <nav className="no-print mt-6 -mb-1 flex gap-2 overflow-x-auto text-sm" aria-label="Sezioni del report">
-          {[
-            ["#trenta", "In 30 secondi"],
-            ["#azioni", "Cosa fare"],
-            ["#concorrenti", "Concorrenti"],
-            ["#dove", "Dove ti trovano"],
-            ["#telescopio", "Zoom e occasioni"],
-            ["#fonti", "Fonti e parole"],
-            ["#dicono", "Cosa dicono"],
-            ["#note", "Note tecniche"],
-          ].map(([href, testo]) => (
-            <a key={href} href={href} className="shrink-0 rounded-full border border-line px-3 py-1 text-muted hover:border-ink hover:text-ink">
-              {testo}
-            </a>
-          ))}
-        </nav>
-      </header>
-
+  const riepilogo = (
+    <div className="divide-y divide-line">
       <InTrentaSecondi report={r} abbonato={abbonato} />
-
-      {/* Posizioni e andamento: due figure, nessun testo */}
-      <section className="py-7 sm:py-9">
-        <div className={`grid gap-8 ${mostraAndamento ? "lg:grid-cols-2 lg:gap-12" : ""}`}>
-          <Posizioni righe={r.righe} />
-          {mostraAndamento && <Andamento punti={r.andamento!} />}
-        </div>
-      </section>
-
-      {/* Tre azioni */}
-      <Blocco id="azioni" titolo="Cosa fare, in ordine di impatto" lettura={letturaAzioni(r)}>
+      {mostraAndamento && (
+        <section className="py-8">
+          <Andamento punti={r.andamento!} />
+        </section>
+      )}
+      <Blocco id="azioni" titolo="Cosa fare, in ordine di impatto">
         {guadagno > 0 && (
           <div className="mb-5">
             <Potenziale punteggio={r.punteggio} azioni={r.azioni} />
@@ -127,7 +88,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
                     <p className="mt-1 text-[15px] text-muted">{a.dato}</p>
                     <p className="mt-2 flex flex-wrap gap-2">
                       <Etichetta tono={a.impatto === "alto" ? "accento" : "neutro"}>impatto {a.impatto}</Etichetta>
-                      {a.impattoStimato !== undefined && <Etichetta tono="neutro">+{a.impattoStimato} punti stimati</Etichetta>}
+                      {a.impattoStimato !== undefined && <Etichetta tono="neutro">circa +{a.impattoStimato} punti</Etichetta>}
                     </p>
                   </div>
                 </div>
@@ -136,16 +97,21 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
           ))}
         </ol>
       </Blocco>
+    </div>
+  );
 
-      {/* Concorrenti */}
-      <Blocco id="concorrenti" titolo="Chi consigliano al posto tuo" lettura={letturaConcorrenti(r)}>
-        <Concorrenti report={r} />
-      </Blocco>
+  const concorrenti = (
+    <Blocco titolo="Chi consigliano al posto tuo" lettura={letturaConcorrenti(r)}>
+      <Concorrenti report={r} />
+    </Blocco>
+  );
 
-      {/* Dove ti trovano: territorio, per assistente, per tipo, mappa */}
+  const domande = (
+    <div className="divide-y divide-line">
       <Blocco id="dove" titolo="Dove ti trovano" lettura={letturaTerritorio(r)}>
         <Territorio righe={r.righe} />
-        <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <Posizioni righe={r.righe} />
+        <div className="mt-10 grid gap-8 lg:grid-cols-2 lg:gap-12">
           <div>
             <h3 className="font-semibold">Per assistente</h3>
             <p className="tabular mt-1 text-[15px]">{letturaAssistenti(r)}</p>
@@ -157,59 +123,56 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
                   valore={m.comparse}
                   massimo={m.totale}
                   testo={`${m.comparse} su ${m.totale}`}
-                  sotto={`${engine(m.motore).utentiMln.toLocaleString("it-IT")} mln · punteggio ${parziali[m.motore] ?? 0}`}
+                  sotto={`punteggio ${parziali[m.motore] ?? 0}`}
                   accento
                 />
               ))}
             </div>
-            <p className="mt-2 text-xs text-muted">Domande spontanee in cui compari almeno una volta, su {r.domandeSpontanee}; utenti mensili in Italia e punteggio parziale 0–100 dell&apos;assistente.</p>
+            <p className="mt-2 text-xs text-muted">Domande in cui l&apos;assistente ti nomina almeno una volta, su {r.domandeSpontanee}.</p>
           </div>
           <div>
             <h3 className="font-semibold">Per tipo di domanda</h3>
             <p className="tabular mt-1 text-[15px]">{letturaTipi(r)}</p>
             <div className="mt-3">
-              {r.perTipo.map((t) => {
-                const f = famiglie.find((x) => x.tipo === t.tipo);
-                const spontanea = TIPI_SPONTANEI.includes(t.tipo);
-                const dettaglio = f && spontanea ? ` · tra domande ${percentuale(f.icDomande.basso)}–${percentuale(f.icDomande.alto)}, stima ridotta ${percentuale(f.ridotta)}` : "";
-                return (
-                  <Barra
-                    key={t.tipo}
-                    etichetta={NOME_TIPO[t.tipo].titolo}
-                    valore={t.comparse}
-                    massimo={t.totale}
-                    testo={`${t.comparse} su ${t.totale}`}
-                    sotto={`${t.domande} ${t.domande === 1 ? "domanda" : "domande"} · ${NOME_TIPO[t.tipo].esempio}${dettaglio}`}
-                    accento
-                  />
-                );
-              })}
+              {r.perTipo.map((t) => (
+                <Barra
+                  key={t.tipo}
+                  etichetta={NOME_TIPO[t.tipo].titolo}
+                  valore={t.comparse}
+                  massimo={t.totale}
+                  testo={`${t.comparse} su ${t.totale}`}
+                  sotto={NOME_TIPO[t.tipo].esempio}
+                  accento
+                />
+              ))}
             </div>
-            <p className="mt-2 text-xs text-muted">
-              Risposte in cui compari, sul totale delle risposte di quella famiglia. «Tra domande» è l&apos;intervallo al 95% che vale per domande di quel tipo, non solo per quelle fatte; la stima
-              ridotta tira le famiglie con poche domande verso la media del report. Confronto, sul nome e informative non entrano nel punteggio.
-            </p>
+            <p className="mt-2 text-xs text-muted">Risposte in cui compari, su quelle di ogni tipo. Confronto, nome e informative non entrano nel punteggio.</p>
           </div>
         </div>
       </Blocco>
 
-      {/* Il telescopio: zoom, intorno a te, occasioni, formulazione */}
       <Blocco id="telescopio" titolo="Da lontano a vicino, e per chi" lettura={letturaTelescopio(r)}>
         <Telescopio report={r} />
       </Blocco>
 
-      {/* Mappa */}
       <Blocco id="mappa" titolo="Domanda per domanda">
-        <div>
-          <p className="text-sm text-muted">Una cella per ogni domanda e assistente: la posizione in cui ti mettono e quante volte su {r.ripetizioni}. Più scura, più in alto. Le domande sono raggruppate per famiglia.</p>
-          <div className="mt-3">
+        <p className="text-sm text-muted">Una cella per ogni domanda e assistente: il posto in cui ti mettono e quante volte su {r.ripetizioni}. Più scura, più in alto.</p>
+        <details className="group mt-4">
+          <summary className="inline-flex cursor-pointer list-none items-center rounded-lg border border-line px-4 py-2 text-sm font-semibold transition-colors hover:border-ink [&::-webkit-details-marker]:hidden">
+            <span className="group-open:hidden">Mostra tutte le {r.domande} domande</span>
+            <span className="hidden group-open:inline">Nascondi le domande</span>
+          </summary>
+          <div className="mt-4">
             <Heatmap righe={r.righe} motori={r.motori} ripetizioni={r.ripetizioni} />
           </div>
-        </div>
+        </details>
       </Blocco>
+    </div>
+  );
 
-      {/* Fonti + parole */}
-      <section id="fonti" className="scroll-mt-20 py-7 sm:py-9">
+  const fonti = (
+    <div className="divide-y divide-line">
+      <section className="py-8">
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
           <div>
             <h2 className="text-xl font-semibold sm:text-2xl">Da dove prendono le informazioni</h2>
@@ -228,7 +191,7 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
                 />
               ))}
             </div>
-            <p className="mt-2 text-xs text-muted">Risposte, su {totaleRisposte}, che citano la fonte; quanti dei 5 concorrenti più citati hanno una scheda lì. Dove non ci sei, gli assistenti non possono trovarti.</p>
+            <p className="mt-2 text-xs text-muted">Risposte, su {totaleRisposte}, che citano la fonte. Dove non ci sei, gli assistenti non possono trovarti.</p>
           </div>
           <div>
             <h2 className="text-xl font-semibold sm:text-2xl">Le parole che usano</h2>
@@ -247,12 +210,11 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
                 />
               ))}
             </div>
-            <p className="mt-2 text-xs text-muted">Volte in cui il termine compare nelle {totaleRisposte} risposte della tua categoria, e quante nelle tue recensioni Google.</p>
+            <p className="mt-2 text-xs text-muted">Volte in cui la parola compare nelle risposte, e quante nelle tue recensioni Google.</p>
           </div>
         </div>
       </section>
 
-      {/* Cosa dicono di te */}
       <Blocco id="dicono" titolo="Cosa dicono di te" lettura={letturaDicono(r)}>
         <ul className="grid gap-3 sm:grid-cols-2">
           {r.descrizioniPerMotore.map((d) => (
@@ -279,8 +241,44 @@ export function Report({ report, abbonato = false }: { report: ReportT; abbonato
           <p className="mt-5 text-sm text-muted">Nessun errore nei dati che gli assistenti riportano su di te.</p>
         )}
       </Blocco>
+    </div>
+  );
 
-      <NoteTecniche report={r} />
+  return (
+    <article>
+      {/* Intestazione */}
+      <header className="pb-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm text-muted">Report di visibilità AI · {periodoScansione(r.metodo.inizio, r.metodo.fine)}</p>
+            <h1 className="mt-1 text-3xl font-bold sm:text-4xl">
+              {r.attivita.nome}, {r.attivita.citta}
+            </h1>
+            <p className="mt-2 text-[15px] text-muted">
+              {r.attivita.categoriaGoogle} · {r.attivita.indirizzo}
+            </p>
+            <p className="tabular mt-1 text-[15px] text-muted">
+              {r.domande} domande a {r.motori.length} assistenti AI, ognuna {r.ripetizioni} volte.
+            </p>
+          </div>
+          <div className="no-print flex gap-2">
+            <Bottone href={`/report/${r.id}/pdf`} secondario className="!w-auto !px-4 !py-2 !text-sm" target="_blank">
+              Scarica il PDF
+            </Bottone>
+            <CopiaLink />
+          </div>
+        </div>
+      </header>
+
+      <SchedeReport
+        schede={[
+          { id: "riepilogo", titolo: "Riepilogo", contenuto: riepilogo },
+          { id: "concorrenti", titolo: "Concorrenti", contenuto: concorrenti },
+          { id: "domande", titolo: "Domande", contenuto: domande },
+          { id: "fonti", titolo: "Fonti", contenuto: fonti },
+          { id: "dettagli", titolo: "Dettagli", contenuto: <NoteTecniche report={r} /> },
+        ]}
+      />
     </article>
   );
 }

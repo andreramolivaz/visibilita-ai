@@ -14,11 +14,14 @@ Fase 0: interfaccia con dati di esempio. Le cinque schermate ci sono, i motori n
 
 | Schermata | Percorso | Stato |
 |---|---|---|
-| Landing con report di esempio | `/` | fatta |
+| Home: la domanda, quanto vale, tre passi, il report, l'invito | `/` | fatta |
+| Come funziona (tre passi, assistenti, perché fidarsi, per chi, white paper) | `/come-funziona` (`/metodo` reindirizza) | fatta |
 | Conferma profilo e domande | `/conferma?q=…` | fatta, profilo finto |
 | Scansione con avanzamento | `/scansione?id=…` | simulata |
-| Report (7 sezioni + note tecniche) | `/report/esempio` | fatta; `?abbonato=1` mostra l'andamento |
+| Report in cinque tab: Riepilogo, Concorrenti, Domande, Fonti, Dettagli | `/report/esempio` | fatta; `?abbonato=1` mostra l'andamento |
 | Prezzi, Privacy | `/prezzi` `/privacy` | fatte |
+
+Nell'intestazione tre tab (Come funziona, Esempio, Prezzi), Accedi e il bottone; su telefono i tab vanno in una riga sotto. Il sito spiega poco e attira: intervalli, famiglie di domande e statistiche stanno nel tab Dettagli del report e nel white paper.
 
 ## Avvio
 
@@ -90,6 +93,7 @@ Una risposta di un assistente (la bolla con l'elenco) la cui coda è un segnapos
 ## Regole di prodotto (dalla roadmap)
 
 - Italiano del tu, frasi corte, zero inglese nell'interfaccia. Niente «gratis», niente conteggi di domande sul sito: il set è il metodo.
+- Il sito è semplice e non ripete: ogni cosa sta in un posto solo. Al titolare non serve sapere tutto: i dettagli tecnici vanno nel tab Dettagli e nel white paper.
 - Un colore d'accento (verde scuro) per "tu"; rosso solo per "Invisibile" e per gli errori di scheda.
 - Un font per tutto (Instrument Sans, titoli leggermente condensati con l'asse `wdth`), punteggio a 64 px, testo a 16 px. Solo barre orizzontali, barre a segmenti, mappe a celle a un colore e una linea per l'andamento.
 - Mai corsivo. Le domande scritte dai clienti sono nello stesso font, in peso medio.
@@ -108,4 +112,4 @@ Una risposta di un assistente (la bolla con l'elenco) la cui coda è un segnapos
 
 ## White paper
 
-Il white paper (metodo, prodotto e strategia) è `public/white-paper-visibilita-ai.pdf`, linkato dalla pagina Metodo. Sorgente in `docs/white-paper/white-paper.html` (con il font Instrument Sans accanto); si rigenera con Chromium via Playwright: `CHROMIUM_PATH=<chromium> node docs/white-paper/genera.mjs` (serve il pacchetto `playwright`).
+Il white paper (metodo, prodotto e strategia) è `public/white-paper-visibilita-ai.pdf`, linkato da Come funziona, dal footer e dal tab Dettagli del report. Sorgente in `docs/white-paper/white-paper.html` (con il font Instrument Sans accanto); si rigenera con Chromium via Playwright: `CHROMIUM_PATH=<chromium> node docs/white-paper/genera.mjs` (serve il pacchetto `playwright`).

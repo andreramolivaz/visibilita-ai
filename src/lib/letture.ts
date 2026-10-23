@@ -1,6 +1,6 @@
 import { engine } from "./engines";
 import type { Report, TipoDomanda } from "./types";
-import { TIPI_SPONTANEI, datiCorretti, punteggioPerMotore, quotaVoce, percentuale, quotaPunti, territorio } from "./stats";
+import { TIPI_SPONTANEI, datiCorretti, punteggioPerMotore, percentuale, quotaPunti, territorio } from "./stats";
 
 /**
  * La riga di lettura di ogni sezione: un fatto con i suoi numeri, niente
@@ -31,10 +31,9 @@ export function letturaConcorrenti(r: Report): string {
   const tu = r.concorrenti.find((c) => c.seiTu);
   const primo = r.concorrenti.filter((c) => !c.seiTu)[0];
   if (!primo || !tu) return "";
-  const qv = quotaVoce(r.concorrenti, r.citazioniTotali);
   const testa = r.testaATesta.find((t) => t.nome === primo.nome);
   const senza = testa ? ` In ${testa.loroSenzaTe} domande su ${r.domandeSpontanee} c'è lui e non tu.` : "";
-  return `${primo.nome}: ${primo.citazioni} citazioni contro le tue ${tu.citazioni}; quota di voce ${percentuale(qv[primo.nome])} contro ${percentuale(qv[tu.nome])}.${senza}`;
+  return `${primo.nome} compare in ${primo.citazioni} risposte, tu in ${tu.citazioni}.${senza}`;
 }
 
 export function letturaTerritorio(r: Report): string {
@@ -51,8 +50,8 @@ export function letturaAssistenti(r: Report): string {
   const meglio = ordinati[0];
   const grande = [...r.motori].sort((a, b) => engine(b).utentiMln - engine(a).utentiMln)[0];
   if (!meglio) return "";
-  if (grande === meglio) return `Punteggio parziale più alto su ${engine(meglio).nome} (${parziali[meglio]}), che è anche il più usato.`;
-  return `Punteggio parziale più alto su ${engine(meglio).nome} (${parziali[meglio]}); su ${engine(grande).nome}, ${mln(engine(grande).utentiMln)} milioni di utenti, ${parziali[grande]}.`;
+  if (grande === meglio) return `Vai meglio su ${engine(meglio).nome}, che è anche il più usato: punteggio ${parziali[meglio]}.`;
+  return `Vai meglio su ${engine(meglio).nome} (punteggio ${parziali[meglio]}). Su ${engine(grande).nome}, il più usato con ${mln(engine(grande).utentiMln)} milioni di utenti, ${parziali[grande]}.`;
 }
 
 export function letturaTipi(r: Report): string {
@@ -75,8 +74,6 @@ export function letturaTelescopio(r: Report): string {
     const qp = quotaPunti(punti);
     parti.push(`intorno a te compari in ${qp.k} ${qp.k === 1 ? "punto" : "punti"} su ${qp.n}`);
   }
-  const f = r.sensibilitaForma;
-  if (f && f.domande >= 3) parti.push(Math.abs(f.differenza) < 2 * f.errore ? "la forma della domanda non cambia il risultato" : `con la richiesta di più opzioni compari ${f.differenza > 0 ? "di più" : "di meno"} (${f.differenza > 0 ? "+" : ""}${Math.round(f.differenza)} punti)`);
   return `${parti.join("; ")}.`;
 }
 
@@ -103,10 +100,4 @@ export function letturaDicono(r: Report): string {
   parti.push(`${r.errori.length} ${r.errori.length === 1 ? "errore" : "errori"}`);
   parti.push(critici.length ? `tono critico su ${critici.map((d) => engine(d.motore).nome).join(", ")}` : "nessuna descrizione critica");
   return `${parti.join("; ")}.`;
-}
-
-export function letturaAzioni(r: Report): string {
-  const guadagno = r.azioni.reduce((acc, a) => acc + (a.impattoStimato ?? 0), 0);
-  if (!guadagno) return "";
-  return `Stima: da ${r.punteggio} a ${Math.min(100, r.punteggio + guadagno)} con tutte e tre; la verifica è la scansione successiva.`;
 }

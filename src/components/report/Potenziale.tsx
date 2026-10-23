@@ -16,7 +16,7 @@ export function Potenziale({ punteggio, azioni, compatto = false }: { punteggio:
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <div>
           <p className="text-sm font-medium">Dove puoi arrivare con le tre azioni</p>
-          <p className="mt-0.5 text-xs text-muted">Stima dai dati di questo report: quanto peserebbero sul punteggio le domande e le fonti su cui agisci.</p>
+          <p className="mt-0.5 text-xs text-muted">Una stima dai dati di questo report: lo verifichi al report successivo.</p>
         </div>
         <p className="tabular text-sm">
           <span className="text-2xl font-bold">{punteggio}</span>

@@ -4,10 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { ProfiloAttivita, SegnaliProfilo } from "@/lib/types";
 import { Bottone, Campo, Etichetta, Scheda } from "@/components/ui";
-import { motoriAttivi } from "@/lib/engines";
 import { REPORT_SINGOLO, euro } from "@/lib/prezzi";
-
-const MOTORI = motoriAttivi().length;
 
 /**
  * Passo 1: il profilo trovato e i segnali da cui costruiamo le domande.
@@ -116,9 +113,7 @@ export function ConfermaProfilo({
       <Scheda>
         <h2 className="font-semibold">Da dove vengono le domande</h2>
         <p className="mt-1 text-sm text-muted">
-          Le domande le costruiamo noi dal tuo profilo, per famiglie: generiche, per bisogno, per specialità, per requisito e orari, per prezzo, per
-          occasione, per recensioni, vicino a te, informative, di confronto, sul nome. Ogni famiglia a più livelli di zoom, ogni domanda in due forme. Il testo
-          esatto resta nel metodo: nel report vedi il risultato, domanda per domanda.
+          Le costruiamo da quello che abbiamo trovato su di te, come le scriverebbe un cliente. Nel report le vedi tutte, con il risultato.
         </p>
         <dl className="mt-3 space-y-2.5 text-sm">
           {segnali.recensioni.length > 0 && (
@@ -178,15 +173,6 @@ export function ConfermaProfilo({
             ))}
           </ul>
         )}
-      </Scheda>
-
-      <Scheda className="border-0 bg-soft">
-        <h2 className="font-semibold">Cosa misuriamo</h2>
-        <ul className="mt-2 space-y-1.5 text-sm text-muted">
-          <li>{MOTORI} assistenti AI, interrogati con la tua città e, per le domande vicino a te, con la posizione impostata in punti diversi intorno all&apos;attività.</li>
-          <li>Ogni domanda ripetuta, perché le risposte cambiano: nel report vedi sempre quante volte compari su quante risposte.</li>
-          <li>La posizione in cui ti nominano, chi citano al posto tuo, da quali fonti prendono le informazioni, cosa dicono di te e se i dati sono giusti.</li>
-        </ul>
       </Scheda>
 
       <div className="rounded-2xl border border-line p-5 sm:p-6">

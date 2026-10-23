@@ -5,34 +5,27 @@ import { config } from "@/lib/config";
 
 export const metadata: Metadata = { title: "Prezzi" };
 
+/** Domande frequenti: risposte brevi, in parole semplici. Il metodo completo è nel white paper. */
 const FAQ = [
   {
-    d: "Le risposte dell'AI cambiano: come fate a misurarle?",
-    r: "Facciamo ogni domanda più volte e ti diciamo quante volte compari su quante risposte, con data e ora. Un numero come «2 su 3» è onesto; un sì o un no non lo sarebbe. Ogni famiglia di domande ha abbastanza risposte da avere un intervallo proprio. Ogni trimestre confrontiamo anche le risposte delle API con quelle dell'app vera.",
+    d: "Cosa ricevo?",
+    r: "Il tuo punteggio da 0 a 100, chi consigliano gli assistenti al posto tuo, da dove prendono le informazioni e le tre cose da fare, in ordine di impatto. Online e in PDF, in pochi minuti.",
   },
   {
-    d: "Da dove prendete le domande, e perché non le vedo prima?",
-    r: "Da uno studio dei prompt reali: le domande agli assistenti sono corte, con un luogo e un vincolo, come le scrive davvero un cliente. Le costruiamo dal tuo profilo per famiglie (generiche, per bisogno, per specialità, per requisito e orari, per prezzo, per occasione, per recensioni, vicino a te, informative, di confronto, sul nome), a più livelli di zoom, e ogni intento in due forme: breve e con la richiesta di più opzioni. Il set è il metodo: resta lo stesso da una scansione all'altra, così il confronto nel tempo regge. Nel report le vedi tutte, domanda per domanda, con il risultato.",
+    d: "Le risposte dell'AI cambiano ogni volta: come fate a misurarle?",
+    r: "Facciamo ogni domanda più volte e contiamo quante volte compari. Per questo il report dice sempre «su quante risposte»: un numero vero, non un sì o un no.",
   },
   {
-    d: "Cosa compro con il report singolo?",
-    r: "Una scansione completa oggi: il set di domande sui sei assistenti, ogni domanda ripetuta, punteggio, concorrenti, fonti, parole, cosa dicono di te, tre azioni, PDF. Se poi ti abboni entro 30 giorni, l'importo viene scalato dal primo mese.",
+    d: "E se risulto invisibile?",
+    r: "Succede alla maggior parte delle attività. Il report ti dice chi citano al posto tuo e cosa fare per comparire. Se preferisci, lo facciamo noi.",
   },
   {
-    d: "Cosa succede se risulto invisibile?",
-    r: "È la situazione più comune: ChatGPT raccomanda l'1,2% delle sedi monitorate da SOCi (2026) e il 40,9% delle attività locali non viene mai raccomandato (Insites, 10.000 attività, 2026). Il report ti dice chi citano al posto tuo, da quali fonti prendono le informazioni e le tre cose da fare, in ordine di impatto. Se preferisci, le facciamo noi.",
-  },
-  {
-    d: "Come faccio a fidarmi dei numeri?",
-    r: "Ogni numero ha il suo campione («51 su 270») e, dove è una quota, l'intervallo di confidenza. Le domande sono ripetute, la posizione è dichiarata, i pesi degli assistenti vengono da dati pubblici e si aggiornano ogni trimestre. In fondo a ogni report ci sono le definizioni, e nella pagina Metodo tutto il percorso dei dati.",
+    d: "Quali assistenti controllate?",
+    r: "ChatGPT, Gemini, Google AI, Claude, Perplexity e Grok. Non siamo affiliati a nessuno di loro.",
   },
   {
     d: "Posso disdire quando voglio?",
-    r: "Sì, dall'area personale, in un clic. L'abbonamento mensile si ferma a fine mese, quello annuale a fine anno.",
-  },
-  {
-    d: "Quali assistenti interrogate?",
-    r: "ChatGPT, Gemini, Google AI (le risposte AI dentro Google), Claude, Perplexity e Grok, tutti attraverso le loro interfacce ufficiali. Nel punteggio ogni assistente pesa per quanti italiani lo usano: essere invisibile su ChatGPT costa più punti che su Grok. Copilot e Meta AI arrivano appena sarà possibile leggerli in modo affidabile. Non siamo affiliati a nessuno di loro.",
+    r: "Sì, dall'area personale, in un clic. Il mensile si ferma a fine mese, l'annuale a fine anno.",
   },
 ];
 
@@ -40,14 +33,14 @@ export default function PaginaPrezzi() {
   return (
     <Pagina larga>
       <div className="max-w-2xl">
-        <Titolo>Un report quando vuoi, o ogni mese</Titolo>
-        <p className="mt-4 text-lg text-muted">Quanto sei visibile, chi citano al posto tuo, tre azioni. Niente da configurare, niente da imparare. Prezzi IVA esclusa.</p>
+        <Titolo>Prezzi</Titolo>
+        <p className="mt-4 text-lg text-muted">Parti con un report. Se vuoi seguire i progressi, ricevilo ogni mese.</p>
       </div>
       <div className="mt-10">
         <Prezzi pagamentiAttivi={config.stripe} />
       </div>
 
-      <section id="domande" className="mt-16 scroll-mt-20">
+      <section id="domande" className="mt-16 scroll-mt-24">
         <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
           <h2 className="text-3xl font-bold sm:text-4xl">Domande frequenti</h2>
           <div className="divide-y divide-line border-y border-line">

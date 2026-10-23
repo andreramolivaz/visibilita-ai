@@ -25,7 +25,7 @@ try {
     preferCSSPageSize: true,
     displayHeaderFooter: true,
     headerTemplate: `<div style="width:100%;font-family:system-ui,sans-serif;font-size:8px;color:#5b6b65;padding:0 18mm;display:flex;justify-content:space-between;align-items:center;margin-top:6mm"><span>${marchio} <span style="font-weight:600;color:#14201c">Visibilità AI</span> · white paper</span><span>ottobre 2026</span></div>`,
-    footerTemplate: `<div style="width:100%;font-family:system-ui,sans-serif;font-size:8px;color:#5b6b65;padding:0 18mm;display:flex;justify-content:space-between;margin-bottom:6mm"><span>visibilita-ai-beta.vercel.app/metodo</span><span>Pagina <span class="pageNumber"></span> di <span class="totalPages"></span></span></div>`,
+    footerTemplate: `<div style="width:100%;font-family:system-ui,sans-serif;font-size:8px;color:#5b6b65;padding:0 18mm;display:flex;justify-content:space-between;margin-bottom:6mm"><span>visibilita-ai-beta.vercel.app/come-funziona</span><span>Pagina <span class="pageNumber"></span> di <span class="totalPages"></span></span></div>`,
     margin: { top: "20mm", bottom: "18mm", left: "18mm", right: "18mm" },
   });
   console.log(`scritto ${uscita}`);

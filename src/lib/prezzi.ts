@@ -1,7 +1,9 @@
 /**
  * Listino. Unico posto dove vivono i prezzi: li leggono la pagina prezzi,
  * l'invito nel report e il checkout Stripe.
- * Prezzi in euro, IVA esclusa. Annuale = due mesi gratis.
+ * Prezzi in euro, IVA esclusa. Annuale = dodici mesi al prezzo di dieci.
+ * Le voci di ogni piano sono per il titolare: corte, senza gergo, senza il
+ * numero di domande (che resta nel report e nel white paper).
  *
  * Il set di domande è il «telescopio» (docs/studio-domande-telescopio.md):
  * famiglie di domande con almeno sei domande ciascuna, così ogni famiglia ha
@@ -40,14 +42,7 @@ export const PIANI: Piano[] = [
     domande: 48,
     ripetizioni: 3,
     cadenza: "ogni mese",
-    include: [
-      "1 attività",
-      "Set completo di domande su 6 assistenti AI, ogni domanda ripetuta in tre giorni diversi",
-      "Scansione ogni mese",
-      "Email mensile con punteggio e variazione",
-      "Storico dei report",
-      "PDF del report",
-    ],
+    include: ["1 attività", "Un report ogni mese", "Email con punteggio e variazione", "Storico dei report e PDF"],
     stripeNome: "Visibilità AI · Base",
   },
   {
@@ -59,14 +54,7 @@ export const PIANI: Piano[] = [
     domande: 72,
     ripetizioni: 2,
     cadenza: "ogni due settimane",
-    include: [
-      "1 attività",
-      "Set esteso di domande: più occasioni, più zoom, nove punti intorno a te",
-      "Scansione ogni due settimane",
-      "5 concorrenti seguiti, avviso se ne entra uno nuovo",
-      "Azioni spuntate e verificate alla scansione dopo",
-      "PDF del report",
-    ],
+    include: ["1 attività", "Un report ogni due settimane", "Più domande, per più occasioni", "5 concorrenti seguiti, con avviso se ne arriva uno nuovo", "Azioni verificate al report successivo"],
     stripeNome: "Visibilità AI · Pro",
     evidenza: true,
   },
@@ -79,7 +67,7 @@ export const PIANI: Piano[] = [
     domande: 72,
     ripetizioni: 2,
     cadenza: "ogni due settimane",
-    include: ["10 attività con report Pro", "PDF con il tuo logo", "Un link cliente per ogni attività", "Export CSV", "Attività in più: 15 € al mese ciascuna"],
+    include: ["10 attività con report Pro", "PDF con il tuo logo", "Un link per ogni cliente", "Export CSV", "Attività in più: 15 € al mese ciascuna"],
     stripeNome: "Visibilità AI · Agenzia",
   },
 ];
@@ -93,13 +81,13 @@ export const REPORT_SINGOLO = {
   motori: 6,
   ripetizioni: 2,
   stripeNome: "Visibilità AI · Report singolo",
-  include: ["Set completo di domande su 6 assistenti AI, ogni domanda ripetuta", "Punteggio, concorrenti, fonti, parole, cosa dicono di te", "Tre azioni in ordine di impatto", "PDF del report", "Scalato dal primo mese se poi ti abboni"],
+  include: ["Tutte le domande, su sei assistenti AI", "Punteggio, concorrenti e fonti", "Tre azioni in ordine di impatto", "PDF del report", "Scalato dal primo mese se poi ti abboni"],
 };
 
 export const SISTEMAZIONE = {
   nome: "Sistemazione",
   prezzo: 490,
-  testo: "Le tre azioni del report le facciamo noi: schede sui portali, categorie, descrizioni, foto. Verifica dopo 30 giorni.",
+  testo: "Le tre azioni del report le facciamo noi: schede, categorie, descrizioni, foto. Dopo 30 giorni controlliamo se hanno funzionato.",
 };
 
 export function piano(id: PianoId): Piano {

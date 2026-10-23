@@ -1,6 +1,6 @@
 import { engine } from "@/lib/engines";
 import type { Report } from "@/lib/types";
-import { confrontoPerConcorrente, percentuale, quotaVoce } from "@/lib/stats";
+import { confrontoPerConcorrente, percentuale } from "@/lib/stats";
 
 /** Alle domande «meglio tu o X?»: in quanti assistenti sei il primo nome. */
 export function ConfrontoDiretto({ report: r }: { report: Report }) {
@@ -20,23 +20,22 @@ export function ConfrontoDiretto({ report: r }: { report: Report }) {
 }
 
 /**
- * Chi consigliano al posto tuo: una tabella sola. Per ogni nome: citazioni,
- * quota di voce, presenza nei primi tre, domande in cui c'è lui e non tu,
- * assistente che lo cita di più. La tua riga è evidenziata.
+ * Chi consigliano al posto tuo: una tabella sola. Per ogni nome: in quante
+ * risposte compare, quanto spesso nei primi tre, in quante domande c'è lui e
+ * non tu, l'assistente che lo cita di più. La tua riga è evidenziata.
+ * La quota di voce sta nel tab Dettagli.
  */
 export function Concorrenti({ report: r }: { report: Report }) {
   const totale = r.concorrenti[0]?.totale ?? 1;
-  const qv = quotaVoce(r.concorrenti, r.citazioniTotali);
   const massimo = Math.max(...r.concorrenti.map((c) => c.citazioni), 1);
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[560px] text-[15px]">
+      <table className="w-full min-w-[520px] text-[15px]">
         <thead>
           <tr className="text-left text-xs text-muted">
             <th className="pb-2 pr-3 font-medium">Attività</th>
-            <th className="pb-2 pr-3 font-medium">Citazioni su {totale}</th>
-            <th className="tabular pb-2 pr-3 text-right font-medium">Quota di voce</th>
+            <th className="pb-2 pr-3 font-medium">Risposte, su {totale}</th>
             <th className="tabular hidden pb-2 pr-3 text-right font-medium sm:table-cell">Nei primi 3</th>
             <th className="tabular pb-2 pr-3 text-right font-medium">Domande senza di te</th>
             <th className="hidden pb-2 font-medium md:table-cell">Più forte su</th>
@@ -64,7 +63,6 @@ export function Concorrenti({ report: r }: { report: Report }) {
                     </div>
                   </div>
                 </td>
-                <td className="tabular py-2.5 pr-3 text-right">{percentuale(qv[c.nome] ?? 0)}</td>
                 <td className="tabular hidden py-2.5 pr-3 text-right sm:table-cell">{primi}</td>
                 <td className="tabular py-2.5 pr-3 text-right">{t ? `${t.loroSenzaTe} su ${r.domandeSpontanee}` : "–"}</td>
                 <td className="hidden py-2.5 text-sm text-muted md:table-cell">
@@ -76,9 +74,8 @@ export function Concorrenti({ report: r }: { report: Report }) {
         </tbody>
       </table>
       <p className="mt-3 text-xs text-muted">
-        Risposte alle {r.domandeSpontanee} domande in cui il cliente non fa il tuo nome. Quota di voce: citazioni dell&apos;attività su tutte le citazioni di attività in quelle risposte
-        {r.citazioniTotali ? ` (${r.citazioniTotali})` : ""}. Nei primi 3: quota delle sue citazioni in 1ª, 2ª o 3ª posizione. Domande senza di te: su {r.domandeSpontanee}, quelle in cui compare lui e non tu
-        {r.testaATesta.length < r.concorrenti.length - 1 ? ", calcolate per i tre più citati" : ""}.
+        Risposte alle {r.domandeSpontanee} domande in cui il cliente non fa il tuo nome. Nei primi 3: quante volte, quando compare, è tra i primi tre nomi. Domande senza di te: quelle in cui
+        compare lui e tu no{r.testaATesta.length < r.concorrenti.length - 1 ? ", per i tre più citati" : ""}.
       </p>
       <ConfrontoDiretto report={r} />
     </div>

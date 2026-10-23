@@ -40,14 +40,14 @@ const SCENARI: {
       ["La Margherita", "buon rapporto qualità-prezzo, aperta anche a pranzo."],
     ],
     manca: "Pizzeria Da Gino non compare.",
-    dettaglio: "Né qui, né in 6 delle 15 domande del report.",
+    dettaglio: "Chi chiede così, stasera va da un'altra parte.",
   },
   {
     motore: "gemini",
     domanda: "Dentista per invisalign a Treviso, consigliato",
     intro: "Alcuni studi a Treviso con buone recensioni per gli allineatori:",
     nomi: [
-      ["Studio Dentistico Conti", "ortodonzia invisibile, prima visita gratuita."],
+      ["Studio Dentistico Conti", "ortodonzia invisibile, prima visita senza impegno."],
       ["Clinica Sorriso", "allineatori e sbiancamento, aperta il sabato."],
       ["Dott.ssa Marin", "studio in centro, pagamenti a rate."],
     ],

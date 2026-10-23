@@ -5,9 +5,9 @@ import { percentuale, quotaPunti } from "@/lib/stats";
 
 /**
  * Il telescopio: la stessa misura a tre livelli di zoom (città, zona, vicino
- * a te), i punti intorno all'attività, le occasioni, quanto conta la forma
- * della domanda e cosa succede nelle domande informative. Solo barre e una
- * mappa a celle, un colore.
+ * a te), i punti intorno all'attività, le occasioni e cosa succede nelle
+ * domande informative. Solo barre e una mappa a celle, un colore. La forma
+ * della domanda (Forma) è un dettaglio tecnico e va nel tab Dettagli.
  */
 
 export const NOME_ZOOM: Record<Zoom, { titolo: string; esempio: string }> = {
@@ -26,12 +26,10 @@ const GRIGLIA: (RisultatoPunto["punto"]["etichetta"] | null)[][] = [
   ["sud-ovest", "sud", "sud-est"],
 ];
 
-function IntornoATe({ punti, motori, ripetizioni }: { punti: RisultatoPunto[]; motori: EngineId[]; ripetizioni: number }) {
+function IntornoATe({ punti, motori }: { punti: RisultatoPunto[]; motori: EngineId[] }) {
   const per = new Map(punti.map((p) => [p.punto.etichetta, p]));
   const raggio = Math.max(...punti.map((p) => Math.max(Math.abs(p.punto.nordM), Math.abs(p.punto.estM))), 0);
   const qp = quotaPunti(punti);
-  const perPunto = punti[0]?.totale ?? 0;
-  const pesoMedio = punti.length ? punti.reduce((a, p) => a + (p.peso ?? 0), 0) / punti.length : 0;
   const presenti = GRIGLIA.flat().filter((e) => e && per.has(e));
   const righe = presenti.length <= 5 ? GRIGLIA.filter((riga) => riga.some((e) => e && per.has(e))) : GRIGLIA;
   return (
@@ -50,7 +48,7 @@ function IntornoATe({ punti, motori, ripetizioni }: { punti: RisultatoPunto[]; m
               key={i}
               className={`flex aspect-square flex-col items-center justify-center rounded-lg text-center ${etichetta === "centro" ? "ring-2 ring-ink/70" : ""} ${scuro ? "text-white" : "text-ink"}`}
               style={{ background: `color-mix(in oklab, var(--accent) ${Math.round(12 + quota * 88)}%, var(--soft))` }}
-              title={`${etichetta}: ${p.comparse} risposte su ${p.totale}; stima ridotta ${percentuale(quota)}`}
+              title={`${etichetta}: ${p.comparse} risposte su ${p.totale}`}
             >
               <span className="tabular text-[15px] font-semibold leading-none">{percentuale(quota)}</span>
               <span className={`tabular mt-1 text-[11px] leading-none ${scuro ? "text-white/80" : "text-muted"}`}>
@@ -62,16 +60,15 @@ function IntornoATe({ punti, motori, ripetizioni }: { punti: RisultatoPunto[]; m
         })}
       </div>
       <p className="mt-3 max-w-md text-xs text-muted">
-        Posizione impostata al tuo indirizzo e a {raggio >= 1000 ? `${(raggio / 1000).toLocaleString("it-IT", { maximumFractionDigits: 1 })} km` : `${raggio} m`} nelle quattro direzioni, su{" "}
-        {motori.map((m) => engine(m).nome).join(" e ")}: gli assistenti che accettano le coordinate in italiano. {ripetizioni} ripetizioni, {perPunto} risposte per punto: troppo poche per
-        leggere un punto da solo, perciò la percentuale è la stima ridotta verso la media dei punti (il dato grezzo pesa circa il {percentuale(1 - pesoMedio)}) e la mappa non si
-        confronta punto per punto da un report all&apos;altro.
+        Come se il cliente fosse da te o a {raggio >= 1000 ? `${(raggio / 1000).toLocaleString("it-IT", { maximumFractionDigits: 1 })} km` : `${raggio} m`}, verso nord, est, sud e ovest, su{" "}
+        {motori.map((m) => engine(m).nome).join(" e ")}. Ogni punto ha poche risposte: la mappa si legge nell&apos;insieme.
       </p>
     </div>
   );
 }
 
-function Forma({ report: r }: { report: Report }) {
+/** La forma della domanda (breve o con la richiesta di più opzioni): sta nel tab Dettagli. */
+export function Forma({ report: r }: { report: Report }) {
   const f = r.sensibilitaForma;
   if (!f || f.domande < 3) return null;
   const qb = f.breve.totale ? f.breve.comparse / f.breve.totale : 0;
@@ -105,7 +102,7 @@ function Informative({ report: r }: { report: Report }) {
       <p className="tabular mt-2 text-[15px]">
         «Come scegliere», «quanto costa in media»: {i.domande} domande, {i.risposte} risposte. {i.conNomi} fanno almeno un nome di attività; tu ci sei in {i.comparse}.
       </p>
-      <p className="mt-2 text-xs text-muted">Sono le domande su cui Google mostra più spesso le AI Overviews. Spesso non fanno nomi: per questo non entrano nel punteggio e si contano sulle risposte che ne fanno almeno uno.</p>
+      <p className="mt-2 text-xs text-muted">Sono le domande in cui Google mostra più spesso le risposte AI. Spesso non fanno nomi, perciò non entrano nel punteggio.</p>
     </div>
   );
 }
@@ -133,11 +130,9 @@ export function Telescopio({ report: r }: { report: Report }) {
             ))}
           </div>
           <p className="mt-2 text-xs text-muted">
-            La stessa domanda, da lontano a vicino: dove ti citano solo quando il cliente è già nella tua zona, manca la notorietà in città. «Vicino a te» conta solo gli assistenti che
-            accettano la posizione; per gli altri «vicino a me» è la città, e le loro risposte stanno lì.
+            La stessa domanda, da lontano a vicino. Se ti citano solo quando il cliente è già nella tua zona, in città non ti conoscono ancora.
           </p>
         </div>
-        <Forma report={r} />
         <Informative report={r} />
       </div>
       <div className="space-y-8">
@@ -145,7 +140,7 @@ export function Telescopio({ report: r }: { report: Report }) {
           <div>
             <h3 className="font-semibold">Intorno a te</h3>
             <div className="mt-3">
-              <IntornoATe punti={intorno.punti} motori={intorno.motori} ripetizioni={r.ripetizioni} />
+              <IntornoATe punti={intorno.punti} motori={intorno.motori} />
             </div>
           </div>
         )}
@@ -157,7 +152,7 @@ export function Telescopio({ report: r }: { report: Report }) {
                 <Barra key={o.occasione} etichetta={o.occasione} valore={o.comparse} massimo={o.totale} testo={`${o.comparse} su ${o.totale}`} accento />
               ))}
             </div>
-            <p className="mt-2 text-xs text-muted">Chi chiede e perché: famiglia, coppia, lavoro, gruppo, turisti, budget, subito. Risposte in cui compari sul totale di quell&apos;occasione.</p>
+            <p className="mt-2 text-xs text-muted">Chi chiede e perché: famiglie, coppie, lavoro, gruppi, turisti. Risposte in cui compari, su quelle di ogni occasione.</p>
           </div>
         )}
       </div>

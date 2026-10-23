@@ -235,8 +235,7 @@ export function Scansione() {
       </div>
 
       <p className="mt-8 text-sm text-muted">
-        Ogni domanda viene posta {ripetizioni} volte, perché le risposte cambiano. Nel report vedrai sempre quante volte compari su quante risposte, mai un sì o un no.
-        {!simulata ? " Le celle in errore non entrano nei conteggi e sono dichiarate nel metodo." : ""}
+        Ogni domanda la facciamo {ripetizioni} volte, perché le risposte cambiano: nel report vedrai quante volte compari su quante risposte.
       </p>
     </div>
   );

@@ -63,7 +63,7 @@ export function InvitoAbbonamento({ reportId, pagamentiAttivi }: { reportId: str
           onChange={(e) => setPeriodo(e.target.checked ? "annuale" : "mensile")}
           className="h-4 w-4 accent-[var(--accent)]"
         />
-        <label htmlFor="annuale">Pago una volta all&apos;anno e ho due mesi gratis</label>
+        <label htmlFor="annuale">Pago una volta all&apos;anno: 2 mesi in meno</label>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">

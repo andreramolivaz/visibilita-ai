@@ -57,7 +57,7 @@ export function Andamento({ punti, compatto = false }: { punti: { mese: string; 
       </div>
       {!compatto && (
         <figcaption className="mt-1.5 text-xs text-muted">
-          Stessa batteria di domande e stessa configurazione a ogni scansione. Una differenza è reale solo se gli intervalli al 95% delle due misure non si sovrappongono.
+          Stesse domande a ogni report: le variazioni di pochi punti possono essere oscillazioni, una tendenza si vede su più mesi.
         </figcaption>
       )}
     </figure>
